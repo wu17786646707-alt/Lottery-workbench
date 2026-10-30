@@ -1,10 +1,283 @@
 {
   "schema": "lottery-public-research-v1",
-  "generatedAt": null,
-  "records": [],
+  "generatedAt": "2026-10-30T17:37:55.068Z",
+  "records": [
+    {
+      "id": "d9fc9018",
+      "game": "ssq",
+      "targetDate": "2026-11-01",
+      "baseIssue": "2026124",
+      "createdAt": "2026-10-30T17:37:55.068Z",
+      "policy": "research-v12.1",
+      "window": 60,
+      "origin": "GitHub Actions public automation; not the user's private device records",
+      "status": "pending",
+      "picks": [
+        {
+          "mode": "analyst",
+          "label": "数据研究员 A",
+          "main": [
+            4,
+            5,
+            12,
+            21,
+            29,
+            30
+          ],
+          "extra": [
+            4
+          ],
+          "snapshot": {
+            "baseIssue": "2026124",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "ssq|2026124|analyst|research-v12.1|60",
+            "hash": "96a88b22",
+            "search": 450
+          }
+        },
+        {
+          "mode": "veteran",
+          "label": "经验研究员 B",
+          "main": [
+            3,
+            14,
+            15,
+            18,
+            25,
+            28
+          ],
+          "extra": [
+            7
+          ],
+          "snapshot": {
+            "baseIssue": "2026124",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "ssq|2026124|veteran|research-v12.1|60",
+            "hash": "96a88b22",
+            "search": 450
+          }
+        },
+        {
+          "mode": "trend",
+          "label": "走势图独立选号 C",
+          "main": [
+            4,
+            5,
+            7,
+            14,
+            22,
+            30
+          ],
+          "extra": [
+            14
+          ],
+          "snapshot": {
+            "baseIssue": "2026124",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "ssq|2026124|trend|research-v12.1|60",
+            "hash": "96a88b22",
+            "search": 450
+          }
+        },
+        {
+          "mode": "random",
+          "label": "随机基准",
+          "main": [
+            8,
+            13,
+            16,
+            19,
+            30,
+            33
+          ],
+          "extra": [
+            12
+          ],
+          "snapshot": {
+            "baseIssue": "2026124",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "ssq|2026124|random|research-v12.1|60",
+            "hash": "96a88b22",
+            "search": 450
+          }
+        }
+      ]
+    },
+    {
+      "id": "8f1af094",
+      "game": "dlt",
+      "targetDate": "2026-10-31",
+      "baseIssue": "2026123",
+      "createdAt": "2026-10-30T17:37:55.068Z",
+      "policy": "research-v12.1",
+      "window": 60,
+      "origin": "GitHub Actions public automation; not the user's private device records",
+      "status": "pending",
+      "picks": [
+        {
+          "mode": "analyst",
+          "label": "数据研究员 A",
+          "main": [
+            6,
+            14,
+            19,
+            22,
+            26
+          ],
+          "extra": [
+            4,
+            9
+          ],
+          "snapshot": {
+            "baseIssue": "2026123",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "dlt|2026123|analyst|research-v12.1|60",
+            "hash": "07079f32",
+            "search": 450
+          }
+        },
+        {
+          "mode": "veteran",
+          "label": "经验研究员 B",
+          "main": [
+            5,
+            14,
+            17,
+            22,
+            28
+          ],
+          "extra": [
+            4,
+            9
+          ],
+          "snapshot": {
+            "baseIssue": "2026123",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "dlt|2026123|veteran|research-v12.1|60",
+            "hash": "07079f32",
+            "search": 450
+          }
+        },
+        {
+          "mode": "trend",
+          "label": "走势图独立选号 C",
+          "main": [
+            1,
+            6,
+            21,
+            24,
+            30
+          ],
+          "extra": [
+            4,
+            12
+          ],
+          "snapshot": {
+            "baseIssue": "2026123",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "dlt|2026123|trend|research-v12.1|60",
+            "hash": "07079f32",
+            "search": 450
+          }
+        },
+        {
+          "mode": "random",
+          "label": "随机基准",
+          "main": [
+            2,
+            12,
+            15,
+            17,
+            18
+          ],
+          "extra": [
+            4,
+            7
+          ],
+          "snapshot": {
+            "baseIssue": "2026123",
+            "window": 60,
+            "policy": "research-v12.1",
+            "seed": "dlt|2026123|random|research-v12.1|60",
+            "hash": "07079f32",
+            "search": 450
+          }
+        }
+      ]
+    }
+  ],
   "summary": {
-    "ssq": {"settled": 0, "pending": 0, "byMode": {}},
-    "dlt": {"settled": 0, "pending": 0, "byMode": {}}
+    "ssq": {
+      "settled": 0,
+      "pending": 1,
+      "byMode": {
+        "analyst": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "veteran": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "trend": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "random": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        }
+      }
+    },
+    "dlt": {
+      "settled": 0,
+      "pending": 1,
+      "byMode": {
+        "analyst": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "veteran": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "trend": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        },
+        "random": {
+          "n": 0,
+          "meanMain": null,
+          "meanExtra": null
+        }
+      }
+    }
   },
-  "note": "Empty initial public record. First GitHub Actions run may produce a future draw prediction when upstream data is fresh. No retrospective live claims."
+  "note": "Empty initial public record. First GitHub Actions run may produce a future draw prediction when upstream data is fresh. No retrospective live claims.",
+  "diagnostics": {
+    "ssq": {
+      "latest": "2026124",
+      "target": "2026-11-01",
+      "readiness": "新建公开候选，待工作流提交到 GitHub"
+    },
+    "dlt": {
+      "latest": "2026123",
+      "target": "2026-10-31",
+      "readiness": "新建公开候选，待工作流提交到 GitHub"
+    }
+  }
 }
