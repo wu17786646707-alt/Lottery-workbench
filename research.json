@@ -1,0 +1,10 @@
+{
+  "schema": "lottery-public-research-v1",
+  "generatedAt": null,
+  "records": [],
+  "summary": {
+    "ssq": {"settled": 0, "pending": 0, "byMode": {}},
+    "dlt": {"settled": 0, "pending": 0, "byMode": {}}
+  },
+  "note": "Empty initial public record. First GitHub Actions run may produce a future draw prediction when upstream data is fresh. No retrospective live claims."
+}

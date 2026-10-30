@@ -1,0 +1,1 @@
+{"name":"lottery-research-workbench","private":true,"version":"12.2.0","type":"module","scripts":{"test":"node --test tests/*.test.mjs","research":"node automation_research.mjs"}}

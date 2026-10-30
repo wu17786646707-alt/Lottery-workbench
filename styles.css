@@ -11,3 +11,12 @@
 .research-live-card strong{font-size:13px}.research-live-card .balls{margin:10px 0;gap:4px}.research-live-card .ball{width:31px;height:31px;flex-basis:31px;font-size:11px}
 .research-live-card .small{line-height:1.7}.research-live-card details{margin-top:8px}
 @media(max-width:900px){.research-live-grid{grid-template-columns:1fr}}
+
+/* V12.2: publicly auditable automated research, distinct from phone-only records */
+.automation-note{font-size:.8rem;line-height:1.65;margin-top:.7rem;padding:.75rem;border:1px solid var(--line,#3a455b);border-radius:12px;opacity:.9}
+.public-record{border:1px solid var(--line,#3a455b);border-radius:13px;padding:.9rem;margin:.7rem 0}
+.public-record h4{margin:.2rem 0 .5rem}
+.public-meta{font-size:.78rem;opacity:.83;line-height:1.6}
+.public-research-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:.5rem;margin-top:.5rem}
+.public-pick{padding:.6rem;background:rgba(127,143,160,.09);border-radius:9px}
+.public-pick .balls .ball{width:28px;height:28px;font-size:.75rem}

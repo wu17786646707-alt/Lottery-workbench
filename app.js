@@ -1,7 +1,7 @@
-import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,safeTicket,safeRecord,normalizeDraw} from './core.js?v=12.1';
-import {pick,stats,shape,classifyKill,rollingBacktest,evaluateKills,sensitivity,scoreLabel,hit,nextDraw,summarizePred} from './engine.js?v=12.1';
+import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,safeTicket,safeRecord,normalizeDraw} from './core.js?v=12.2';
+import {pick,stats,shape,classifyKill,rollingBacktest,evaluateKills,sensitivity,scoreLabel,hit,nextDraw,summarizePred} from './engine.js?v=12.2';
 const el=id=>document.getElementById(id);const gameNames=Object.keys(GAMES);
-const ui={autoPreview:false,researchCandidates:[],researchSignature:"",game:'ssq',page:'home',state:null,generated:[],kill:null,lastBacktest:null,lastKill:null,filter:'',historyShown:30,board:{ssq:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()},dlt:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()}},busy:false};
+const ui={autoPreview:false,researchCandidates:[],researchSignature:"",game:'ssq',page:'home',state:null,generated:[],kill:null,lastBacktest:null,lastKill:null,filter:'',historyShown:30,board:{ssq:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()},dlt:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()}},busy:false,publicLog:null,publicStatus:"公开记录读取中"};
 let persisting=Promise.resolve(),alertTimer=null,suppressOrb=false,pressTimer=null;
 const getRows=()=>ui.state.draws[ui.game];
 const gameRule=()=>GAMES[ui.game];
@@ -29,6 +29,47 @@ function ensureCandidates(){
   ui.generated=ui.researchCandidates.map(p=>({...p,main:[...p.main],extra:[...p.extra]}));ui.autoPreview=true;
  }
 }
+function drawBallsSafe(main,extra){
+ if(!Array.isArray(main)||!Array.isArray(extra)||main.some(n=>!Number.isInteger(n)||n<1||n>35)||extra.some(n=>!Number.isInteger(n)||n<1||n>16))return '<span class="sub">号码不合法</span>';
+ return coloredBalls(main,extra);
+}
+function isPublicRecord(rec){
+ if(!rec||!['ssq','dlt'].includes(rec.game)||!['pending','settled'].includes(rec.status)||!/^20\d{2}-\d{2}-\d{2}$/.test(rec.targetDate||''))return false;
+ if(!Array.isArray(rec.picks)||rec.picks.length!==4||rec.picks.some(p=>!['analyst','veteran','trend','random'].includes(p.mode)))return false;
+ const rule=GAMES[rec.game];return rec.picks.every(p=>p.main?.length===rule.mainCount&&p.extra?.length===rule.extraCount&&new Set(p.main).size===rule.mainCount&&new Set(p.extra).size===rule.extraCount&&p.main.every(n=>Number.isInteger(n)&&n>=1&&n<=rule.mainMax)&&p.extra.every(n=>Number.isInteger(n)&&n>=1&&n<=rule.extraMax));
+}
+async function loadPublicLog(){
+ try{
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),9000);
+  let response;try{response=await fetch('./research.json?fresh='+Date.now(),{cache:'no-store',signal:controller.signal})}finally{clearTimeout(timer)}
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const obj=await response.json();if(obj?.schema!=='lottery-public-research-v1'||!Array.isArray(obj.records)||obj.records.length>10000)throw Error('公开记录格式异常');
+  ui.publicLog={...obj,records:obj.records.filter(isPublicRecord)};
+  ui.publicStatus=obj.generatedAt?'后台记录最近写入 '+new Date(obj.generatedAt).toLocaleString('zh-CN'):'公开记录已就绪，但尚未有定时采集提交';
+ }catch(e){ui.publicLog=null;ui.publicStatus='公开记录暂不可用：'+e.message+'。请检查 Actions 是否已安装并完成第一次运行。'}
+ renderPublicLog();
+}
+function renderPublicLog(){
+ const records=(ui.publicLog?.records||[]).filter(r=>r.game===ui.game).sort((a,b)=>String(b.targetDate).localeCompare(String(a.targetDate)));
+ const finished=records.filter(r=>r.status==='settled'),pending=records.filter(r=>r.status==='pending');
+ const status=ui.publicStatus+`；${GAMES[ui.game].name} 已核对${finished.length}期、待开奖${pending.length}期`;
+ if(el('publicResearchStatus'))el('publicResearchStatus').textContent=status;
+ if(el('publicDataStatus'))el('publicDataStatus').textContent=status;
+ if(el('homeAutomation'))el('homeAutomation').textContent='GitHub 自动研究档案：'+status;
+ if(el('publicLeaderboard')){
+   if(!finished.length)el('publicLeaderboard').innerHTML='<div class="item"><strong>长期战绩尚未形成</strong><p class="small">没有已经开奖的真实提前记录，暂时不显示虚构命中率。历史模拟回测请在下方独立查看。</p></div>';
+   else{
+    const labels={analyst:'A 数据',veteran:'B 经验',trend:'C 走势',random:'随机基准'};
+    const calc=mode=>{const v=finished.map(r=>r.outcome?.[mode]).filter(x=>x&&Number.isInteger(x.main)&&Number.isInteger(x.extra));return {n:v.length,m:v.length?v.reduce((a,b)=>a+b.main,0)/v.length:0,e:v.length?v.reduce((a,b)=>a+b.extra,0)/v.length:0};};
+    const base=calc('random');
+    el('publicLeaderboard').innerHTML='<div class="item"><strong>提前记录长期战绩（仅已核对的真实期次）</strong><div class="public-research-grid">'+['analyst','veteran','trend','random'].map(mode=>{const v=calc(mode);return `<div class="public-pick"><strong>${E(labels[mode])}</strong><p class="small">样本 ${v.n} 期 · 主区均中 ${v.m.toFixed(2)} · 后区均中 ${v.e.toFixed(2)}</p>${mode!=='random'?`<p class="public-meta">相对随机平均命中差 ${(v.m+v.e-base.m-base.e).toFixed(2)} /期（描述性，不代表统计优势）</p>`:''}</div>`}).join('')+'</div><p class="footnote">不能将命中差直接解释为中奖概率改善，样本有限时存在大幅随机波动。</p></div>';
+   }
+ }
+ if(!el('publicResearchList'))return;
+ if(!records.length){el('publicResearchList').innerHTML='<div class="item">尚无公开提前锁定记录。完成 GitHub Actions 首次运行后，如果数据足够新并且下一期尚未开奖，才会创建真实候选；不会编造历史实盘成绩。</div>';return}
+ const labels={analyst:'A 数据研究员',veteran:'B 经验老彩民',trend:'C 走势图研究员',random:'随机基准'};
+ el('publicResearchList').innerHTML=records.slice(0,12).map(rec=>`<article class="public-record"><h4>${E(rec.targetDate)} · ${rec.status==='settled'?'已开奖核对':'待开奖'} </h4><p class="public-meta">基准期号 ${E(rec.baseIssue)}；自动记录时间 ${E(rec.createdAt)}；策略版本 ${E(rec.policy)}。仅作研究对照，Git 提交历史可供核查但并非第三方不可篡改认证。</p><div class="public-research-grid">${rec.picks.map(p=>`<div class="public-pick"><strong>${E(labels[p.mode]||p.mode)}</strong>${drawBallsSafe(p.main,p.extra)}${rec.status==='settled'&&rec.outcome?.[p.mode]?`<p class="public-meta">主区命中 ${Number(rec.outcome[p.mode].main)||0} / 后区命中 ${Number(rec.outcome[p.mode].extra)||0}</p>`:''}</div>`).join('')}</div>${rec.status==='settled'&&rec.actual?`<p class="public-meta">实际开奖 ${E(rec.actual.issue)}：${E((Array.isArray(rec.actual.main)?rec.actual.main:[]).filter(Number.isInteger).map(n=>pad(n)).join(' '))} + ${E((Array.isArray(rec.actual.extra)?rec.actual.extra:[]).filter(Number.isInteger).map(n=>pad(n)).join(' '))}（${E(rec.actual.verification||'单源待核验')}）</p>`:''}</article>`).join('');
+}
 function researchCardsHTML(){
  const rows=getRows();if(rows.length<30)return `<p class="sub">目前只有 ${rows.length} 期数据；研究员至少需要30期历史数据才能生成真实数据驱动的候选号码。请先点击右上角同步。</p>`;
  if(!ui.researchCandidates.length)return '<p class="sub">本期候选尚未生成，请点击“重新研究”。</p>';
@@ -39,10 +80,10 @@ function renderAll(){ensureCandidates();const rows=getRows(),r=gameRule(),meta=u
  el('homeCandidateList').innerHTML=researchCardsHTML();el('freshnessStatus').textContent=rows.length&&meta.stale?'⚠ 最近记录可能滞后，请到数据中心核验官方开奖':rows.length?'依据已收录真实数据生成':'请先同步历史开奖记录';
  const done=records.map(rec=>({rec,draw:nextDraw(ui.state.draws[rec.game],rec.baseIssue)}));const matched=done.filter(x=>x.draw).length;el('homeResearch').innerHTML=`<p><strong>${records.length}</strong> 份本机研究快照，<strong>${matched}</strong> 份已可核对下一期开奖。</p><p class="sub">本机时间锁定不可作第三方防篡改证明；历史模拟战绩不会混进实盘成绩。</p>`;
  el('boardMainLabel').textContent=r.mainName+'（选'+r.mainCount+'个）';el('boardExtraLabel').textContent=r.extraName+'（选'+r.extraCount+'个）';el('storeLabel').textContent=storageName();el('storageNotice').textContent=`当前持久化方式：${storageName()}。请定期导出完整备份。更新网页前先备份；清除 Safari 网站数据可能丢失本机研究档案。`;
- el('syncSummary').textContent=ui.state.meta.status||'尚未同步';el('versionInfo').textContent=`前端 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`;renderPage();}
+ renderPublicLog();el('syncSummary').textContent=ui.state.meta.status||'尚未同步';el('versionInfo').textContent=`前端 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`;renderPage();}
 function renderPage(){if(ui.page==='trend')renderTrend();if(ui.page==='pick'){renderPicks();renderBoard();renderTickets()}if(ui.page==='kill'){renderKill()}if(ui.page==='research'){renderResearch()}if(ui.page==='history'){renderHistory()}if(ui.page==='data'){renderQuality()}}
 function renderQuality(){const g=ui.game,rows=getRows(),p=ui.state.meta.provenance[g]||{},a=auditIssues(rows),qc=ui.state.meta.quarantine.filter(x=>x.game===g),verified=rows.filter(x=>x.verification==='cross-checked').length;el('qualityGrid').innerHTML=`<div class="item"><div class="row"><strong>${E(GAMES[g].name)} · ${rows.length} 期</strong><span class="tag">双源已核验 ${verified} 期</span></div><p class="small">最新期号：${E(rows[0]?.issue||'—')}，来源：${E(p.source||'旧版本机数据 / 手动导入')}</p><p class="small">校验说明：${E(p.verification||'尚未标注独立验证')}。上次同步：${E(ui.state.meta.lastSync||'无')}</p><p class="small">疑似断号：${a.suspectedGaps} 处（节假日及停开不等同缺失）；冲突隔离：${qc.length} 条。</p>${qc.length?'<details><summary>查看冲突记录</summary><p class="small">'+qc.slice(-15).map(x=>E(x.issue+' '+x.reason)).join('；')+'</p></details>':''}</div><div class="item"><h4>数据来源纪律</h4><p class="small">① 静态 JSON 快照优先；② 缺少快照时尝试第三方历史库的 CDN 和 raw 两条网络线路（同一来源，不构成双源）；③ 独立官方结果核验由自动采集工作流负责。任何数据冲突都保留旧记录并隔离，不静默覆盖。</p></div>`}
-async function performSync(){if(ui.busy)return;ui.busy=true;['syncData','syncTop'].forEach(id=>el(id).disabled=true);notify('正在同步真实历史开奖数据……');try{const old=getRows()[0]?.issue,res=await syncData(ui.state);await persist();if(res.reports.length){if(old!==getRows()[0]?.issue)ui.generated=[];notify('同步完成：'+res.reports.join('；')+(res.errors.length?'；部分网络线路异常':'；来源已比较'));}else notify('同步未成功：'+res.errors.slice(0,2).join('；'),true);renderAll();}catch(e){notify('数据同步失败：'+e.message,true)}finally{ui.busy=false;['syncData','syncTop'].forEach(id=>el(id).disabled=false)}}
+async function performSync(){if(ui.busy)return;ui.busy=true;['syncData','syncTop'].forEach(id=>el(id).disabled=true);notify('正在同步真实历史开奖数据……');try{const old=getRows()[0]?.issue,res=await syncData(ui.state);await persist();if(res.reports.length){if(old!==getRows()[0]?.issue)ui.generated=[];notify('同步完成：'+res.reports.join('；')+(res.errors.length?'；部分网络线路异常':'；来源已比较'));}else notify('同步未成功：'+res.errors.slice(0,2).join('；'),true);renderAll();loadPublicLog();}catch(e){notify('数据同步失败：'+e.message,true)}finally{ui.busy=false;['syncData','syncTop'].forEach(id=>el(id).disabled=false)}}
 const selectedWindow=()=>Number(el('pickWindow').value)||60;
 function buildPicks(modes=['analyst','veteran','trend'],forceBans=null){const rows=getRows(),r=gameRule(),size=selectedWindow();if(rows.length<30){setPage('data');notify('历史数据不足30期，请先同步',true);return}
  const bans=forceBans||((el('pickBan').value==='current')?currentBans():{main:[],extra:[]});try{ui.generated=createCandidates(modes,size,bans);ui.autoPreview=false;setPage('pick');renderPicks();notify(`已按${rows[0].issue}期历史快照生成 ${modes.length} 注；可展开查看逐球理由`)}catch(e){notify(e.message,true)}}
@@ -107,5 +148,5 @@ function attach(){document.querySelectorAll('[data-page]').forEach(b=>b.addEvent
  el('runBacktest').onclick=runBacktest;el('exportBacktest').onclick=()=>{if(!ui.lastBacktest){notify('请先运行回测',true);return}downloadFile('双彩同算法滚动回测_'+ui.game+'.json',JSON.stringify(ui.lastBacktest,null,2))};el('exportRecords').onclick=()=>downloadFile('双彩研究锁定档案_'+ui.game+'.json',JSON.stringify({format:'lottery-research-v12',exportedAt:new Date().toISOString(),records:ui.state.records.filter(x=>x.game===ui.game),warning:'本机锁定不是不可篡改证明'},null,2));
  el('historySearch').oninput=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyLimit').onchange=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyMore').onclick=()=>{ui.historyShown+=Number(el('historyLimit').value);renderHistory()};el('importCSV').onclick=()=>importCsvText(el('csvText').value);el('csvInput').onchange=e=>useFile(e.target,importCsvText,6e6);el('backupAll').onclick=()=>downloadFile('双彩研究工作台_V12_完整备份.json',JSON.stringify(fullBackup(ui.state),null,2));el('backupCSV').onclick=backupCSV;el('restoreJSON').onchange=e=>useFile(e.target,restoreBackup,8e6);
  window.addEventListener('resize',()=>{if(ui.page==='trend')renderTrend()});}
-async function init(){attach();try{ui.state=await loadState();await persist();renderAll();const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;if(!getRows().length||!last||Date.now()-last>24*3600e3)performSync();}catch(e){ui.state=ui.state||{draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},records:[],meta:{provenance:{},quarantine:[]},settings:{}};renderAll();notify('初始化失败：'+e.message,true)}if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=12.1').catch(()=>{});}
+async function init(){attach();try{ui.state=await loadState();await persist();renderAll();const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;loadPublicLog();if(!getRows().length||!last||Date.now()-last>24*3600e3)performSync();}catch(e){ui.state=ui.state||{draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},records:[],meta:{provenance:{},quarantine:[]},settings:{}};renderAll();notify('初始化失败：'+e.message,true)}if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=12.2').catch(()=>{});}
 init();

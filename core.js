@@ -1,5 +1,5 @@
 /* 双彩研究工作台 V12 — 数据层。无第三方运行时依赖。 */
-export const VERSION='12.1.0';
+export const VERSION='12.2.0';
 export const POLICY='research-v12.1';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
@@ -30,7 +30,7 @@ export function normalizeDraw(item,game,source='未注明来源'){
  if(!validBalls(main,extra,game))throw Error('号码范围/数量/重复检查失败');
  const src=String(source||item.source||'未注明来源').slice(0,90);
  const sources=Array.isArray(item.sources)?item.sources.filter(x=>typeof x==='string').slice(0,4):[src];
- const verification=['cross-checked','single-source','manual-import'].includes(item.verification)?item.verification:'single-source';
+ const verification=['cross-checked','single-source','official-only','manual-import'].includes(item.verification)?item.verification:'single-source';
  return {game,issue,date,main,extra,sources,verification};
 }
 export const sameDraw=(a,b)=>a.issue===b.issue&&a.date===b.date&&a.main.join(',')===b.main.join(',')&&a.extra.join(',')===b.extra.join(',');
@@ -79,11 +79,11 @@ export async function syncData(s){
  if(typeof location!=='undefined'&&location.hostname.endsWith('.github.io')){
   const owner=location.hostname.split('.')[0],repo=location.pathname.split('/').filter(Boolean)[0];
   if(/^[a-zA-Z0-9_-]+$/.test(owner)&&/^[a-zA-Z0-9_.-]+$/.test(repo)){
-   snapshots.push(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/history.json?v=${Date.now()}`);
-   snapshots.push(`https://cdn.jsdelivr.net/gh/${owner}/${repo}@main/data/history.json?v=${Date.now()}`);
+   snapshots.push(`https://raw.githubusercontent.com/${owner}/${repo}/main/history.json?v=${Date.now()}`);
+   snapshots.push(`https://cdn.jsdelivr.net/gh/${owner}/${repo}@main/history.json?v=${Date.now()}`);
   }
  }
- snapshots.push('./data/history.json?v='+Date.now());
+ snapshots.push('./history.json?v='+Date.now());
  // No early return on an HTTP-200 response: a successful CDN request may contain stale records.
  const tasks=[...snapshots.map(url=>({url,origin:'本仓库 GitHub Actions 数据快照',kind:'snapshot'})),
   ...MIRRORS.map(prefix=>({prefix,origin:'同一第三方历史仓库（CDN / GitHub raw 镜像）',kind:'mirror'}))];

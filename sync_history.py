@@ -17,7 +17,7 @@ import urllib.parse
 import urllib.request
 
 BASE = pathlib.Path(__file__).resolve().parent
-DEST = BASE / 'data' / 'history.json'
+DEST = BASE / 'history.json'
 MIRRORS = [
     'https://raw.githubusercontent.com/yangxb919/lottery-data/main/data/{game}.json',
     'https://cdn.jsdelivr.net/gh/yangxb919/lottery-data@main/data/{game}.json',
@@ -144,7 +144,13 @@ def run():
     succeeded = 0
     for game in GAME:
         try:
-            source_rows = fetch_mirror(game)
+            mirror_error = ''
+            try:
+                source_rows = fetch_mirror(game)
+            except Exception as exc:
+                source_rows = []
+                mirror_error = str(exc)[:200]
+                print(game + ' 第三方历史库暂不可用：' + mirror_error)
             mirror = {}
             for item in source_rows:
                 try:
@@ -157,16 +163,25 @@ def run():
                         mirror[row['issue']] = row
                 except (ValueError, TypeError, KeyError):
                     pass
-            if len(mirror) < 20:
-                raise RuntimeError('有效开奖记录不足20期')
             official, reason = {}, ''
             try:
                 official = official_ssq() if game == 'ssq' else official_dlt()
             except Exception as exc:
                 reason = str(exc)[:200]
                 print(game + ' 官方独立核验暂不可用：' + reason)
-            checked, conflicts = 0, 0
-            old_rows = {r['issue']: r for r in previous.get(game, []) if isinstance(r, dict) and 'issue' in r}
+            checked, conflicts, official_only = 0, 0, 0
+            # Do not implicitly trust pre-existing repository records: validate them again.
+            old_rows = {}
+            for old in previous.get(game, []):
+                try:
+                    row = norm(old, game, '仓库既有快照')
+                    row['verification'] = old.get('verification') if old.get('verification') in ('cross-checked','single-source','official-only','manual-import') else 'single-source'
+                    row['sources'] = [str(v)[:120] for v in old.get('sources', [])[:5] if isinstance(v, str)] or ['仓库既有快照']
+                    old_rows[row['issue']] = row
+                except (TypeError, ValueError, KeyError, AttributeError):
+                    continue
+            if len(mirror) < 20 and not official and len(old_rows) < 20:
+                raise RuntimeError('没有足够可用数据，不能生成研究快照')
             for issue, row in list(mirror.items()):
                 cross = official.get(issue)
                 if cross:
@@ -182,6 +197,18 @@ def run():
                             mirror[issue] = old_rows[issue]
                         else:
                             del mirror[issue]
+            # Official results missing from the third-party historical mirror may be used as
+            # official-only evidence. They are NOT 'cross-checked' until mirror independently agrees.
+            for issue, row in official.items():
+                if issue in mirror or any(x['game'] == game and x['issue'] == issue for x in output['quarantine']):
+                    continue
+                if issue in old_rows and not equal(old_rows[issue], row):
+                    conflicts += 1
+                    output['quarantine'].append({'game': game, 'issue': issue, 'reason': '官方新记录与旧快照冲突，等待人工核对'})
+                    mirror[issue] = old_rows[issue]  # preserve last known record, but quarantine the discrepancy
+                    continue
+                mirror[issue] = dict(row, verification='official-only', sources=['www.cwl.gov.cn' if game == 'ssq' else 'webapi.sporttery.cn'])
+                official_only += 1
             for issue, old in old_rows.items():
                 if issue not in mirror and not any(x['game'] == game and x['issue'] == issue for x in output['quarantine']):
                     mirror[issue] = old
@@ -194,9 +221,9 @@ def run():
                     mirror[issue]['sources'] = sorted(set(mirror[issue]['sources'] + old.get('sources', [])))
             output[game] = sorted(mirror.values(), key=lambda x: x['issue'], reverse=True)
             output['provenance'][game] = {
-                'status': f'双源核验{checked}期；其余单源' if checked else '未完成独立双源核验',
+                'status': f'双源核验{checked}期；官方单源补入{official_only}期；其余单源' if checked else f'尚无交叉核验；官方单源补入{official_only}期；其余单源',
                 'officialRows': len(official), 'checked': checked, 'conflicts': conflicts,
-                'mirrorSource': 'yangxb919/lottery-data', 'officialError': reason,
+                'mirrorSource': 'yangxb919/lottery-data', 'mirrorError': mirror_error, 'officialError': reason,
                 'latestIssue': output[game][0]['issue'], 'rows': len(output[game])}
             print(game, '记录', len(output[game]), '核验', checked, '冲突', conflicts)
             succeeded += 1
