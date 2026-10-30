@@ -1,1 +1,1 @@
-{"name":"双彩研究工作台 v5","short_name":"双彩工作台","start_url":"./index.html","display":"standalone","background_color":"#0b1222","theme_color":"#101a31","lang":"zh-CN","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{"name":"双彩研究工作台 V12","short_name":"双彩研究","id":"./","start_url":"./index.html","scope":"./","display":"standalone","background_color":"#0c1322","theme_color":"#10182a","lang":"zh-CN","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}
