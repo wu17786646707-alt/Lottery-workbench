@@ -1,6 +1,6 @@
 /* PWA cache v12: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
-const CACHE='dual-lottery-v12.0.0';
-const ASSETS=['./','./index.html','./styles.css?v=12','./core.js','./engine.js','./app.js?v=12','./icon.svg','./manifest.webmanifest'];
+const CACHE='dual-lottery-v12.1.0';
+const ASSETS=['./','./index.html','./styles.css?v=12.1','./core.js?v=12.1','./engine.js?v=12.1','./app.js?v=12.1','./official_latest.json','./icon.svg','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(x=>x!==CACHE).map(x=>caches.delete(x)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;if(u.pathname.endsWith('/data/history.json')){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return}

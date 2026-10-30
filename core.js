@@ -1,5 +1,5 @@
 /* 双彩研究工作台 V12 — 数据层。无第三方运行时依赖。 */
-export const VERSION='12.0.0';
+export const VERSION='12.1.0';
 export const POLICY='research-v12.1';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
@@ -74,17 +74,62 @@ export function parseBackup(value){if(!value||!value.state)throw Error('备份�
 export function downloadFile(filename,content,type='application/json'){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
 const MIRRORS=['https://cdn.jsdelivr.net/gh/yangxb919/lottery-data@main/data/','https://raw.githubusercontent.com/yangxb919/lottery-data/main/data/'];
 async function getJSON(url,timeout=18000){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),timeout);try{const r=await fetch(url,{cache:'no-store',signal:ctl.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
-export async function syncData(s){const reports=[],errors=[];let local=null;const snapshots=[];if(typeof location!=='undefined'&&location.hostname.endsWith('.github.io')){const owner=location.hostname.split('.')[0],repo=location.pathname.split('/').filter(Boolean)[0];if(/^[a-zA-Z0-9_-]+$/.test(owner)&&/^[a-zA-Z0-9_.-]+$/.test(repo)){snapshots.push(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/history.json?v=${Date.now()}`);snapshots.push(`https://cdn.jsdelivr.net/gh/${owner}/${repo}@main/data/history.json?v=${Date.now()}`)}}snapshots.push('./data/history.json?v='+Date.now());for(const u of snapshots){try{local=await getJSON(u,10000);if(local&&Array.isArray(local.ssq)&&Array.isArray(local.dlt))break;local=null}catch(e){}}if(!local)errors.push('尚无自动同步数据快照，改用第三方单源历史库');
- for(const g of Object.keys(GAMES)){let raw=null,src='';if(local&&Array.isArray(local[g])){raw=local[g];src='GitHub Actions 本站快照'}else{for(const mirror of MIRRORS){try{raw=await getJSON(mirror+g+'.json?v='+Math.floor(Date.now()/3600000));src='第三方公开历史仓库（CDN / raw 仅为同源镜像）';break}catch(e){errors.push(`${g} 镜像访问失败：${String(e.message).slice(0,50)}`)}}}
- if(!Array.isArray(raw)||raw.length<20){errors.push(`${g} 无有效历史数据（至少20期）`);continue}
- const normalized=[],sourceVerification=local?.provenance?.[g]||{};
- for(const x of raw){try{const row=normalizeDraw(x,g,src);if(local&&x.verification==='cross-checked')row.verification='cross-checked';normalized.push(row)}catch{}}
- if(normalized.length<20){errors.push(`${g} 数据合法性校验失败`);continue}
- const merged=mergeDraws(s.draws[g],normalized,g,{source:src});s.draws[g]=merged.rows;
- s.meta.quarantine=[...s.meta.quarantine,...merged.quarantine].slice(-150);
- s.meta.provenance[g]={source:src,verification:src.startsWith('GitHub')?String(sourceVerification.status||'逐期核验状态详见数据详情'):'未独立核验',latest:merged.rows[0]?.issue||'',count:merged.rows.length,updated:new Date().toISOString(),suspectedGaps:merged.suspectedGaps,conflicts:merged.report.conflicts};
- reports.push(`${GAMES[g].name} ${merged.rows.length}期、新增${merged.report.added}期、冲突${merged.report.conflicts}条`);
+export async function syncData(s){
+ const reports=[],errors=[],snapshots=[];
+ if(typeof location!=='undefined'&&location.hostname.endsWith('.github.io')){
+  const owner=location.hostname.split('.')[0],repo=location.pathname.split('/').filter(Boolean)[0];
+  if(/^[a-zA-Z0-9_-]+$/.test(owner)&&/^[a-zA-Z0-9_.-]+$/.test(repo)){
+   snapshots.push(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/history.json?v=${Date.now()}`);
+   snapshots.push(`https://cdn.jsdelivr.net/gh/${owner}/${repo}@main/data/history.json?v=${Date.now()}`);
+  }
  }
- if(reports.length){s.meta.lastSync=new Date().toISOString();s.meta.status=reports.join('；')}
+ snapshots.push('./data/history.json?v='+Date.now());
+ // No early return on an HTTP-200 response: a successful CDN request may contain stale records.
+ const tasks=[...snapshots.map(url=>({url,origin:'本仓库 GitHub Actions 数据快照',kind:'snapshot'})),
+  ...MIRRORS.map(prefix=>({prefix,origin:'同一第三方历史仓库（CDN / GitHub raw 镜像）',kind:'mirror'}))];
+ const snapshotPromises=tasks.filter(x=>x.kind==='snapshot').map(async x=>{
+  try{const data=await getJSON(x.url,9500);return {data,source:x.origin,kind:x.kind}}
+  catch(e){return null}
+ });
+ const candidates=[];
+ const loadedSnapshots=await Promise.all(snapshotPromises);
+ for(const x of loadedSnapshots)if(x&&Array.isArray(x.data?.ssq)&&Array.isArray(x.data?.dlt))candidates.push(x);
+ // Each mirror is tried even if the other returned HTTP 200. Freshness is determined by issue, not response success.
+ const mirrored=await Promise.all(MIRRORS.flatMap(prefix=>Object.keys(GAMES).map(async game=>{
+  try{return {game,data:await getJSON(prefix+game+'.json?v='+Date.now(),15500),source:'第三方历史仓库 '+(prefix.includes('jsdelivr')?'CDN':'GitHub raw')+'（同一源）',kind:'mirror'}}
+  catch(e){errors.push(game+' '+(prefix.includes('jsdelivr')?'CDN':'raw')+'访问失败：'+String(e.message).slice(0,40));return null}
+ })));
+ for(const x of mirrored)if(x)candidates.push(x);
+ let official=null;
+ try{official=await getJSON('./official_latest.json?v='+Date.now(),7000)}catch(e){errors.push('内置官方核对快照未能加载（请确认 official_latest.json 已上传）')}
+ for(const g of Object.keys(GAMES)){
+  const options=[];
+  for(const src of candidates){
+   const arr=src.game===g?src.data:src.game?null:src.data[g];
+   if(!Array.isArray(arr)||arr.length<20)continue;
+   const valid=[];for(const item of arr){try{valid.push(normalizeDraw(item,g,src.source))}catch{}}
+   if(valid.length>=20)options.push({rows:valid,kind:src.kind,source:src.source,latest:valid.reduce((a,x)=>a>x.issue?a:x.issue,'')});
+  }
+  options.sort((a,b)=>b.latest.localeCompare(a.latest)||b.rows.length-a.rows.length);
+  let result={rows:s.draws[g],quarantine:[],report:{added:0,verified:0,conflicts:0},suspectedGaps:0},add=0,conflicts=0,sources=[];
+  // Merge newer source first. Cross-source discrepancies are quarantined, never silently overwritten.
+  for(const x of options){result=mergeDraws(result.rows,x.rows,g,{source:x.source});add+=result.report.added;conflicts+=result.report.conflicts;sources.push(x.source);s.meta.quarantine=[...s.meta.quarantine,...result.quarantine].slice(-150)}
+  const manual=Array.isArray(official?.[g])?official[g]:[];
+  if(manual.length){
+   const verified=[];for(const item of manual){try{verified.push(normalizeDraw(item,g,'机构官网人工核对快照'))}catch{}}
+   if(verified.length){result=mergeDraws(result.rows,verified,g,{source:'机构官网人工核对快照'});add+=result.report.added;conflicts+=result.report.conflicts;s.meta.quarantine=[...s.meta.quarantine,...result.quarantine].slice(-150);sources.push('机构官网一次性人工核对快照（非持续自动官方接口）')}
+  }
+  if(!result.rows?.length){errors.push(GAMES[g].name+'：尚无历史数据，请核对网络或手动导入');continue}
+  s.draws[g]=result.rows;
+  const latest=result.rows[0],todayCN=new Date(Date.now()+8*3600000).toISOString().slice(0,10);
+  const gap=Math.floor((Date.parse(todayCN+'T00:00:00Z')-Date.parse(latest.date+'T00:00:00Z'))/86400000);
+  const stale=gap>=3;
+  const sourceLabel=[...new Set(sources)].join('；')||'本地原有记录（网络源不可用）';
+  const latestManual=manual.some(x=>{try{return canonicalIssue(x.issue,x.date)===latest.issue}catch{return false}});
+  const verificationLabel=latestManual&&latest.verification==='cross-checked'?'本期由两家福利彩票机构官网人工核对':latest.verification==='cross-checked'?'记录标记交叉核验（请审查来源）':'未独立核验';
+  s.meta.provenance[g]={source:sourceLabel,verification:verificationLabel,latest:latest.issue,count:result.rows.length,updated:new Date().toISOString(),suspectedGaps:auditIssues(result.rows).suspectedGaps,conflicts,stale};
+  reports.push(`${GAMES[g].name} 最新${latest.issue}（${latest.date}），共${result.rows.length}期，新增${add}期${!options.length&&!manual.length?'；本次未取得可用远程数据':''}${stale?'；⚠距最近记录已'+gap+'天，请核验官方':''}`);
+ }
+ if(reports.length){s.meta.lastSync=new Date().toISOString();s.meta.status=reports.join('；')+(errors.length?'；部分线路不可用':'')}
  return {reports,errors};
 }

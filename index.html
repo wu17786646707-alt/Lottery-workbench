@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#10182a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>双彩研究工作台 V12</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=12">
+<title>双彩研究工作台 V12.1</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=12.1">
 </head>
 <body>
 <header class="mast container">
- <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V12</span></h1></div></div>
+ <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V12.1</span></h1></div></div>
  <div class="head-actions"><span id="storeLabel" class="tag muted-tag">存储检测中</span><button id="syncTop" class="mini-accent" type="button">↻ 同步</button></div>
 </header>
 <div class="container"><div class="info-banner" role="note">独立随机开奖无法被历史走势图可靠预测。以下“预测号码”是可复盘的研究候选，不代表中奖概率高于随机选号。</div>
@@ -20,6 +20,7 @@
  <div class="metrics"><article class="metric"><div class="label">历史期数</div><div id="metricCount" class="figure">—</div><small>有效格式校验后</small></article><article class="metric"><div class="label">最近开奖期次</div><div id="metricIssue" class="figure">—</div><small id="metricDate">等待数据</small></article><article class="metric"><div class="label">资料可信度</div><div id="metricQuality" class="figure small-figure">—</div><small id="metricQualityExplain">检查中</small></article><article class="metric"><div class="label">研究记录</div><div id="metricRecords" class="figure">0</div><small>本机锁定，不可作第三方证明</small></article></div>
  <div class="two-col"><article class="panel"><div class="panel-head"><div><h3>最新一期号码</h3><p class="sub" id="latestInfo">未导入开奖数据</p></div><span class="tag" id="latestVerify">待核验</span></div><div class="balls" id="latestBalls"></div><p class="footnote">只有通过真实数据源或手动导入，才会显示号码；本系统不生成虚构开奖记录。</p></article><article class="panel"><h3>本期研究状态</h3><div id="homeResearch" class="stack"><p class="sub">导入至少30期后生成研究候选。</p></div><div class="inline-actions"><button data-action="go-research">查看研究员档案</button><button data-action="go-data">数据质量</button></div></article></div>
  <article class="panel"><div class="panel-head"><h3>三种研究角度</h3><span class="tag">相同快照 · 可重复</span></div><div class="strategy-grid"><div class="strategy-card"><span class="tiny-index">A / 统计研究</span><strong>数据研究员</strong><p>频率 + 遗漏 + 形态</p></div><div class="strategy-card"><span class="tiny-index">B / 经验规则</span><strong>经验老彩民</strong><p>奇偶 + 分区 + 组合</p></div><div class="strategy-card emph"><span class="tiny-index">C / 新增</span><strong>走势图独立选号</strong><p>短窗走势 vs 前一窗口</p></div></div><p class="footnote">三种方法都只是不同的候选构造方法，需要与随机基准在同算法滚动回测中比较。</p></article>
+ <article class="panel"><div class="panel-head"><div><h3>本期 A / B / C 研究候选号码</h3><p class="sub" id="freshnessStatus">正在检查数据</p></div><button data-action="go-pick" class="accent">选号详细页</button></div><div id="homeCandidateList" class="stack"><p class="sub">读取历史数据后自动生成研究候选。</p></div></article>
 </section>
 <section id="trend" class="page">
  <div class="page-head"><div><div class="eyebrow">TREND EXPLORER</div><h2>走势研究室</h2><p class="sub">观察号码出现、连续遗漏、形态波动；走势图不表示开奖存在可预测的方向性</p></div><button data-action="trend-generate" class="accent">根据走势图生成一注 ↗</button></div>
@@ -43,6 +44,7 @@
 <section id="research" class="page">
  <div class="page-head"><div><div class="eyebrow">RESEARCH & EVIDENCE</div><h2>研究员与战绩中心</h2><p class="sub">真实提前锁定记录 ≠ 历史回放；两者分别呈现</p></div></div>
  <article class="panel"><h3>研究员策略档案</h3><div class="strategy-grid"><div class="strategy-card"><strong>A · 数据研究员</strong><p>基于近期频率、遗漏、冷热变化和整体形态建立评分。</p></div><div class="strategy-card"><strong>B · 经验老彩民</strong><p>把常见经验型规则编码成算法，不冒充真实彩民采访。</p></div><div class="strategy-card emph"><strong>C · 走势图研究员</strong><p>独立评估短窗与前窗频次变化，并提供逐球走势解释。</p></div></div></article>
+ <article class="panel"><div class="panel-head"><div><h3>本期三位研究员的真实候选号码</h3><p class="sub">直接查看 A / B / C 三组号码和逐球理由，不需先锁定。</p></div><button class="accent" id="researchGenerate">重新研究本期</button></div><div id="researchCurrent" class="stack"><p class="sub">读取历史数据中……</p></div></article>
  <article class="panel"><div class="panel-head"><h3>实盘研究档案</h3><button id="exportRecords">导出锁定记录</button></div><div id="recordSummary" class="metrics compact"></div><div id="recordList" class="stack"></div></article>
  <article class="panel"><h3>同算法滚动回测 / 随机 A/B 对照</h3><div class="control-row"><label>训练窗口 <select id="btTrain"><option value="30">30期</option><option value="60" selected>60期</option><option value="100">100期</option></select></label><label>最近测试期数 <select id="btTest"><option value="20">20期</option><option value="40">40期</option><option value="60" selected>60期</option><option value="120">120期</option></select></label></div><div class="inline-actions"><button id="runBacktest" class="accent">运行 A / B / C 对照回测</button><button id="exportBacktest">导出回测</button></div><div id="backtestResult" class="stack"></div></article>
  <article class="panel"><h3>策略稳定性与分歧</h3><div id="researchCompare" class="stack"><p class="sub">生成三组候选后将显示分歧，运行回测后显示分段稳定性。</p></div></article>
@@ -52,8 +54,8 @@
  <article class="panel"><div class="panel-head"><h3>数据质量报告</h3><button id="syncData" class="accent">立即同步</button></div><p id="syncSummary" class="sub">准备检查数据</p><div id="qualityGrid" class="stack"></div><p class="footnote">CDN 与 GitHub raw 如果指向同一仓库，只算一个来源。官方独立核验需要在 GitHub Actions 同步脚本中启用且运行成功，失败或未核验的记录会明确标记。</p></article>
  <article class="panel"><h3>本地 CSV 导入</h3><p class="sub">格式：<code>game,issue,date,main,extra</code>。号码用空格分隔；game 为 ssq 或 dlt；支持五位、七位期号自动统一。</p><input type="file" id="csvInput" accept=".csv,text/csv"><textarea id="csvText" placeholder="game,issue,date,main,extra&#10;ssq,2026123,2026-10-27,04 05 20 21 26 30,12"></textarea><button id="importCSV">从文本导入并核验</button><p id="csvImportResult" class="footnote"></p></article>
  <article class="panel"><h3>完整备份与恢复</h3><p class="sub">一次备份包含历史数据、守号、三路研究锁定记录、参数及来源状态。恢复会覆盖当前 V12 数据，请先备份。</p><div class="inline-actions"><button id="backupAll" class="accent">下载完整 JSON 备份</button><button id="backupCSV">导出历史 CSV</button></div><label class="file-choice">导入 V12 完整备份 <input type="file" id="restoreJSON" accept=".json,application/json"></label><p id="storageNotice" class="footnote"></p></article>
- <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 data/history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V12.0.0</p></article>
+ <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 data/history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V12.1.0</p></article>
 </section>
-</main><footer class="footer">双彩研究工作台 V12 · 研究记录与随机基准 · 仅供统计研究与娱乐，量力而行</footer></div>
-<script type="module" src="app.js?v=12"></script>
+</main><footer class="footer">双彩研究工作台 V12.1 · 研究记录与随机基准 · 仅供统计研究与娱乐，量力而行</footer></div>
+<script type="module" src="app.js?v=12.1"></script>
 </body></html>

@@ -4,3 +4,10 @@
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
 .stability-table{width:100%;border-collapse:separate;border-spacing:4px;font-size:11px}.stability-table th,.stability-table td{padding:9px;text-align:center;border-radius:6px;background:#22354e}.stability-table .pos{background:#234b45;color:#b4f1d8}.stability-table .neg{background:#57353b;color:#ffd0d2}.stability-table .flat{background:#3e4551;color:#d4e1f0}
+
+/* V12.1: candidate numbers are visible in both dashboard and researcher dossier. */
+.research-live-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.research-live-card{background:linear-gradient(150deg,#1b3049,#15243a);border:1px solid #355777;border-radius:12px;padding:13px;min-width:0}
+.research-live-card strong{font-size:13px}.research-live-card .balls{margin:10px 0;gap:4px}.research-live-card .ball{width:31px;height:31px;flex-basis:31px;font-size:11px}
+.research-live-card .small{line-height:1.7}.research-live-card details{margin-top:8px}
+@media(max-width:900px){.research-live-grid{grid-template-columns:1fr}}
