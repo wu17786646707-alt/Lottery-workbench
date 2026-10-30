@@ -1,0 +1,49 @@
+name: Lottery data and public research
+on:
+  workflow_dispatch:
+  schedule:
+    # 10:16 and 23:26 in Beijing; UTC cron, can be delayed by GitHub.
+    - cron: '16 2 * * *'
+    - cron: '26 15 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: lottery-data-and-research
+  cancel-in-progress: false
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate existing source code
+        run: |
+          node --check core.js
+          node --check engine.js
+          node --check app.js
+          node --check automation_research.mjs
+          python -m py_compile sync_history.py
+          node --input-type=module -e "import fs from 'node:fs'; import {pick} from './engine.js'; const h=JSON.parse(fs.readFileSync('history.json','utf8')); for(const g of ['ssq','dlt']) { if(h[g].length<30) throw Error(g+' too few draws'); const p=pick(h[g],g,'analyst',{window:60}); if(!p.main.length) throw Error('empty strategy'); }"
+      - name: Fetch and independently compare draw results (best effort)
+        run: python sync_history.py
+      - name: Write public pre-draw A/B/C snapshots and reconcile older locks
+        run: node automation_research.mjs
+      - name: Commit changed public data
+        run: |
+          git add history.json research.json
+          if git diff --cached --quiet; then
+            echo 'No updates to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'data: sync independently checked draws and pre-draw research'
+          git push
