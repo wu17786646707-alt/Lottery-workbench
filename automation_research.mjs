@@ -5,10 +5,10 @@
  * No prediction is invented for past draws. Historical backtests remain separate.
  */
 import fs from 'node:fs';
-import {pick, hit, scoreLabel} from './engine.js';
+import {pick, hit, scoreLabel, makeCompound, compoundHit, historicPatterns, summarizePred} from './engine.js';
 import {GAMES, POLICY, hash} from './core.js';
 
-const HISTORY='history.json', OUTPUT='research.json';
+const HISTORY='history.json', OUTPUT='research.json', HEALTH='health.json';
 const SCHEDULE={ssq:[0,2,4],dlt:[1,3,6]}; // UTC weekday for Beijing calendar date (Sun=0); holidays excluded
 const MODES=['analyst','veteran','trend','random'];
 const CN_DATE=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
@@ -21,6 +21,12 @@ function nextScheduled(game,now){
  const local=cndate(now),hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',hourCycle:'h23'}).format(now));
  for(let i=0;i<8;i++){const day=dateAdd(local,i);if(SCHEDULE[game].includes(weekday(day))&&(i>0||hour<19))return day;}
  return null;
+}
+function latestExpectedDraw(game,now){
+ const local=cndate(now),hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',hourCycle:'h23'}).format(now));
+ let day=local;
+ if(hour<22 || !SCHEDULE[game].includes(weekday(local)))return previousScheduled(game,local);
+ return day;
 }
 function previousScheduled(game,target){let day=target;for(let i=0;i<9;i++){day=dateAdd(day,-1);if(SCHEDULE[game].includes(weekday(day)))return day;}return null;}
 function validated(raw,game){
@@ -52,19 +58,34 @@ export function run(now=new Date(),root='.'){
   if(old?.schema==='lottery-public-research-v1'&&Array.isArray(old.records))existing=old;
  }
  const records=existing.records;
- let changed=false;const diagnostics={};
+ let changed=false;const diagnostics={},healthGames={},alerts=[];
  for(const game of Object.keys(GAMES)){
   const rows=validated(history[game]||[],game),target=nextScheduled(game,now);
+  const priorExpected=latestExpectedDraw(game,now),latest=rows[0],crossCount=rows.filter(x=>x.verification==='cross-checked').length;
+  const isFresh=Boolean(latest&&latest.date>=priorExpected);
+  const health={latestIssue:latest?.issue||null,latestDate:latest?.date||null,expectedBySchedule:priorExpected,
+    sourceRows:rows.length,independentlyVerified:crossCount,sourceVerification:latest?.verification||'unknown',
+    freshness:isFresh?'最新开奖覆盖常规日程':'数据可能滞后（常规日程）',settlement:'尚无已到期提前记录',
+    officialError:history.provenance?.[game]?.officialError||'',mirrorError:history.provenance?.[game]?.mirrorError||''};
+  healthGames[game]=health;
+  if(!isFresh)alerts.push(`${GAMES[game].name}：最新${latest?.date||'无数据'}，常规日程预期${priorExpected}；自动核对可能滞后`);
+  if(health.officialError)alerts.push(`${GAMES[game].name} 官方独立核验失败：${health.officialError}`);
   diagnostics[game]={latest:rows[0]?.issue||null,target,readiness:'unknown'};
   if(rows.length<30){diagnostics[game].readiness='不足30期历史数据';continue;}
   // Resolve ONLY predictions previously placed in the repository on a prior run.
   for(const rec of records.filter(x=>x.game===game&&x.status==='pending')){
-   const draw=rows.find(d=>d.issue>rec.baseIssue&&d.date>=rec.targetDate);
+   const draw=rows.find(d=>d.issue>rec.baseIssue&&d.date===rec.targetDate);
    if(draw){
     const outcome={};for(const p of rec.picks){outcome[p.mode]={main:hit(p.main,draw.main),extra:hit(p.extra,draw.extra)};}
-    rec.status='settled';rec.outcome=outcome;rec.actual={issue:draw.issue,date:draw.date,main:draw.main,extra:draw.extra,verification:draw.verification};changed=true;
+    rec.status='settled';rec.outcome=outcome;rec.actual={issue:draw.issue,date:draw.date,main:draw.main,extra:draw.extra,verification:draw.verification};
+    if(Array.isArray(rec.compoundPicks))rec.compoundOutcome=Object.fromEntries(rec.compoundPicks.map(p=>[p.mode,compoundHit({...p,game},draw)]));
+    changed=true;
    }
   }
+  const settled=records.filter(r=>r.game===game&&r.status==='settled').length;
+  const overdue=records.filter(r=>r.game===game&&r.status==='pending'&&r.targetDate< cndate(now)).length;
+  health.settlement=overdue?`${overdue}条到期记录尚未核对`:`已核对${settled}条，暂无逾期待核对记录`;
+  if(overdue)alerts.push(`${GAMES[game].name}有${overdue}条到期研究记录尚未核对`);
   const prior=previousScheduled(game,target);
   if(rows[0].date!==prior){
    diagnostics[game].readiness=`已知最新开奖${rows[0].date}，按常规日程上期应为${prior}；可能停开或数据未更新，本轮不自动锁定`;
@@ -75,16 +96,24 @@ export function run(now=new Date(),root='.'){
   }
   const picks=MODES.map(mode=>{
    const pred=pick(rows,game,mode,{window:60,search:450});
-   return {mode,label:scoreLabel[mode],main:pred.main,extra:pred.extra,snapshot:pred.snapshot};
+   return {mode,label:scoreLabel[mode],main:pred.main,extra:pred.extra,snapshot:pred.snapshot,explanations:pred.explain,pattern:pred.pattern,summary:summarizePred(pred,rows).text};
+  });
+  const compoundPicks=['analyst','veteran','trend'].map(mode=>{
+    const p=makeCompound(rows,game,mode,{window:60,search:700});
+    return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:summarizePred(p,rows).text};
   });
   const rec={id:hash(`${game}|${target}|${rows[0].issue}|${POLICY}`),game,targetDate:target,baseIssue:rows[0].issue,
    createdAt:now.toISOString(),policy:POLICY,window:Math.min(60,rows.length),
-   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks};
+   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'重号/连号为结构特征，不是独立开奖预测信号'}};
   records.push(rec);changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
  }
  // Only append true before-the-draw records, no retrospective insertion.
  existing.records=records.slice(-600);existing.summary=Object.fromEntries(Object.keys(GAMES).map(g=>[g,summary(existing.records,g)]));
  existing.diagnostics=diagnostics;
+ const health={schema:'lottery-health-v1',generatedAt:now.toISOString(),games:healthGames,alerts,
+  note:'绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。'};
+ fs.writeFileSync(root+'/'+HEALTH,JSON.stringify(health,null,2)+'\n');
+ for(const alert of alerts)console.warn('::warning::'+alert);
  // Update timestamp only when a real change happened; no daily meaningless commits.
  if(changed||!fs.existsSync(outputPath)){
   existing.generatedAt=now.toISOString();fs.mkdirSync(root,{recursive:true});

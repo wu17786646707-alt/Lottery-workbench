@@ -1,0 +1,7 @@
+{
+  "schema": "lottery-health-v1",
+  "generatedAt": null,
+  "games": {},
+  "alerts": ["V13 后台任务尚未执行，不能认为数据已经更新或核验。"],
+  "note": "仅作初始占位，首次 GitHub Actions 执行后替换。"
+}

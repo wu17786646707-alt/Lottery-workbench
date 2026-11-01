@@ -1,11 +1,11 @@
-/* 双彩研究工作台 V12 — 数据层。无第三方运行时依赖。 */
-export const VERSION='12.2.0';
-export const POLICY='research-v12.1';
+/* 双彩研究工作台 V13 — 数据层。无第三方运行时依赖。 */
+export const VERSION='13.0.0';
+export const POLICY='research-v13.0';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
  dlt:{name:'超级大乐透',mainName:'前区',extraName:'后区',mainMax:35,extraMax:12,mainCount:5,extraCount:2}
 };
-export function newState(){return {schema:12,draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},records:[],meta:{lastSync:'',status:'未同步',provenance:{},quarantine:[],migration:''},settings:{window:60,train:60,test:60}}}
+export function newState(){return {schema:12,draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},compounds:{ssq:[],dlt:[]},records:[],meta:{lastSync:'',status:'未同步',provenance:{},quarantine:[],migration:''},settings:{window:60,train:60,test:60}}}
 export const pad=n=>String(n).padStart(2,'0');
 export const numsText=xs=>(xs||[]).map(pad).join(' ');
 export const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -49,6 +49,18 @@ export function mergeDraws(existing,incoming,game,opts={}){
  const rows=[...map.values()].sort((a,b)=>b.issue.localeCompare(a.issue));return {rows,quarantine,report,...auditIssues(rows)};
 }
 export function safeTicket(raw,g){if(!raw||typeof raw!=='object')return null;const main=arr(raw.main).sort((a,b)=>a-b),extra=arr(raw.extra).sort((a,b)=>a-b);if(!validBalls(main,extra,g))return null;return {id:String(raw.id||hash(`${g}/${main}/${extra}/${raw.created||''}`)).slice(0,64),game:g,main,extra,created:String(raw.created||new Date().toISOString()).slice(0,40),startIssue:(()=>{try{return raw.startIssue?canonicalIssue(raw.startIssue):''}catch{return ''}})(),note:String(raw.note||'').slice(0,200),active:raw.active!==false}}
+export function safeCompound(raw,g){
+ if(!raw||typeof raw!=='object'||!GAMES[g])return null;
+ const c=GAMES[g],k=g==='ssq'?8:7;
+ const main=arr(raw.main).sort((a,b)=>a-b),extra=arr(raw.extra).sort((a,b)=>a-b);
+ if(main.length!==k||extra.length!==c.extraCount||new Set(main).size!==k||new Set(extra).size!==c.extraCount||
+   main.some(n=>!Number.isInteger(n)||n<1||n>c.mainMax)||extra.some(n=>!Number.isInteger(n)||n<1||n>c.extraMax))return null;
+ let startIssue='';try{if(raw.startIssue)startIssue=canonicalIssue(raw.startIssue)}catch{}
+ const created=new Date(raw.created||new Date().toISOString());if(!Number.isFinite(created.getTime()))return null;
+ return {id:String(raw.id||hash(`${g}/${main}/${extra}/${created.toISOString()}`)).slice(0,64),game:g,main,extra,
+  created:created.toISOString(),startIssue,mode:['analyst','veteran','trend','random'].includes(raw.mode)?raw.mode:'trend',
+  note:String(raw.note||'复式研究候选').slice(0,160),policy:String(raw.policy||'research-v13.0').slice(0,60)};
+}
 export function safeRecord(raw){if(!raw||typeof raw!=='object'||!GAMES[raw.game])return null;let baseIssue;try{baseIssue=canonicalIssue(raw.baseIssue||raw.issue||'',String(raw.baseDate||''))}catch{return null}
  if(!Array.isArray(raw.picks)||raw.picks.length<1||raw.picks.length>4)return null;
  const picks=raw.picks.map(p=>{const t=safeTicket(p,raw.game);if(!t)return null;const legacyMode=raw.policy||raw.model||'旧版';const mode=p.mode==='trend'&&legacyMode==='dual-v9'?'analyst':p.mode;return {mode:['analyst','veteran','trend','random'].includes(mode)?mode:'analyst',main:t.main,extra:t.extra,explanations:Array.isArray(p.explanations)?p.explanations.map(x=>String(x).slice(0,300)).slice(0,20):[],bans:{main:Array.isArray(p.bans?.main)?p.bans.main.filter(n=>Number.isInteger(n)&&n>=1&&n<=GAMES[raw.game].mainMax).slice(0,24):[],extra:Array.isArray(p.bans?.extra)?p.bans.extra.filter(n=>Number.isInteger(n)&&n>=1&&n<=GAMES[raw.game].extraMax).slice(0,10):[]},killContext:p.killContext&&typeof p.killContext==='object'?{method:['cold','hot','miss'].includes(p.killContext.method)?p.killContext.method:'cold',window:Math.max(0,Math.min(200,Number(p.killContext.window)||0))}:null}});if(picks.some(x=>!x))return null;
@@ -56,7 +68,7 @@ export function safeRecord(raw){if(!raw||typeof raw!=='object'||!GAMES[raw.game]
  return {id:String(raw.id||hash(JSON.stringify({baseIssue,picks,time}))).slice(0,64),game:raw.game,baseIssue,lockedAt:time.toISOString(),snapshotHash:String(raw.snapshotHash||'').slice(0,64),window:Math.max(0,Math.min(1000,Number(raw.window)||0)),policy:String(raw.policy||'旧版记录').slice(0,50),picks,localOnly:true};
 }
 export function migrateLegacy(legacy={},legacyResearch=[]){const s=newState();for(const g of Object.keys(GAMES)){s.draws[g]=mergeDraws([],legacy.draws?.[g]||[],g).rows;s.tickets[g]=(legacy.tickets?.[g]||[]).slice(0,10000).map(x=>safeTicket(x,g)).filter(Boolean)}s.records=(Array.isArray(legacyResearch)?legacyResearch:[]).slice(0,5000).map(safeRecord).filter(Boolean);s.meta.migration='已检查并迁移本机旧版本记录（无效项目已跳过）';return s}
-function validateState(raw){const s=newState();if(!raw||typeof raw!=='object')return s;for(const g of Object.keys(GAMES)){s.draws[g]=mergeDraws([],raw.draws?.[g]||[],g).rows;s.tickets[g]=(Array.isArray(raw.tickets?.[g])?raw.tickets[g]:[]).slice(0,15000).map(x=>safeTicket(x,g)).filter(Boolean)}s.records=(Array.isArray(raw.records)?raw.records:[]).slice(0,10000).map(safeRecord).filter(Boolean);if(raw.meta&&typeof raw.meta==='object')s.meta={...s.meta,lastSync:String(raw.meta.lastSync||'').slice(0,40),status:String(raw.meta.status||'').slice(0,150),quarantine:Array.isArray(raw.meta.quarantine)?raw.meta.quarantine.slice(-150):[],provenance:raw.meta.provenance&&typeof raw.meta.provenance==='object'?raw.meta.provenance:{},migration:String(raw.meta.migration||'').slice(0,140)};if(raw.settings&&typeof raw.settings==='object')s.settings={window:[30,60,100,200].includes(Number(raw.settings.window))?Number(raw.settings.window):60,train:[30,60,100].includes(Number(raw.settings.train))?Number(raw.settings.train):60,test:[20,40,60,120].includes(Number(raw.settings.test))?Number(raw.settings.test):60};return s}
+function validateState(raw){const s=newState();if(!raw||typeof raw!=='object')return s;for(const g of Object.keys(GAMES)){s.draws[g]=mergeDraws([],raw.draws?.[g]||[],g).rows;s.tickets[g]=(Array.isArray(raw.tickets?.[g])?raw.tickets[g]:[]).slice(0,15000).map(x=>safeTicket(x,g)).filter(Boolean);s.compounds[g]=(Array.isArray(raw.compounds?.[g])?raw.compounds[g]:[]).slice(0,500).map(x=>safeCompound(x,g)).filter(Boolean)}s.records=(Array.isArray(raw.records)?raw.records:[]).slice(0,10000).map(safeRecord).filter(Boolean);if(raw.meta&&typeof raw.meta==='object')s.meta={...s.meta,lastSync:String(raw.meta.lastSync||'').slice(0,40),status:String(raw.meta.status||'').slice(0,150),quarantine:Array.isArray(raw.meta.quarantine)?raw.meta.quarantine.slice(-150):[],provenance:raw.meta.provenance&&typeof raw.meta.provenance==='object'?raw.meta.provenance:{},migration:String(raw.meta.migration||'').slice(0,140)};if(raw.settings&&typeof raw.settings==='object')s.settings={window:[30,60,100,200].includes(Number(raw.settings.window))?Number(raw.settings.window):60,train:[30,60,100].includes(Number(raw.settings.train))?Number(raw.settings.train):60,test:[20,40,60,120].includes(Number(raw.settings.test))?Number(raw.settings.test):60};return s}
 let db=null;let storageMode='IndexedDB';
 export function storageName(){return storageMode}
 export async function loadState(){let raw=null;try{db=await new Promise((res,rej)=>{const req=indexedDB.open('lottery_v12',1);req.onupgradeneeded=()=>req.result.createObjectStore('app');req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)});raw=await new Promise((res,rej)=>{const req=db.transaction('app').objectStore('app').get('state');req.onsuccess=()=>res(req.result||null);req.onerror=()=>rej(req.error)})}catch(e){storageMode='localStorage 后备';db=null;try{raw=JSON.parse(localStorage.getItem('lottery_v12_state')||'null')}catch{}}

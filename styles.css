@@ -20,3 +20,15 @@
 .public-research-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:.5rem;margin-top:.5rem}
 .public-pick{padding:.6rem;background:rgba(127,143,160,.09);border-radius:9px}
 .public-pick .balls .ball{width:28px;height:28px;font-size:.75rem}
+
+/* V13: compound research cards and transparent automation health */
+.compound-cost{display:inline-block;border-radius:10px;padding:11px 13px;margin:3px 0;background:#203b50;border:1px solid #3d7595;color:#d5efff;font-size:14px;font-weight:700}
+.compound-result{padding:16px;background:linear-gradient(140deg,#18384c,#19283c);border:1px solid #397a91;border-radius:14px}
+.compound-result .balls{gap:6px;flex-wrap:wrap}
+.compound-pill{font-size:12px;border-radius:999px;background:#284761;padding:5px 9px;display:inline-flex;gap:3px;margin:3px 4px 3px 0}
+.pattern-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pattern-cards .item strong{font-size:18px;color:#eef6ff}
+.health-good{border-left:3px solid #58bc91}.health-warn{border-left:3px solid #d9a253}
+.mini-bar{background:#253f57;height:9px;border-radius:9px;overflow:hidden;display:block}.mini-bar>i{display:block;height:100%;background:#4d96cf}
+.compound-result .explain-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:760px){.pattern-cards,.compound-result .explain-list{grid-template-columns:1fr}}
