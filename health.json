@@ -1,15 +1,15 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-01T09:39:35.507Z",
+  "generatedAt": "2026-11-01T15:01:13.663Z",
   "games": {
     "ssq": {
       "latestIssue": "2026124",
       "latestDate": "2026-10-29",
-      "expectedBySchedule": "2026-10-29",
+      "expectedBySchedule": "2026-11-01",
       "sourceRows": 3521,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "freshness": "最新开奖覆盖常规日程",
+      "freshness": "数据可能滞后（常规日程）",
       "settlement": "已核对0条，暂无逾期待核对记录",
       "officialError": "HTTP Error 403: Forbidden",
       "mirrorError": ""
@@ -28,6 +28,7 @@
     }
   },
   "alerts": [
+    "双色球：最新2026-10-29，常规日程预期2026-11-01；自动核对可能滞后",
     "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
     "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
