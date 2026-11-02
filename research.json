@@ -1,6 +1,6 @@
 {
   "schema": "lottery-public-research-v1",
-  "generatedAt": "2026-11-01T02:54:37.239Z",
+  "generatedAt": "2026-11-02T02:57:49.272Z",
   "records": [
     {
       "id": "d9fc9018",
@@ -11,7 +11,7 @@
       "policy": "research-v12.1",
       "window": 60,
       "origin": "GitHub Actions public automation; not the user's private device records",
-      "status": "pending",
+      "status": "settled",
       "picks": [
         {
           "mode": "analyst",
@@ -105,7 +105,41 @@
             "search": 450
           }
         }
-      ]
+      ],
+      "outcome": {
+        "analyst": {
+          "main": 1,
+          "extra": 0
+        },
+        "veteran": {
+          "main": 1,
+          "extra": 0
+        },
+        "trend": {
+          "main": 1,
+          "extra": 0
+        },
+        "random": {
+          "main": 0,
+          "extra": 0
+        }
+      },
+      "actual": {
+        "issue": "2026125",
+        "date": "2026-11-01",
+        "main": [
+          4,
+          6,
+          10,
+          15,
+          26,
+          27
+        ],
+        "extra": [
+          11
+        ],
+        "verification": "single-source"
+      }
     },
     {
       "id": "8f1af094",
@@ -350,32 +384,1167 @@
           }
         }
       ]
+    },
+    {
+      "id": "c2f78023",
+      "game": "ssq",
+      "targetDate": "2026-11-03",
+      "baseIssue": "2026125",
+      "createdAt": "2026-11-02T02:57:49.272Z",
+      "policy": "research-v13.0",
+      "window": 60,
+      "origin": "GitHub Actions public automation; not the user's private device records",
+      "status": "pending",
+      "picks": [
+        {
+          "mode": "analyst",
+          "label": "数据研究员 A",
+          "main": [
+            4,
+            11,
+            14,
+            17,
+            22,
+            32
+          ],
+          "extra": [
+            4
+          ],
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|analyst|research-v13.0|60|single",
+            "hash": "3c728bb7",
+            "search": 450,
+            "mainCount": 6,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 4,
+              "observed": 18,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 7,
+              "previous": 8,
+              "reason": "与上期重号；近60期出现18次（均匀随机期望10.9次），当前遗漏0期"
+            },
+            {
+              "kind": "main",
+              "number": 11,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 5,
+              "previous": 4,
+              "reason": "非上期重号；近60期出现13次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 14,
+              "observed": 17,
+              "expected": 10.91,
+              "miss": 5,
+              "recent": 6,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现17次（均匀随机期望10.9次），当前遗漏5期"
+            },
+            {
+              "kind": "main",
+              "number": 17,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 1,
+              "reason": "非上期重号；近60期出现9次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 7,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现13次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 32,
+              "observed": 8,
+              "expected": 10.91,
+              "miss": 14,
+              "recent": 2,
+              "previous": 1,
+              "reason": "非上期重号；近60期出现8次（均匀随机期望10.9次），当前遗漏14期"
+            },
+            {
+              "kind": "extra",
+              "number": 4,
+              "observed": 10,
+              "expected": 3.75,
+              "miss": 6,
+              "recent": 3,
+              "previous": 2,
+              "reason": "非上期重号；近60期出现10次（均匀随机期望3.8次），当前遗漏6期"
+            }
+          ],
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 0
+          },
+          "summary": "数据研究员 A：基于60期、最新2026125期；主区和值100、奇数2个、连号对0、与上期重号1个；主区平均近窗出现13.00次。以频率、遗漏与形态共同评分。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        },
+        {
+          "mode": "veteran",
+          "label": "经验研究员 B",
+          "main": [
+            7,
+            8,
+            11,
+            17,
+            26,
+            32
+          ],
+          "extra": [
+            7
+          ],
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|veteran|research-v13.0|60|single",
+            "hash": "3c728bb7",
+            "search": 450,
+            "mainCount": 6,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 7,
+              "observed": 8,
+              "expected": 10.91,
+              "miss": 4,
+              "recent": 3,
+              "previous": 1,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 8,
+              "observed": 7,
+              "expected": 10.91,
+              "miss": 24,
+              "recent": 0,
+              "previous": 3,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 11,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 5,
+              "previous": 4,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 17,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 1,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 6,
+              "previous": 3,
+              "reason": "与上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 32,
+              "observed": 8,
+              "expected": 10.91,
+              "miss": 14,
+              "recent": 2,
+              "previous": 1,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "extra",
+              "number": 7,
+              "observed": 2,
+              "expected": 3.75,
+              "miss": 27,
+              "recent": 0,
+              "previous": 1,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            }
+          ],
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "summary": "经验研究员 B：基于60期、最新2026125期；主区和值101、奇数3个、连号对1、与上期重号1个；主区平均近窗出现9.33次。用经验型组合约束选择，并无已证实优势。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        },
+        {
+          "mode": "trend",
+          "label": "走势图独立选号 C",
+          "main": [
+            4,
+            12,
+            22,
+            24,
+            29,
+            30
+          ],
+          "extra": [
+            9
+          ],
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|trend|research-v13.0|60|single",
+            "hash": "3c728bb7",
+            "search": 450,
+            "mainCount": 6,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 4,
+              "observed": 18,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 7,
+              "previous": 8,
+              "reason": "与上期重号；10/20/40期多窗口变化；近20期出现7次、前窗8次"
+            },
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 6,
+              "recent": 3,
+              "previous": 3,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现3次、前窗3次"
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 7,
+              "previous": 5,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现7次、前窗5次"
+            },
+            {
+              "kind": "main",
+              "number": 24,
+              "observed": 19,
+              "expected": 10.91,
+              "miss": 4,
+              "recent": 6,
+              "previous": 6,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现6次、前窗6次"
+            },
+            {
+              "kind": "main",
+              "number": 29,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 1,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现4次、前窗1次"
+            },
+            {
+              "kind": "main",
+              "number": 30,
+              "observed": 15,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 7,
+              "previous": 6,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现7次、前窗6次"
+            },
+            {
+              "kind": "extra",
+              "number": 9,
+              "observed": 4,
+              "expected": 3.75,
+              "miss": 1,
+              "recent": 2,
+              "previous": 2,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现2次、前窗2次"
+            }
+          ],
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "summary": "走势图独立选号 C：基于60期、最新2026125期；主区和值121、奇数1个、连号对1、与上期重号1个；主区平均近窗出现14.17次。独立依据短窗与前窗频次差生成，并不意味下一期有趋势延续。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        },
+        {
+          "mode": "random",
+          "label": "随机基准",
+          "main": [
+            5,
+            7,
+            15,
+            20,
+            22,
+            26
+          ],
+          "extra": [
+            8
+          ],
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|random|research-v13.0|60|single",
+            "hash": "3c728bb7",
+            "search": 450,
+            "mainCount": 6,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 5,
+              "observed": 15,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现15次（均匀随机期望10.9次），当前遗漏2期"
+            },
+            {
+              "kind": "main",
+              "number": 7,
+              "observed": 8,
+              "expected": 10.91,
+              "miss": 4,
+              "recent": 3,
+              "previous": 1,
+              "reason": "非上期重号；近60期出现8次（均匀随机期望10.9次），当前遗漏4期"
+            },
+            {
+              "kind": "main",
+              "number": 15,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 2,
+              "previous": 4,
+              "reason": "与上期重号；近60期出现9次（均匀随机期望10.9次），当前遗漏0期"
+            },
+            {
+              "kind": "main",
+              "number": 20,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 5,
+              "previous": 4,
+              "reason": "非上期重号；近60期出现10次（均匀随机期望10.9次），当前遗漏2期"
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 7,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现13次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 6,
+              "previous": 3,
+              "reason": "与上期重号；近60期出现11次（均匀随机期望10.9次），当前遗漏0期"
+            },
+            {
+              "kind": "extra",
+              "number": 8,
+              "observed": 4,
+              "expected": 3.75,
+              "miss": 20,
+              "recent": 0,
+              "previous": 1,
+              "reason": "非上期重号；近60期出现4次（均匀随机期望3.8次），当前遗漏20期"
+            }
+          ],
+          "pattern": {
+            "repeat": 2,
+            "adjacent": 0
+          },
+          "summary": "随机基准：基于60期、最新2026125期；主区和值95、奇数3个、连号对0、与上期重号2个；主区平均近窗出现11.00次。以频率、遗漏与形态共同评分。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        }
+      ],
+      "compoundPicks": [
+        {
+          "mode": "analyst",
+          "main": [
+            1,
+            5,
+            14,
+            18,
+            22,
+            23,
+            24,
+            26
+          ],
+          "extra": [
+            4
+          ],
+          "bets": 28,
+          "cost": 56,
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|analyst|research-v13.0|60|compound-8",
+            "hash": "3c728bb7",
+            "search": 700,
+            "mainCount": 8,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 2
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 1,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 3,
+              "recent": 3,
+              "previous": 2,
+              "reason": "非上期重号；近60期出现9次（均匀随机期望10.9次），当前遗漏3期"
+            },
+            {
+              "kind": "main",
+              "number": 5,
+              "observed": 15,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现15次（均匀随机期望10.9次），当前遗漏2期"
+            },
+            {
+              "kind": "main",
+              "number": 14,
+              "observed": 17,
+              "expected": 10.91,
+              "miss": 5,
+              "recent": 6,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现17次（均匀随机期望10.9次），当前遗漏5期"
+            },
+            {
+              "kind": "main",
+              "number": 18,
+              "observed": 12,
+              "expected": 10.91,
+              "miss": 5,
+              "recent": 3,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现12次（均匀随机期望10.9次），当前遗漏5期"
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 7,
+              "previous": 5,
+              "reason": "非上期重号；近60期出现13次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 23,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 3,
+              "reason": "非上期重号；近60期出现10次（均匀随机期望10.9次），当前遗漏1期"
+            },
+            {
+              "kind": "main",
+              "number": 24,
+              "observed": 19,
+              "expected": 10.91,
+              "miss": 4,
+              "recent": 6,
+              "previous": 6,
+              "reason": "非上期重号；近60期出现19次（均匀随机期望10.9次），当前遗漏4期"
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 6,
+              "previous": 3,
+              "reason": "与上期重号；近60期出现11次（均匀随机期望10.9次），当前遗漏0期"
+            },
+            {
+              "kind": "extra",
+              "number": 4,
+              "observed": 10,
+              "expected": 3.75,
+              "miss": 6,
+              "recent": 3,
+              "previous": 2,
+              "reason": "非上期重号；近60期出现10次（均匀随机期望3.8次），当前遗漏6期"
+            }
+          ],
+          "summary": "数据研究员 A：基于60期、最新2026125期；主区和值133、奇数3个、连号对2、与上期重号1个；主区平均近窗出现13.25次。以频率、遗漏与形态共同评分。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        },
+        {
+          "mode": "veteran",
+          "main": [
+            5,
+            10,
+            12,
+            13,
+            20,
+            23,
+            25,
+            30
+          ],
+          "extra": [
+            7
+          ],
+          "bets": 28,
+          "cost": 56,
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|veteran|research-v13.0|60|compound-8",
+            "hash": "3c728bb7",
+            "search": 700,
+            "mainCount": 8,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 5,
+              "observed": 15,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 10,
+              "observed": 8,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 2,
+              "previous": 2,
+              "reason": "与上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 6,
+              "recent": 3,
+              "previous": 3,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 13,
+              "observed": 12,
+              "expected": 10.91,
+              "miss": 5,
+              "recent": 4,
+              "previous": 6,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 20,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 5,
+              "previous": 4,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 23,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 3,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 25,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 6,
+              "recent": 1,
+              "previous": 7,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "main",
+              "number": 30,
+              "observed": 15,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 7,
+              "previous": 6,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            },
+            {
+              "kind": "extra",
+              "number": 7,
+              "observed": 2,
+              "expected": 3.75,
+              "miss": 27,
+              "recent": 0,
+              "previous": 1,
+              "reason": "非上期重号；经验型结构：奇偶、分区、和值、跨度、重号及连号的历史分布"
+            }
+          ],
+          "summary": "经验研究员 B：基于60期、最新2026125期；主区和值138、奇数4个、连号对1、与上期重号1个；主区平均近窗出现11.50次。用经验型组合约束选择，并无已证实优势。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        },
+        {
+          "mode": "trend",
+          "main": [
+            4,
+            14,
+            20,
+            22,
+            23,
+            25,
+            26,
+            28
+          ],
+          "extra": [
+            9
+          ],
+          "bets": 28,
+          "cost": 56,
+          "snapshot": {
+            "baseIssue": "2026125",
+            "window": 60,
+            "policy": "research-v13.0",
+            "seed": "ssq|2026125|trend|research-v13.0|60|compound-8",
+            "hash": "3c728bb7",
+            "search": 700,
+            "mainCount": 8,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 2,
+            "adjacent": 2
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 4,
+              "observed": 18,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 7,
+              "previous": 8,
+              "reason": "与上期重号；10/20/40期多窗口变化；近20期出现7次、前窗8次"
+            },
+            {
+              "kind": "main",
+              "number": 14,
+              "observed": 17,
+              "expected": 10.91,
+              "miss": 5,
+              "recent": 6,
+              "previous": 5,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现6次、前窗5次"
+            },
+            {
+              "kind": "main",
+              "number": 20,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 2,
+              "recent": 5,
+              "previous": 4,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现5次、前窗4次"
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 13,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 7,
+              "previous": 5,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现7次、前窗5次"
+            },
+            {
+              "kind": "main",
+              "number": 23,
+              "observed": 10,
+              "expected": 10.91,
+              "miss": 1,
+              "recent": 4,
+              "previous": 3,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现4次、前窗3次"
+            },
+            {
+              "kind": "main",
+              "number": 25,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 6,
+              "recent": 1,
+              "previous": 7,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现1次、前窗7次"
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 11,
+              "expected": 10.91,
+              "miss": 0,
+              "recent": 6,
+              "previous": 3,
+              "reason": "与上期重号；10/20/40期多窗口变化；近20期出现6次、前窗3次"
+            },
+            {
+              "kind": "main",
+              "number": 28,
+              "observed": 9,
+              "expected": 10.91,
+              "miss": 7,
+              "recent": 3,
+              "previous": 1,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现3次、前窗1次"
+            },
+            {
+              "kind": "extra",
+              "number": 9,
+              "observed": 4,
+              "expected": 3.75,
+              "miss": 1,
+              "recent": 2,
+              "previous": 2,
+              "reason": "非上期重号；10/20/40期多窗口变化；近20期出现2次、前窗2次"
+            }
+          ],
+          "summary": "走势图独立选号 C：基于60期、最新2026125期；主区和值162、奇数2个、连号对2、与上期重号2个；主区平均近窗出现12.38次。独立依据短窗与前窗频次差生成，并不意味下一期有趋势延续。重号和连号仅用于历史结构对照，不证明下期有规律；数据特征不代表中奖概率提升。"
+        }
+      ],
+      "featureSnapshot": {
+        "previousIssue": "2026125",
+        "patternHistory": {
+          "sample": 59,
+          "meanRepeat": 1.1694915254237288,
+          "meanAdjacent": 0.9322033898305084,
+          "currentAdjacent": 1,
+          "previousMain": [
+            4,
+            6,
+            10,
+            15,
+            26,
+            27
+          ],
+          "records": [
+            {
+              "issue": "2026125",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026124",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026123",
+              "repeat": 2,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026122",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026121",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026120",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026119",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026118",
+              "repeat": 1,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026117",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026116",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026115",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026114",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026113",
+              "repeat": 2,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026112",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026111",
+              "repeat": 1,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026110",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026109",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026108",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026107",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026106",
+              "repeat": 3,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026105",
+              "repeat": 1,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026104",
+              "repeat": 2,
+              "adjacent": 3
+            },
+            {
+              "issue": "2026103",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026102",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026101",
+              "repeat": 1,
+              "adjacent": 3
+            },
+            {
+              "issue": "2026100",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026099",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026098",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026097",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026096",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026095",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026094",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026093",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026092",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026091",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026090",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026089",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026088",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026087",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026086",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026085",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026084",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026083",
+              "repeat": 3,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026082",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026081",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026080",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026079",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026078",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026077",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026076",
+              "repeat": 1,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026075",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026074",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026073",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026072",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026071",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026070",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026069",
+              "repeat": 3,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026068",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026067",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026066",
+              "repeat": 0,
+              "adjacent": 1
+            }
+          ],
+          "repeatDistribution": {
+            "0": 13,
+            "1": 26,
+            "2": 17,
+            "3": 3,
+            "4": 0,
+            "5": 0,
+            "6": 0
+          },
+          "adjacentDistribution": {
+            "0": 15,
+            "1": 35,
+            "2": 7,
+            "3": 2,
+            "4": 0,
+            "5": 0
+          }
+        },
+        "method": "重号/连号为结构特征，不是独立开奖预测信号"
+      }
     }
   ],
   "summary": {
     "ssq": {
-      "settled": 0,
+      "settled": 1,
       "pending": 1,
       "byMode": {
         "analyst": {
-          "n": 0,
-          "meanMain": null,
-          "meanExtra": null
+          "n": 1,
+          "meanMain": 1,
+          "meanExtra": 0
         },
         "veteran": {
-          "n": 0,
-          "meanMain": null,
-          "meanExtra": null
+          "n": 1,
+          "meanMain": 1,
+          "meanExtra": 0
         },
         "trend": {
-          "n": 0,
-          "meanMain": null,
-          "meanExtra": null
+          "n": 1,
+          "meanMain": 1,
+          "meanExtra": 0
         },
         "random": {
-          "n": 0,
-          "meanMain": null,
-          "meanExtra": null
+          "n": 1,
+          "meanMain": 0,
+          "meanExtra": 0
         }
       }
     },
@@ -409,14 +1578,14 @@
   "note": "Empty initial public record. First GitHub Actions run may produce a future draw prediction when upstream data is fresh. No retrospective live claims.",
   "diagnostics": {
     "ssq": {
-      "latest": "2026124",
-      "target": "2026-11-01",
-      "readiness": "目标开奖日已存在锁定记录"
+      "latest": "2026125",
+      "target": "2026-11-03",
+      "readiness": "新建公开候选，待工作流提交到 GitHub"
     },
     "dlt": {
       "latest": "2026124",
       "target": "2026-11-02",
-      "readiness": "新建公开候选，待工作流提交到 GitHub"
+      "readiness": "目标开奖日已存在锁定记录"
     }
   }
 }
