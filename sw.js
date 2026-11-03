@@ -1,6 +1,6 @@
-/* PWA cache v12: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
-const CACHE='dual-lottery-v13.0.0';
-const ASSETS=['./','./index.html','./styles.css?v=13.0','./core.js?v=13.0','./engine.js?v=13.0','./app.js?v=13.0','./official_latest.json','./health.json','./icon.svg','./manifest.webmanifest'];
+/* PWA cache v16: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
+const CACHE='dual-lottery-v16.0.0';
+const ASSETS=['./','./index.html','./styles.css?v=16.0','./core.js?v=16.0','./engine.js?v=16.0','./app.js?v=16.0','./coverage.js?v=16.0','./multiwindow.js?v=16.0','./shape-engine.js?v=16.0','./shape-ui.js?v=16.0','./multiwindow-ui.js?v=16.0','./official_latest.json','./health.json','./icon.svg','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(x=>x!==CACHE).map(x=>caches.delete(x)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;if((u.pathname.endsWith('/history.json')||u.pathname.endsWith('/research.json')||u.pathname.endsWith('/health.json'))){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return}

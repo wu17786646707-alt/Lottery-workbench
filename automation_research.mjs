@@ -5,12 +5,14 @@
  * No prediction is invented for past draws. Historical backtests remain separate.
  */
 import fs from 'node:fs';
-import {pick, hit, scoreLabel, makeCompound, compoundHit, historicPatterns, summarizePred} from './engine.js';
+import {hit, scoreLabel, compoundHit, historicPatterns} from './engine.js';
+import {pickV15,makeCompoundV15,MW_POLICY} from './multiwindow.js';
 import {GAMES, POLICY, hash} from './core.js';
 
 const HISTORY='history.json', OUTPUT='research.json', HEALTH='health.json';
 const SCHEDULE={ssq:[0,2,4],dlt:[1,3,6]}; // UTC weekday for Beijing calendar date (Sun=0); holidays excluded
 const MODES=['analyst','veteran','trend','random'];
+const briefShape=p=>p?{target:p.target,reason:p.reason,empirical:{sample:p.empirical?.sample,commonZones:p.empirical?.commonZones?.slice(0,3)}}:null;
 const CN_DATE=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
 function cndate(at){const p=CN_DATE.formatToParts(at);const m=Object.fromEntries(p.filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));return `${m.year}-${m.month}-${m.day}`;}
 function weekday(day){return new Date(day+'T12:00:00Z').getUTCDay();}
@@ -95,16 +97,16 @@ export function run(now=new Date(),root='.'){
    diagnostics[game].readiness='目标开奖日已存在锁定记录';continue;
   }
   const picks=MODES.map(mode=>{
-   const pred=pick(rows,game,mode,{window:60,search:450});
-   return {mode,label:scoreLabel[mode],main:pred.main,extra:pred.extra,snapshot:pred.snapshot,explanations:pred.explain,pattern:pred.pattern,summary:summarizePred(pred,rows).text};
+   const pred=pickV15(rows,game,mode,{window:120,search:360});
+   return {mode,label:scoreLabel[mode],main:pred.main,extra:pred.extra,snapshot:pred.snapshot,explanations:pred.explain,pattern:pred.pattern,summary:pred.summ.text,shapePlan:briefShape(pred.shapePlan),shapeActual:pred.shapeActual,softKills:pred.softKills};
   });
   const compoundPicks=['analyst','veteran','trend'].map(mode=>{
-    const p=makeCompound(rows,game,mode,{window:60,search:700});
-    return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:summarizePred(p,rows).text};
+    const p=makeCompoundV15(rows,game,mode,{window:120,search:360});
+    return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:p.summ.text,shapePlan:briefShape(p.shapePlan),shapeActual:p.shapeActual,softKills:p.softKills};
   });
-  const rec={id:hash(`${game}|${target}|${rows[0].issue}|${POLICY}`),game,targetDate:target,baseIssue:rows[0].issue,
-   createdAt:now.toISOString(),policy:POLICY,window:Math.min(60,rows.length),
-   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'重号/连号为结构特征，不是独立开奖预测信号'}};
+  const rec={primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${MW_POLICY}`),game,targetDate:target,baseIssue:rows[0].issue,
+   createdAt:now.toISOString(),policy:MW_POLICY,window:Math.min(120,rows.length),
+   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'V16形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:MW_POLICY}};
   records.push(rec);changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
  }
  // Only append true before-the-draw records, no retrospective insertion.
