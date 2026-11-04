@@ -1,6 +1,6 @@
 /* V15 mobile multi-window research report UI. No purchase functionality. */
-import {factTable,patterns,pickV15,makeCompoundV15,backtestV15,WINDOWS,MODE_LABELS,MW_POLICY} from './multiwindow.js?v=16.0';
-import {GAMES,pad,hash,escapeHTML as E} from './core.js?v=16.0';
+import {factTable,patterns,pickV15,makeCompoundV15,backtestV15,WINDOWS,MODE_LABELS,MW_POLICY} from './multiwindow.js?v=17.0';
+import {GAMES,pad,hash,escapeHTML as E} from './core.js?v=17.0';
 const $=id=>document.getElementById(id);
 let report=null,oldKey='',lastBacktest=null;
 function ctx(){return typeof window.getV15Context==='function'?window.getV15Context():{game:'ssq',rows:[]}}

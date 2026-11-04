@@ -1,7 +1,7 @@
-/** V16 shape-first, one-compound-at-a-time research view. */
-import {pickV15,makeCompoundV15,MODE_LABELS} from './multiwindow.js?v=16.0';
-import {shapePlan,softKill,exclusionRisk,featuresOf,extraShape,SHAPE_POLICY} from './shape-engine.js?v=16.0';
-import {GAMES,pad,escapeHTML as esc,hash} from './core.js?v=16.0';
+/** V17 shape-first, one-compound-at-a-time research view. */
+import {pickV15,makeCompoundV15,MODE_LABELS} from './multiwindow.js?v=17.0';
+import {shapePlan,softKill,exclusionRisk,featuresOf,extraShape,SHAPE_POLICY} from './shape-engine.js?v=17.0';
+import {GAMES,pad,escapeHTML as esc,hash} from './core.js?v=17.0';
 const el=id=>document.getElementById(id);
 const modes=['analyst','veteran','trend'];
 let result=null,previousGame=null;
@@ -36,11 +36,11 @@ function render(){if(!result)return;const r=result,c=context();if(r.game!==c.gam
  el('v16Alternatives').innerHTML=r.studies.filter(x=>x.mode!==selected).map(x=>`<div class="item"><strong>${esc(MODE_LABELS[x.mode])}</strong>${balls(x.compound)}<p class="small">${x.compound.bets}注 · ${x.compound.cost}元。仅用于方案比较，默认不加入主展示，也不自动扩大预算。</p><details><summary>查看备选方案的形态</summary>${shapeHTML(x.compound,true)}</details></div>`).join('');
 }
 function singlePrimary(){const r=current(),mode=el('v16Mode').value,p=r.studies.find(x=>x.mode===mode).compound,b=Math.max(0,Math.floor(Number(el('v16Budget').value)||0));if(b<p.cost)throw Error('当前预算不足以覆盖复式；保持原预算，不自动推荐增加投入');return p}
-function select(){try{const p=singlePrimary();if(typeof window.useV16PrimaryCompound!=='function')throw Error('旧版复式保存入口暂不可用');window.useV16PrimaryCompound(p);el('v16Message').textContent='已把这一组放进“复式选号”页面供核对；尚未保存为守号，也不会自动购买。'}catch(e){el('v16Message').textContent=e.message}}
+function select(){try{const p=singlePrimary();if(typeof window.useV17PrimaryCompound!=='function')throw Error('旧版复式保存入口暂不可用');window.useV17PrimaryCompound(p);el('v16Message').textContent='已把这一组放进“复式选号”页面供核对；尚未保存为守号，也不会自动购买。'}catch(e){el('v16Message').textContent=e.message}}
 async function copy(){try{const p=singlePrimary();const s=`${GAMES[p.game].name} ${p.snapshot.baseIssue}期后研究复式 · ${MODE_LABELS[p.mode]}\n${nums(p)}\n${p.bets}注 / ${p.cost}元基本投注\n形态：${fmtShape(p.shapeActual)}\n仅研究候选，单注无额外一等奖概率优势。`;if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(s);else throw Error('浏览器不支持快捷复制');el('v16Message').textContent='已复制所选的一组复式（不包含其余两组）'}catch(e){el('v16Message').textContent=e.message}}
 function exportJSON(){try{const p=singlePrimary(),r=current();const data={schema:'lottery-v16-primary-compound',game:r.game,baseIssue:r.issue,window:r.window,policy:r.policy,primaryMode:p.mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,reason:p.shapePlan?.reason,shape:p.shapeActual,dataHash:r.fingerprint,note:'仅导出一组复式，不自动购买；不是GitHub公开时间锁定证明'};
- const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`V16_唯一主复式_${r.game}_${r.issue}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);el('v16Message').textContent='已导出一组主展示复式研究卡片';}catch(e){el('v16Message').textContent=e.message}}
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`V17_唯一主复式_${r.game}_${r.issue}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);el('v16Message').textContent='已导出一组主展示复式研究卡片';}catch(e){el('v16Message').textContent=e.message}}
 function init(){if(!el('v16Run'))return;el('v16Run').addEventListener('click',()=>{try{generate()}catch(e){el('v16Research').textContent='研究失败：'+e.message}});el('v16Window').addEventListener('change',()=>{result=null;el('v16Primary').textContent='观察窗口已改变，请重新研究';});el('v16Mode').addEventListener('change',render);el('v16Budget').addEventListener('input',render);el('v16Select').addEventListener('click',select);el('v16Copy').addEventListener('click',copy);el('v16Export').addEventListener('click',exportJSON);
  document.querySelector('[data-page="shape"]')?.addEventListener('click',update);
- document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>{setTimeout(update,0)}));window.renderV16Shape=update;update();}
+ document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>{setTimeout(update,0)}));window.renderV17Shape=update;update();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

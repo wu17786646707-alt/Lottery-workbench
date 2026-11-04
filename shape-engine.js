@@ -1,10 +1,10 @@
 /**
- * V16 Shape-first research layer (not a probability predictor).
+ * V17 Shape-first research layer (not a probability predictor).
  * This is a scoring/description component only; never hard-excludes by default.
  * Data must be newest-first and every row is historical as of decision time.
  */
-import {GAMES} from './core.js?v=16.0';
-export const SHAPE_POLICY='shape-first-v16.0';
+import {GAMES} from './core.js?v=17.0';
+export const SHAPE_POLICY='shape-first-v17.0';
 const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
 const round=(v,p=2)=>Number(v.toFixed(p));
 const quant=(a,p)=>{const b=[...a].sort((x,y)=>x-y);return b[Math.floor(p*(b.length-1))]||0};

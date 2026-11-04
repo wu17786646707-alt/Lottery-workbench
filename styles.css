@@ -54,7 +54,7 @@
 .v15-explain{border:1px solid #2b435c;border-radius:9px;padding:10px}.v15-explain b{display:block;color:#f5cad0;margin-bottom:5px}.v15-explain span{font-size:.78rem;color:#aec3d8;line-height:1.6}
 @media(max-width:620px){.v15-summary-grid{grid-template-columns:1fr}.v15-researcher{padding:11px}.v15-explain-list{grid-template-columns:1fr}}
 
-/* V16 shape-first and budget-guarded single compound */
+/* V17 shape-first and budget-guarded single compound */
 .v16-primary{border-color:#527fa2;background:linear-gradient(145deg,#182a42,#142238)}
 .v16-primary-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .v16-shape{background:#10233a;border:1px solid #284a69;border-radius:10px;padding:10px 12px;margin:8px 0 12px}
@@ -66,3 +66,14 @@
 .v16-explain strong{font-size:12px;color:#ffd0d3}.v16-explain span{font-size:11px;color:#b7cbe0;line-height:1.6}
 .v16-warning{color:#ffc39a;font-weight:700;border-left:3px solid #f3aa76;padding:8px;background:#3b2a27;border-radius:5px}
 @media(max-width:620px){.v16-shape-grid,.v16-explain-grid{grid-template-columns:1fr}.v16-research-card{padding:11px}}
+
+/* V17 review: horizontally scrollable on a narrow iPhone, without altering existing cards */
+.v17-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;padding-bottom:4px}
+.v17-scroll table{width:100%;min-width:620px;border-collapse:collapse;font-size:.82rem;margin:10px 0}
+.v17-scroll th,.v17-scroll td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line,#344055);white-space:nowrap}
+.v17-scroll th{color:var(--muted,#9CA3AF)}
+.v17-audit .small{margin:8px 0}
+.v17-variant{border:1px solid var(--line,#344055);border-radius:12px;padding:12px;margin:10px 0;overflow-wrap:anywhere}
+.v17-variant p{margin:8px 0}
+#review label{display:block;margin:10px 0}
+#review select{max-width:100%;width:100%;margin-top:6px}

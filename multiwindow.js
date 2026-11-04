@@ -3,10 +3,10 @@
  * All heuristics are exploratory scores, NOT calibrated draw probabilities.
  * Draws must be supplied in newest-first order; backtests use only past draws.
  */
-import {GAMES,hash} from './core.js?v=16.0';
-import {shapePlan,shapePenalty,softKill,extraShapePenalty,extraShape,SHAPE_POLICY} from './shape-engine.js?v=16.0';
+import {GAMES,hash} from './core.js?v=17.0';
+import {shapePlan,shapePenalty,softKill,extraShapePenalty,extraShape,SHAPE_POLICY} from './shape-engine.js?v=17.0';
 
-export const MW_POLICY='research-v16.0-shape-first';
+export const MW_POLICY='research-v17.0-shape-first';
 export const WINDOWS=[20,60,120,300];
 export const MODES=['analyst','veteran','trend','random'];
 export const MODE_LABELS={analyst:'A 数据研究员',veteran:'B 经验研究员',trend:'C 走势研究员',random:'随机基准'};
@@ -96,7 +96,7 @@ function pickPart(rows,game,mode,part,size,seed,banned,search,primary){
   const nums=shuffle(max,size,random,banned),mean=avg(nums.map(n=>features[n-1].score));
   const penalty=profile?structureScore(nums,[...rows[0].main],profile,mode,baseK).penalty:0;
   let val=mode==='veteran'?mean*.15-penalty:mode==='trend'?mean*2.0-penalty:mean*1.5-penalty;
-  if(mode!=='random'){const shp=plan?shapePenalty(nums,rows[0].main,game,plan,rows[1]?.main||[]):extraShapePenalty(nums,game,mode);val-= (mode==='veteran'?.70:mode==='trend'?.42:.32)*shp.penalty;val-=nums.filter(n=>lowered.has(n)).length*.07;}
+  if(mode!=='random'){const shp=plan?shapePenalty(nums,rows[0].main,game,plan,rows[1]?.main||[]):extraShapePenalty(nums,game,mode);val-= (mode==='veteran'?.70:mode==='trend'?.42:.32)*shp.penalty;val-=nums.filter(n=>lowered.has(n)).length*.067;}
   if(best===null||val>bestScore){best=nums;bestScore=val}
  }
  return {numbers:best,score:round(bestScore),features,shapePlan:plan,softKills:[...lowered]};

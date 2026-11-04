@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import {hit, scoreLabel, compoundHit, historicPatterns} from './engine.js';
 import {pickV15,makeCompoundV15,MW_POLICY} from './multiwindow.js';
 import {GAMES, POLICY, hash} from './core.js';
+import {settledAudit} from './evidence.js';
 
 const HISTORY='history.json', OUTPUT='research.json', HEALTH='health.json';
 const SCHEDULE={ssq:[0,2,4],dlt:[1,3,6]}; // UTC weekday for Beijing calendar date (Sun=0); holidays excluded
@@ -60,13 +61,16 @@ export function run(now=new Date(),root='.'){
   if(old?.schema==='lottery-public-research-v1'&&Array.isArray(old.records))existing=old;
  }
  const records=existing.records;
+ let previousHealth=null;try{previousHealth=JSON.parse(fs.readFileSync(root+'/'+HEALTH,'utf8'))}catch{}
  let changed=false;const diagnostics={},healthGames={},alerts=[];
  for(const game of Object.keys(GAMES)){
   const rows=validated(history[game]||[],game),target=nextScheduled(game,now);
   const priorExpected=latestExpectedDraw(game,now),latest=rows[0],crossCount=rows.filter(x=>x.verification==='cross-checked').length;
   const isFresh=Boolean(latest&&latest.date>=priorExpected);
+  const priorSeen=previousHealth?.games?.[game];const firstObservedAt=latest?.issue&&priorSeen?.latestIssue!==latest.issue?now.toISOString():priorSeen?.firstObservedAt||null;
   const health={latestIssue:latest?.issue||null,latestDate:latest?.date||null,expectedBySchedule:priorExpected,
     sourceRows:rows.length,independentlyVerified:crossCount,sourceVerification:latest?.verification||'unknown',
+    lastCheckAt:now.toISOString(),firstObservedAt,statusCode:isFresh?'on-schedule':'lagging',delayDays:latest?Math.max(0,Math.round((Date.parse(priorExpected+'T00:00:00Z')-Date.parse(latest.date+'T00:00:00Z'))/864e5)):null,
     freshness:isFresh?'最新开奖覆盖常规日程':'数据可能滞后（常规日程）',settlement:'尚无已到期提前记录',
     officialError:history.provenance?.[game]?.officialError||'',mirrorError:history.provenance?.[game]?.mirrorError||''};
   healthGames[game]=health;
@@ -79,7 +83,9 @@ export function run(now=new Date(),root='.'){
    const draw=rows.find(d=>d.issue>rec.baseIssue&&d.date===rec.targetDate);
    if(draw){
     const outcome={};for(const p of rec.picks){outcome[p.mode]={main:hit(p.main,draw.main),extra:hit(p.extra,draw.extra)};}
-    rec.status='settled';rec.outcome=outcome;rec.actual={issue:draw.issue,date:draw.date,main:draw.main,extra:draw.extra,verification:draw.verification};
+    rec.status='settled';rec.firstSettledAt=now.toISOString();rec.outcome=outcome;rec.actual={issue:draw.issue,date:draw.date,main:draw.main,extra:draw.extra,verification:draw.verification};
+    // Append derived audit upon actual settlement; never mutate the pre-draw pick arrays.
+    try{const idx=rows.findIndex(r=>r.issue===rec.baseIssue);if(idx>=0)rec.audit=settledAudit(rec,rows[idx],rows[idx+1]||null,draw);}catch(e){rec.auditError='audit unavailable: '+e.message;}
     if(Array.isArray(rec.compoundPicks))rec.compoundOutcome=Object.fromEntries(rec.compoundPicks.map(p=>[p.mode,compoundHit({...p,game},draw)]));
     changed=true;
    }
@@ -106,7 +112,7 @@ export function run(now=new Date(),root='.'){
   });
   const rec={primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${MW_POLICY}`),game,targetDate:target,baseIssue:rows[0].issue,
    createdAt:now.toISOString(),policy:MW_POLICY,window:Math.min(120,rows.length),
-   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'V16形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:MW_POLICY}};
+   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'V17形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:MW_POLICY}};
   records.push(rec);changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
  }
  // Only append true before-the-draw records, no retrospective insertion.

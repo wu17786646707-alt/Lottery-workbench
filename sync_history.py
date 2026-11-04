@@ -5,6 +5,7 @@
 Usage: python sync_history.py
 """
 from __future__ import annotations
+import base64
 import datetime as dt
 import json
 import os
@@ -26,7 +27,7 @@ GAME = {'ssq': (33, 16, 6, 1), 'dlt': (35, 12, 5, 2)}
 
 def get_json(url: str, timeout=30):
     request = urllib.request.Request(url, headers={
-        'User-Agent': 'LotteryResearchLab/12 (+static-data-integrity-check)',
+        'User-Agent': 'LotteryResearchLab/17 (+static-data-integrity-check)',
         'Accept': 'application/json', 'Referer': 'https://www.lottery.gov.cn/'
     })
     with urllib.request.urlopen(request, timeout=timeout) as res:
@@ -68,17 +69,48 @@ def norm(obj, game, source):
             'date': d, 'main': main, 'extra': extra,
             'verification': 'single-source', 'sources': [source]}
 
+def fetch_github_api(game):
+    """A fresher transport for the SAME third-party data repository; not an independent source."""
+    obj = get_json('https://api.github.com/repos/yangxb919/lottery-data/contents/data/' + game + '.json?ref=main', timeout=18)
+    if not isinstance(obj, dict) or obj.get('encoding') != 'base64':
+        raise ValueError('GitHub API content encoding unavailable')
+    payload = base64.b64decode(obj['content'], validate=False)
+    if len(payload) > 6_000_000:
+        raise ValueError('GitHub API payload too large')
+    return json.loads(payload)
+
 def fetch_mirror(game):
-    errors = []
-    for template in MIRRORS:
+    """Compare transports of the same upstream; choose the newest valid snapshot, never count independent verification."""
+    attempts = [('raw', lambda: get_json(MIRRORS[0].format(game=game))),
+                ('api', lambda: fetch_github_api(game)),
+                ('cdn', lambda: get_json(MIRRORS[1].format(game=game)))]
+    snapshots, errors = [], []
+    for name, loader in attempts:
+        if name == 'cdn' and snapshots:
+            continue
         try:
-            raw = get_json(template.format(game=game))
+            raw = loader()
             if not isinstance(raw, list) or len(raw) < 20:
                 raise ValueError('not enough rows')
-            return raw
+            # Only a representative date/issue is needed to rank transport freshness.
+            valid = []
+            for item in raw[:12]:
+                try:
+                    row = norm(item, game, name)
+                    valid.append((row['issue'], row['date']))
+                except (TypeError, ValueError, KeyError, AttributeError):
+                    pass
+            if not valid:
+                raise ValueError('no valid latest rows')
+            snapshots.append((max(valid), name, raw))
         except Exception as exc:
-            errors.append(str(exc)[:160])
-    raise RuntimeError('两条镜像线路均失败（同一底层数据源）：' + ' / '.join(errors))
+            errors.append(name + ': ' + str(exc)[:140])
+    if snapshots:
+        snapshots.sort(key=lambda x: (x[0], 1 if x[1] == 'api' else 0), reverse=True)
+        picked = snapshots[0]
+        print(game, '单源传输新鲜度', [(x[1], x[0][0]) for x in snapshots], '采用', picked[1])
+        return picked[2]
+    raise RuntimeError('第三方数据源全部传输失败（raw/API/CDN均同一底层仓库）：'+' / '.join(errors))
 
 def official_ssq():
     # 中国福利彩票管理中心公开开奖 JSON；接口变动/禁止访问时不得声称核验成功。

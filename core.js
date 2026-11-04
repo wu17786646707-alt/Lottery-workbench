@@ -1,6 +1,6 @@
 /* 双彩研究工作台 V15 — 数据层。无第三方运行时依赖。 */
-export const VERSION='16.0.0';
-export const POLICY='research-v16.0';
+export const VERSION='17.0.0';
+export const POLICY='research-v17.0';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
  dlt:{name:'超级大乐透',mainName:'前区',extraName:'后区',mainMax:35,extraMax:12,mainCount:5,extraCount:2}
@@ -59,7 +59,7 @@ export function safeCompound(raw,g){
  const created=new Date(raw.created||new Date().toISOString());if(!Number.isFinite(created.getTime()))return null;
  return {id:String(raw.id||hash(`${g}/${main}/${extra}/${created.toISOString()}`)).slice(0,64),game:g,main,extra,
   created:created.toISOString(),startIssue,mode:['analyst','veteran','trend','random'].includes(raw.mode)?raw.mode:'trend',
-  note:String(raw.note||'复式研究候选').slice(0,160),policy:String(raw.policy||'research-v16.0').slice(0,60)};
+  note:String(raw.note||'复式研究候选').slice(0,160),policy:String(raw.policy||'research-v17.0').slice(0,60)};
 }
 export function safeRecord(raw){if(!raw||typeof raw!=='object'||!GAMES[raw.game])return null;let baseIssue;try{baseIssue=canonicalIssue(raw.baseIssue||raw.issue||'',String(raw.baseDate||''))}catch{return null}
  if(!Array.isArray(raw.picks)||raw.picks.length<1||raw.picks.length>4)return null;

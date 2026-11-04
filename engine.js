@@ -1,5 +1,5 @@
 /* 双彩工作台 V15：保留历史走势图/杀号等旧策略工具；正式选号与回测统一使用 multiwindow.js。 */
-import {GAMES,POLICY,hash,validBalls,numsText} from './core.js?v=16.0';
+import {GAMES,POLICY,hash,validBalls,numsText} from './core.js?v=17.0';
 export function rngFrom(s){let seed=parseInt(hash(s),16)>>>0;return ()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
 const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
 const sd=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)))};
