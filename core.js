@@ -1,5 +1,5 @@
 /* 双彩研究工作台 V15 — 数据层。无第三方运行时依赖。 */
-export const VERSION='17.2.0';
+export const VERSION='17.2.1';
 export const POLICY='research-v17.0';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
@@ -86,6 +86,28 @@ export function parseBackup(value){if(!value||!value.state)throw Error('备份�
 export function downloadFile(filename,content,type='application/json'){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),3000)}
 const MIRRORS=['https://cdn.jsdelivr.net/gh/yangxb919/lottery-data@main/data/','https://raw.githubusercontent.com/yangxb919/lottery-data/main/data/'];
 async function getJSON(url,timeout=18000){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),timeout);try{const r=await fetch(url,{cache:'no-store',signal:ctl.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
+/** 快速恢复首页与走势图：优先读取与网页同源的 history.json。
+ * 这不等于官方双源核验；后续常规 syncData 仍继续做其他线路的新鲜度对照。
+ * 仅合并真实合法记录，不会清空手机已有的守号与研究档案。
+ */
+export async function syncLocalHistoryFirst(s,timeout=14000){
+ const data=await getJSON('./history.json?first='+Date.now(),timeout);
+ if(!data||!Array.isArray(data.ssq)||!Array.isArray(data.dlt))throw Error('仓库 history.json 不完整');
+ const messages=[];let good=0;
+ for(const g of Object.keys(GAMES)){
+  if(data[g].length<20)continue;
+  const result=mergeDraws(s.draws[g]||[],data[g],g,{source:'当前网站 history.json'});
+  if(!result.rows.length)continue;
+  s.draws[g]=result.rows;
+  s.meta.provenance[g]={...(s.meta.provenance[g]||{}),source:'网站 history.json（独立核验未完成）',verification:'single-source',stale:false};
+  messages.push(`${GAMES[g].name}${result.rows.length}期，最新${result.rows[0].issue}`);
+  good++;
+ }
+ if(!good)throw Error('本仓库历史快照中没有有效开奖记录');
+ s.meta.status='已先加载本仓库历史数据：'+messages.join('；')+'。其他外部线路随后核验。';
+ return {good,messages};
+}
+
 export async function syncData(s){
  const reports=[],errors=[],snapshots=[],remoteGames={ssq:false,dlt:false};
  if(typeof location!=='undefined'&&location.hostname.endsWith('.github.io')){

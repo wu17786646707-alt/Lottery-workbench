@@ -1,4 +1,4 @@
-import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,safeTicket,safeRecord,safeCompound,normalizeDraw} from './core.js?v=17.2';
+import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,syncLocalHistoryFirst,safeTicket,safeRecord,safeCompound,normalizeDraw} from './core.js?v=17.2.1';
 import {pick,stats,shape,classifyKill,rollingBacktest,evaluateKills,sensitivity,scoreLabel,hit,nextDraw,summarizePred,makeCompound,compoundHit,rollingCompoundBacktest,historicPatterns,repeatAndAdjacent} from './engine.js?v=17.2';
 import {pickV15,makeCompoundV15,backtestV15,rollingCompoundBacktestV15} from './multiwindow.js?v=17.2';
 import {issueContext,fmtTarget,fmtBase,statusText,tentativeIssue,recordStage} from './issue-context.js?v=17.2';
@@ -157,7 +157,31 @@ function renderCompound(){
 }
 function renderPage(){if(ui.page==='trend')renderTrend();if(ui.page==='pick'){renderPicks();renderBoard();renderTickets()}if(ui.page==='compound'){renderCompound()}if(ui.page==='kill'){renderKill()}if(ui.page==='research'){renderResearch()}if(ui.page==='history'){renderHistory()}if(ui.page==='data'){renderQuality()}if(ui.page==='insights'&&window.renderV15Research)window.renderV15Research();if(ui.page==='shape'&&window.renderV17Shape)window.renderV17Shape()}
 function renderQuality(){const g=ui.game,rows=getRows(),p=ui.state.meta.provenance[g]||{},a=auditIssues(rows),qc=ui.state.meta.quarantine.filter(x=>x.game===g),verified=rows.filter(x=>x.verification==='cross-checked').length;el('qualityGrid').innerHTML=`<div class="item"><div class="row"><strong>${E(GAMES[g].name)} · ${rows.length} 期</strong><span class="tag">双源已核验 ${verified} 期</span></div><p class="small">最新期号：${E(rows[0]?.issue||'—')}，来源：${E(p.source||'旧版本机数据 / 手动导入')}</p><p class="small">校验说明：${E(p.verification||'尚未标注独立验证')}。上次同步：${E(ui.state.meta.lastSync||'无')}</p><p class="small">疑似断号：${a.suspectedGaps} 处（节假日及停开不等同缺失）；冲突隔离：${qc.length} 条。</p>${qc.length?'<details><summary>查看冲突记录</summary><p class="small">'+qc.slice(-15).map(x=>E(x.issue+' '+x.reason)).join('；')+'</p></details>':''}</div><div class="item"><h4>数据来源纪律</h4><p class="small">① 静态 JSON 快照优先；② 缺少快照时尝试第三方历史库的 CDN 和 raw 两条网络线路（同一来源，不构成双源）；③ 独立官方结果核验由自动采集工作流负责。任何数据冲突都保留旧记录并隔离，不静默覆盖。</p></div>`}
-async function performSync(){if(ui.busy)return;ui.busy=true;['syncData','syncTop'].forEach(id=>el(id).disabled=true);notify('正在同步真实历史开奖数据……');try{const old=getRows()[0]?.issue,res=await syncData(ui.state);await persist();if(res.reports.length){if(old!==getRows()[0]?.issue){ui.generated=[];ui.compound=null;}const received=Object.entries(res.remoteGames||{}).filter(([,ok])=>ok).map(([g])=>GAMES[g].name);notify(received.length?'已取得远程数据（'+received.join('、')+'）：'+res.reports.join('；'):'⚠ 本轮未取得可用的远程数据；显示的是本机旧记录，不代表已更新到最新开奖。',!received.length||received.length<2);}else notify('同步未成功：'+res.errors.slice(0,2).join('；'),true);renderAll();loadPublicLog();loadHealth();}catch(e){notify('数据同步失败：'+e.message,true)}finally{ui.busy=false;['syncData','syncTop'].forEach(id=>el(id).disabled=false)}}
+async function performSync(){
+ if(ui.busy)return;
+ ui.busy=true;['syncData','syncTop'].forEach(id=>el(id).disabled=true);
+ notify('正在优先读取本网站 history.json；开奖历史、走势图会先恢复，外部核验随后继续……');
+ try{
+  try{
+   const fast=await syncLocalHistoryFirst(ui.state,14000);
+   await persist();renderAll();
+   notify('已载入本网站真实历史数据：'+fast.messages.join('；')+'。后台继续检查镜像是否有更新。');
+  }catch(e){
+   el('syncSummary').textContent='本网站历史文件暂未读取成功（'+e.message+'），继续尝试其他数据源。';
+  }
+  const old=getRows()[0]?.issue,res=await syncData(ui.state);
+  await persist();
+  if(res.reports.length){
+   if(old!==getRows()[0]?.issue){ui.generated=[];ui.compound=null;}
+   const received=Object.entries(res.remoteGames||{}).filter(([,ok])=>ok).map(([g])=>GAMES[g].name);
+   notify(received.length?'真实开奖数据已更新：'+res.reports.join('；'):'⚠ 未能从外部线路更新；保留网站与本机已有历史。',!received.length);
+  }else notify('未取得新数据，仍可查看已经加载的历史；请检查数据中心。',true);
+  renderAll();loadPublicLog();loadHealth();
+ }catch(e){
+  notify('同步未完成：'+e.message+'。已加载的数据不会被清空。',true);
+  if(ui.state)try{renderAll()}catch{}
+ }finally{ui.busy=false;['syncData','syncTop'].forEach(id=>el(id).disabled=false)}
+}
 const selectedWindow=()=>Number(el('pickWindow').value)||60;
 function buildPicks(modes=['analyst','veteran','trend'],forceBans=null){if(!requireFreshPrediction())return;const rows=getRows(),r=gameRule(),size=selectedWindow();if(rows.length<30){setPage('data');notify('历史数据不足30期，请先同步',true);return}
  const bans=forceBans||((el('pickBan').value==='current')?currentBans():{main:[],extra:[]});try{ui.generated=createCandidates(modes,size,bans);ui.autoPreview=false;setPage('pick');renderPicks();notify(`目标${fmtTarget(currentIssue())}，依据第${rows[0].issue}期；已生成${modes.length}注本机候选（未公开锁定）`)}catch(e){notify(e.message,true)}}
@@ -233,5 +257,21 @@ function attach(){el('issueContextPanel')?.addEventListener('click',e=>{const bu
  window.addEventListener('resize',()=>{if(ui.page==='trend')renderTrend()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ui.state){loadPublicLog();loadHealth();const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;if(!ui.busy&&(!last||Date.now()-last>20*60e3))performSync();else renderIssueBanner();}});
  }
-async function init(){attach();try{ui.state=await loadState();await persist();renderAll();const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;loadPublicLog();loadHealth();if(!getRows().length||!last||Date.now()-last>20*60e3)performSync();}catch(e){ui.state=ui.state||{draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},records:[],meta:{provenance:{},quarantine:[]},settings:{}};renderAll();notify('初始化失败：'+e.message,true)}if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=17.2').catch(()=>{});}
+async function init(){
+ attach();
+ try{
+  ui.state=await loadState();
+  renderAll(); // 不要等 IndexedDB 再次写入完成后才显示原有开奖与走势图
+  persist();
+  const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;
+  loadPublicLog();loadHealth();
+  if(!getRows().length||!last||Date.now()-last>20*60e3)performSync();
+ }catch(e){
+  console.error('V17.2.1 初始化失败',e);
+  if(!ui.state)ui.state={draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},compounds:{ssq:[],dlt:[]},records:[],meta:{provenance:{},quarantine:[]},settings:{}};
+  try{renderAll()}catch(renderError){console.error('启动备用界面也失败',renderError)}
+  notify('页面初始化异常，请尝试“同步”；原有 GitHub 开奖文件未删除。'+e.message,true);
+ }
+ if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=17.2.1').catch(()=>{});
+}
 init();
