@@ -95,3 +95,12 @@
 .issue-actions button{background:#294969;border:1px solid #50799a;color:#e5f1fc;border-radius:9px;padding:8px 10px;min-height:34px;font-size:12px;cursor:pointer}
 .issue-actions button:focus-visible{outline:2px solid #8bbcf0;outline-offset:2px}
 .issue-attention .issue-actions button:first-child{background:#65452b;border-color:#bd9564}
+
+/* V18: mobile-first next-draw evidence and one-budget compound presentation */
+.v18-ticket{border:1px solid var(--border,#34445e);border-radius:14px;padding:14px;display:grid;gap:10px}
+.v18-ticket h3{margin:6px 0 0}.v18-fact-block{padding:12px 0;border-bottom:1px solid var(--border,#34445e)}
+.v18-fact-block h4{margin:0 0 8px}.v18-table{width:100%;border-collapse:collapse;font-size:12px;min-width:560px}
+.v18-table th,.v18-table td{padding:8px;border-bottom:1px solid rgba(140,155,178,.22);text-align:left;vertical-align:top}
+.v18-table th{white-space:nowrap}.v18-table .v18-selected{background:rgba(67,131,222,.15)}
+.v18-error{color:#ff939b;font-size:13px}.v18-fact-block details summary{padding:10px 0;cursor:pointer}
+@media(max-width:600px){.v18-ticket{padding:10px}.v18-table{font-size:11px}.v18-table th,.v18-table td{padding:6px}.v18-ticket .balls{flex-wrap:wrap}}

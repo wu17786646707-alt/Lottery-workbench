@@ -1,6 +1,6 @@
 /* 双彩研究工作台 V15 — 数据层。无第三方运行时依赖。 */
-export const VERSION='17.2.1';
-export const POLICY='research-v17.0';
+export const VERSION='18.0.0';
+export const POLICY='research-v17.0'; // 保持研究算法版本，前瞻档案不可改写
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
  dlt:{name:'超级大乐透',mainName:'前区',extraName:'后区',mainMax:35,extraMax:12,mainCount:5,extraCount:2}
@@ -51,15 +51,18 @@ export function mergeDraws(existing,incoming,game,opts={}){
 export function safeTicket(raw,g){if(!raw||typeof raw!=='object')return null;const main=arr(raw.main).sort((a,b)=>a-b),extra=arr(raw.extra).sort((a,b)=>a-b);if(!validBalls(main,extra,g))return null;return {id:String(raw.id||hash(`${g}/${main}/${extra}/${raw.created||''}`)).slice(0,64),game:g,main,extra,created:String(raw.created||new Date().toISOString()).slice(0,40),startIssue:(()=>{try{return raw.startIssue?canonicalIssue(raw.startIssue):''}catch{return ''}})(),note:String(raw.note||'').slice(0,200),active:raw.active!==false}}
 export function safeCompound(raw,g){
  if(!raw||typeof raw!=='object'||!GAMES[g])return null;
- const c=GAMES[g],k=g==='ssq'?8:7;
+ const c=GAMES[g];
  const main=arr(raw.main).sort((a,b)=>a-b),extra=arr(raw.extra).sort((a,b)=>a-b);
- if(main.length!==k||extra.length!==c.extraCount||new Set(main).size!==k||new Set(extra).size!==c.extraCount||
+ const shapes=g==='ssq'?[[8,1],[7,4]]:[[7,2],[5,7]];
+ if(!shapes.some(([m,e])=>main.length===m&&extra.length===e)||new Set(main).size!==main.length||new Set(extra).size!==extra.length||
    main.some(n=>!Number.isInteger(n)||n<1||n>c.mainMax)||extra.some(n=>!Number.isInteger(n)||n<1||n>c.extraMax))return null;
  let startIssue='';try{if(raw.startIssue)startIssue=canonicalIssue(raw.startIssue)}catch{}
  const created=new Date(raw.created||new Date().toISOString());if(!Number.isFinite(created.getTime()))return null;
  return {id:String(raw.id||hash(`${g}/${main}/${extra}/${created.toISOString()}`)).slice(0,64),game:g,main,extra,
   created:created.toISOString(),startIssue,mode:['analyst','veteran','trend','random'].includes(raw.mode)?raw.mode:'trend',
-  note:String(raw.note||'复式研究候选').slice(0,160),policy:String(raw.policy||'research-v17.0').slice(0,60)};
+  note:String(raw.note||'复式研究候选').slice(0,160),policy:String(raw.policy||'research-v17.0').slice(0,60),
+  targetDate:/^20\d{2}-\d{2}-\d{2}$/.test(String(raw.targetDate||''))?String(raw.targetDate):'',
+  type:`${main.length}+${extra.length}`};
 }
 export function safeRecord(raw){if(!raw||typeof raw!=='object'||!GAMES[raw.game])return null;let baseIssue;try{baseIssue=canonicalIssue(raw.baseIssue||raw.issue||'',String(raw.baseDate||''))}catch{return null}
  if(!Array.isArray(raw.picks)||raw.picks.length<1||raw.picks.length>4)return null;

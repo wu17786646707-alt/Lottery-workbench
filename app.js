@@ -1,7 +1,9 @@
-import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,syncLocalHistoryFirst,safeTicket,safeRecord,safeCompound,normalizeDraw} from './core.js?v=17.2.1';
-import {pick,stats,shape,classifyKill,rollingBacktest,evaluateKills,sensitivity,scoreLabel,hit,nextDraw,summarizePred,makeCompound,compoundHit,rollingCompoundBacktest,historicPatterns,repeatAndAdjacent} from './engine.js?v=17.2';
-import {pickV15,makeCompoundV15,backtestV15,rollingCompoundBacktestV15} from './multiwindow.js?v=17.2';
-import {issueContext,fmtTarget,fmtBase,statusText,tentativeIssue,recordStage} from './issue-context.js?v=17.2';
+import {VERSION,POLICY,GAMES,pad,numsText,escapeHTML as E,hash,loadState,saveState,storageName,mergeDraws,auditIssues,parseCSV,parseBackup,fullBackup,downloadFile,syncData,syncLocalHistoryFirst,safeTicket,safeRecord,safeCompound,normalizeDraw} from './core.js?v=18.0';
+import {pick,stats,shape,classifyKill,rollingBacktest,evaluateKills,sensitivity,scoreLabel,hit,nextDraw,summarizePred,makeCompound,compoundHit,rollingCompoundBacktest,historicPatterns,repeatAndAdjacent} from './engine.js?v=18.0';
+import {pickV15,makeCompoundV15,backtestV15,rollingCompoundBacktestV15} from './multiwindow.js?v=18.0';
+import {issueContext,fmtTarget,fmtBase,statusText,tentativeIssue,recordStage} from './issue-context.js?v=18.0';
+import {selectCompound,validateCompound,COMPOUND_TYPES} from './decision-engine.js?v=18.0';
+import {exactCoverage} from './evidence.js?v=18.0';
 const el=id=>document.getElementById(id);const gameNames=Object.keys(GAMES);
 const ui={compound:null,health:null,healthStatus:"后台状态读取中",autoPreview:false,researchCandidates:[],researchSignature:"",game:'ssq',page:'home',state:null,generated:[],kill:null,lastBacktest:null,lastKill:null,filter:'',historyShown:30,board:{ssq:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()},dlt:{main:new Set(),extra:new Set(),banMain:new Set(),banExtra:new Set()}},busy:false,publicLog:null,publicStatus:"公开记录读取中"};
 let persisting=Promise.resolve(),alertTimer=null,suppressOrb=false,pressTimer=null;
@@ -11,7 +13,7 @@ const getRows=()=>ui.state.draws[ui.game];
 const currentIssue=()=>issueContext(ui.game,getRows(),ui.publicLog);
 window.getLotteryIssueContext=()=>currentIssue();
 window.getV15Context=()=>({game:ui.game,rows:ui.state?.draws?.[ui.game]||[],version:VERSION,source:ui.state?.meta?.provenance?.[ui.game]||{},publicLog:ui.publicLog});
-window.useV17PrimaryCompound=(p)=>{if(!p||p.game!==ui.game)throw Error('当前彩种不一致');if(p.bets!==(ui.game==='ssq'?28:21))throw Error('复式注数异常');ui.compound=p;setPage('compound');renderCompound();};
+window.useV17PrimaryCompound=(p)=>{if(!requireFreshPrediction())throw Error('目标期次已过或最新数据未同步');if(!validateCompound(ui.game,p))throw Error('复式结构、注数或成本校验失败');if(p.snapshot?.baseIssue!==getRows()[0]?.issue)throw Error('历史基准期号已改变，请重新生成');ui.compound=p;const t=`${p.main.length}+${p.extra.length}`;if(el('compoundTemplate'))el('compoundTemplate').value=t;if(el('compoundMode'))el('compoundMode').value=p.mode;setPage('compound');renderCompound();};
 const gameRule=()=>GAMES[ui.game];
 function renderIssueBanner(){
  const node=el('issueContextPanel');if(!node||!ui.state)return;const c=currentIssue();
@@ -27,8 +29,8 @@ function notify(msg,error=false){const x=el('alert');x.textContent=msg;x.classNa
 function persist(){persisting=persisting.then(()=>saveState(ui.state)).catch(e=>notify(e.message,true));return persisting}
 const small=s=>`<span class="meta">${E(s)}</span>`;
 const coloredBalls=(main,extra)=>`<div class="balls">${main.map(n=>`<span class="ball">${pad(n)}</span>`).join('')}${extra.map(n=>`<span class="ball extra">${pad(n)}</span>`).join('')}</div>`;
-function setPage(p){if(!el(p)||!el(p).classList.contains('page'))return;ui.page=p;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===p));window.scrollTo({top:0,behavior:'auto'});renderPage();if(p==='insights'&&window.renderV15Research)window.renderV15Research();if(p==='shape'&&window.renderV17Shape)window.renderV17Shape();if(p==='review'&&window.renderV17Review)window.renderV17Review()}
-function setGame(g){if(!GAMES[g])return;ui.game=g;ui.compound=null;ui.generated=[];ui.researchCandidates=[];ui.researchSignature="";ui.autoPreview=false;ui.kill=null;ui.lastBacktest=null;ui.lastKill=null;document.querySelectorAll('[data-game]').forEach(x=>x.classList.toggle('active',x.dataset.game===g));renderAll();if(window.renderV15Research)window.renderV15Research();if(window.renderV17Review)window.renderV17Review()}
+function setPage(p){if(!el(p)||!el(p).classList.contains('page'))return;ui.page=p;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===p));document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===p));window.scrollTo({top:0,behavior:'auto'});renderPage();if(p==='insights'&&window.renderV15Research)window.renderV15Research();if(p==='shape'&&window.renderV17Shape)window.renderV17Shape();if(p==='review'&&window.renderV17Review)window.renderV17Review();if(p==='decision'&&window.renderV18Decision)window.renderV18Decision()}
+function setGame(g){if(!GAMES[g])return;ui.game=g;ui.compound=null;ui.generated=[];ui.researchCandidates=[];ui.researchSignature="";ui.autoPreview=false;ui.kill=null;ui.lastBacktest=null;ui.lastKill=null;document.querySelectorAll('[data-game]').forEach(x=>x.classList.toggle('active',x.dataset.game===g));renderAll();if(window.renderV15Research)window.renderV15Research();if(window.renderV17Review)window.renderV17Review();if(window.renderV18Decision)window.renderV18Decision()}
 function createCandidates(modes=['analyst','veteran','trend'],size=Number(el('pickWindow').value)||60,bans={main:[],extra:[]}){
  const rows=getRows();return modes.map(mode=>{const p=pickV15(rows,ui.game,mode,{window:size,bans});p.bans={main:[...(bans.main||[])],extra:[...(bans.extra||[])]};p.killContext=(p.bans.main.length||p.bans.extra.length)?{method:el('killMode').value,window:Number(el('killWindow').value)}:null;return p})
 }
@@ -130,32 +132,44 @@ function generateCompound(){
  if(getRows().length<30){notify('历史数据不足30期，请先同步',true);return}
  try{
   const mode=el('compoundMode').value,windowSize=Number(el('compoundWindow').value)||60;
-  ui.compound=makeCompoundV15(getRows(),ui.game,mode,{window:windowSize});renderCompound();
-  notify(`${GAMES[ui.game].name} 已生成${ui.game==='ssq'?'8+1':'7+2'}复式 ${ui.compound.bets}注，含逐球解释`);
+  const base=makeCompoundV15(getRows(),ui.game,mode,{window:windowSize});
+  const type=el('compoundTemplate').value;ui.compound=selectCompound(getRows(),ui.game,base,type);renderCompound();
+  notify(`${GAMES[ui.game].name} 已生成${type}复式 ${ui.compound.bets}注／${ui.compound.cost}元；只展示这一组`);
  }catch(e){notify('复式生成失败：'+e.message,true)}
 }
-function compoundLine(p){return `目标${fmtTarget(currentIssue())}；历史依据${p.snapshot.baseIssue}期 · ${GAMES[p.game].name} ${p.game==='ssq'?'8+1':'7+2'}复式 · ${scoreLabel[p.mode]} · ${numsText(p.main)} + ${numsText(p.extra)} · ${p.bets}注/${p.cost}元基本投注 · 历史基准${p.snapshot.baseIssue}`}
+function compoundLine(p){return `目标${fmtTarget(currentIssue())}；历史依据第${p.snapshot.baseIssue}期 · ${GAMES[p.game].name} ${p.main.length}+${p.extra.length}复式 · ${scoreLabel[p.mode]} · ${numsText(p.main)} + ${numsText(p.extra)} · ${p.bets}注/${p.cost}元基本投注 · 本机即时研究，未自动公开锁定`}
 function saveCompound(){
  if(!requireFreshPrediction())return;
  const x=ui.compound;if(!x){notify('请先生成一注复式号码',true);return}
- const t=safeCompound({game:x.game,main:x.main,extra:x.extra,created:new Date().toISOString(),startIssue:x.snapshot.baseIssue,mode:x.mode,policy:x.snapshot.policy,note:'复式候选 '+scoreLabel[x.mode]},ui.game);
+ if(!validateCompound(ui.game,x)||x.snapshot.baseIssue!==getRows()[0]?.issue){notify('期次或复式结构已经变化，请重新生成',true);return}
+ const t=safeCompound({game:x.game,main:x.main,extra:x.extra,created:new Date().toISOString(),startIssue:x.snapshot.baseIssue,targetDate:currentIssue().targetDate,mode:x.mode,policy:x.snapshot.policy,note:`${x.main.length}+${x.extra.length} · ${scoreLabel[x.mode]} · 目标${fmtTarget(currentIssue())}`},ui.game);
  if(!t){notify('复式格式校验失败',true);return}
  ui.state.compounds[ui.game].unshift(t);ui.state.compounds[ui.game]=ui.state.compounds[ui.game].slice(0,100);
  persist();renderCompound();notify('已保存本机复式守号，请定期导出备份');
 }
 function renderCompound(){
- const type=ui.game==='ssq'?'8+1':'7+2',bets=ui.game==='ssq'?28:21,cost=bets*2;
- el('compoundPageSub').textContent=`${GAMES[ui.game].name} ${type}：固定${bets}注基本投注，每注2元；以下只提供研究号码，不代购彩。`;
- el('compoundCostHint').textContent=`${GAMES[ui.game].name} ${type}：${bets}注 × 2元 = ${cost}元${ui.game==='dlt'?'；如选择追加则合计63元':''}。`;
- if(ui.compound&&(ui.compound.snapshot.baseIssue!==getRows()[0]?.issue||!currentIssue().canRecommend)){ui.compound=null;notify('上一期复式已结束研究，最新数据需要重新选号',true);}
+ const types=COMPOUND_TYPES[ui.game],type=el('compoundTemplate').value;
+ if(!types.includes(type))el('compoundTemplate').value=types[0];
+ const wanted=el('compoundTemplate').value,[m,e]=wanted.split('+').map(Number),expected=exactCoverage(ui.game,m,e);
+ el('compoundPageSub').textContent=`${GAMES[ui.game].name}：可切换 ${types.join(' / ')}。两种结构都是${expected.bets}注，每注2元，基本投注${expected.cost}元；只展示一组，不自动购票。`;
+ el('compoundCostHint').textContent=`当前选择 ${wanted}：${expected.bets}注 × 2元 = ${expected.cost}元（大乐透不含追加）。另一结构注数与基本成本相同，不代表更容易中一等奖。`;
+ if(ui.compound&&(ui.compound.snapshot?.baseIssue!==getRows()[0]?.issue||!currentIssue().canRecommend)){
+  ui.compound=null;notify('上一期复式已结束研究，最新数据需要重新选号',true);
+ }
  const x=ui.compound;
- if(x){const pat=historicPatterns(getRows(),ui.game,x.snapshot.window);const examples=x.explain.map(item=>`<div class="explain-item"><strong>${item.kind==='main'?GAMES[ui.game].mainName:GAMES[ui.game].extraName} ${pad(item.number)}</strong><p>近期出现${item.observed}次 / 均匀随机期望${item.expected}次，遗漏${item.miss}期。</p><p>${E(item.reason)}</p></div>`).join('');
- el('compoundResult').innerHTML=`<div class="compound-result"><div class="row wrap"><h3>${E(scoreLabel[x.mode])} · ${type}复式候选</h3><span class="tag">目标${E(fmtTarget(currentIssue()))} · 基准${E(x.snapshot.baseIssue)}期</span></div>${coloredBalls(x.main,x.extra)}<div class="row wrap"><span class="compound-pill">重号 ${x.pattern.repeat}个</span><span class="compound-pill">连号对 ${x.pattern.adjacent}组</span><span class="compound-pill">组合展开 ${x.bets}注</span><span class="compound-pill">基本投注 ${x.cost}元</span></div><p class="small">最近 ${pat.sample}期单式历史均值：重号 ${pat.meanRepeat.toFixed(2)}个、连号对 ${pat.meanAdjacent.toFixed(2)}组；复式因选球更多，不能直接比较。</p><details><summary>展开所有${x.main.length+x.extra.length}个球的选择依据</summary><div class="explain-list">${examples}</div></details><p class="footnote">策略版本${E(x.snapshot.policy)} · 数据指纹${E(x.snapshot.hash)}。这注尚未公开提前锁定；复制或保存不会自动成为官方销售彩票。</p></div>`;
- }else el('compoundResult').innerHTML='<p class="sub">请先选择研究员并点击“生成一注复式候选”。</p>';
+ if(x){const pat=historicPatterns(getRows(),ui.game,x.snapshot.window||120),typeNow=`${x.main.length}+${x.extra.length}`;
+ const examples=(x.explain||[]).map(item=>`<div class="explain-item"><strong>${item.kind==='main'?GAMES[ui.game].mainName:GAMES[ui.game].extraName} ${pad(item.number)}</strong><p>近期出现${E(item.observed??'—')}次 / 均匀随机期望${E(item.expected??'—')}次，遗漏${E(item.miss??'—')}期。</p><p>${E(item.reason)}</p></div>`).join('');
+ el('compoundResult').innerHTML=`<div class="compound-result"><div class="row wrap"><h3>${E(scoreLabel[x.mode])} · ${typeNow}复式候选</h3><span class="tag">目标${E(fmtTarget(currentIssue()))} · 基准${E(x.snapshot.baseIssue)}期</span></div>${coloredBalls(x.main,x.extra)}<div class="row wrap"><span class="compound-pill">重号 ${x.pattern.repeat}个</span><span class="compound-pill">连号对 ${x.pattern.adjacent}组</span><span class="compound-pill">组合展开 ${x.bets}注</span><span class="compound-pill">基本投注 ${x.cost}元</span></div><p class="small">最近${pat.sample}期单式历史均值：重号${pat.meanRepeat.toFixed(2)}个、连号对${pat.meanAdjacent.toFixed(2)}组；复式选球更多，不能直接比较。</p><p class="small">${E(x.origin||'研究员候选')}；本次仅一组，本机保存不等于购票或GitHub公开锁定。</p><details><summary>展开${x.main.length+x.extra.length}个球的选择依据</summary><div class="explain-list">${examples}</div></details><p class="footnote">策略版本${E(x.snapshot.policy)} · 历史指纹${E(x.snapshot.hash)}。候选结构可在上方切换，切换后必须重新生成，不会偷偷沿用旧号码。</p></div>`;
+ }else el('compoundResult').innerHTML='<p class="sub">请先选择研究员和复式结构，再点击“生成一组复式候选”。</p>';
  const records=(ui.state?.compounds?.[ui.game]||[]).slice(0,30);
- el('compoundSaved').innerHTML=records.length?records.map(t=>{const later=nextDraw(getRows(),t.startIssue),review=later?compoundHit(t,later):null;return `<div class="item"><div class="row wrap"><strong>${E(t.note)}</strong><span class="tag">${E(t.startIssue)}起</span></div>${coloredBalls(t.main,t.extra)}<p class="small">${type}复式 ${bets}注 / ${cost}元 · 保存于 ${E(t.created.slice(0,10))}</p>${review?`<p class="small">首次后续开奖 ${E(later.issue)} · 覆盖开奖号码：主区${review.mainHits}个、后区${review.extraHits}个；展开组合 ${review.total}注。</p><details><summary>查看展开后的单式命中分布（不等于实际奖金）</summary><p class="small">${review.distributions.map(z=>`${z.main}+${z.extra}命中：${z.tickets}注`).join('；')}</p></details>`:'<p class="small">待后续真实开奖数据核对</p>'}<button data-remove-compound="${E(t.id)}">删除这条本机方案</button></div>`}).join(''):'<p class="sub">尚未保存复式方案；可先生成后点击“保存复式守号”。</p>';
+ el('compoundSaved').innerHTML=records.length?records.map(t=>{
+  const tt=`${t.main.length}+${t.extra.length}`,bx=exactCoverage(ui.game,t.main.length,t.extra.length);
+  const later=nextDraw(getRows(),t.startIssue),review=later?compoundHit(t,later):null;
+  return `<div class="item"><div class="row wrap"><strong>${E(t.note)}</strong><span class="tag">${E(t.startIssue)}起；${tt}</span></div>${coloredBalls(t.main,t.extra)}<p class="small">${tt}复式 ${bx.bets}注 / ${bx.cost}元 · 保存于${E(t.created.slice(0,10))}${t.targetDate?' · 原目标'+E(t.targetDate):''}</p>${review?`<p class="small">首次后续开奖 第${E(later.issue)}期 · 覆盖实际开奖号码：主区${review.mainHits}个、后区${review.extraHits}个；展开组合${review.total}注。</p><details><summary>展开后各类单式命中分布（不等于实际奖金）</summary><p class="small">${review.distributions.map(z=>`${z.main}+${z.extra}：${z.tickets}注`).join('；')}</p></details>`:'<p class="small">等待真实目标期开奖；记录不会跨期改写。</p>'}<button data-remove-compound="${E(t.id)}">删除这条本机方案</button></div>`;
+ }).join(''):'<p class="sub">尚未保存复式方案；生成并核对后可保存到本机。</p>';
 }
-function renderPage(){if(ui.page==='trend')renderTrend();if(ui.page==='pick'){renderPicks();renderBoard();renderTickets()}if(ui.page==='compound'){renderCompound()}if(ui.page==='kill'){renderKill()}if(ui.page==='research'){renderResearch()}if(ui.page==='history'){renderHistory()}if(ui.page==='data'){renderQuality()}if(ui.page==='insights'&&window.renderV15Research)window.renderV15Research();if(ui.page==='shape'&&window.renderV17Shape)window.renderV17Shape()}
+
+function renderPage(){if(ui.page==='trend')renderTrend();if(ui.page==='pick'){renderPicks();renderBoard();renderTickets()}if(ui.page==='compound'){renderCompound()}if(ui.page==='kill'){renderKill()}if(ui.page==='research'){renderResearch()}if(ui.page==='history'){renderHistory()}if(ui.page==='data'){renderQuality()}if(ui.page==='insights'&&window.renderV15Research)window.renderV15Research();if(ui.page==='shape'&&window.renderV17Shape)window.renderV17Shape();if(ui.page==='decision'&&window.renderV18Decision)window.renderV18Decision()}
 function renderQuality(){const g=ui.game,rows=getRows(),p=ui.state.meta.provenance[g]||{},a=auditIssues(rows),qc=ui.state.meta.quarantine.filter(x=>x.game===g),verified=rows.filter(x=>x.verification==='cross-checked').length;el('qualityGrid').innerHTML=`<div class="item"><div class="row"><strong>${E(GAMES[g].name)} · ${rows.length} 期</strong><span class="tag">双源已核验 ${verified} 期</span></div><p class="small">最新期号：${E(rows[0]?.issue||'—')}，来源：${E(p.source||'旧版本机数据 / 手动导入')}</p><p class="small">校验说明：${E(p.verification||'尚未标注独立验证')}。上次同步：${E(ui.state.meta.lastSync||'无')}</p><p class="small">疑似断号：${a.suspectedGaps} 处（节假日及停开不等同缺失）；冲突隔离：${qc.length} 条。</p>${qc.length?'<details><summary>查看冲突记录</summary><p class="small">'+qc.slice(-15).map(x=>E(x.issue+' '+x.reason)).join('；')+'</p></details>':''}</div><div class="item"><h4>数据来源纪律</h4><p class="small">① 静态 JSON 快照优先；② 缺少快照时尝试第三方历史库的 CDN 和 raw 两条网络线路（同一来源，不构成双源）；③ 独立官方结果核验由自动采集工作流负责。任何数据冲突都保留旧记录并隔离，不静默覆盖。</p></div>`}
 async function performSync(){
  if(ui.busy)return;
@@ -234,10 +248,10 @@ async function restoreBackup(text){try{const value=JSON.parse(text);if(value?.fo
  const parsed=parseBackup(value);if(!window.confirm(`即将覆盖当前 V12 数据、守号和研究记录。${value.format==='lottery-v5'?'此旧版备份没有单独存储的 V10/V11 研究记录，恢复后请另外导入锁定记录。':''}请先备份当前内容。确定继续？`))return;ui.state=parsed;ui.generated=[];ui.compound=null;ui.kill=null;await persist();renderAll();notify('完整备份已恢复，请核对历史期数及研究档案')}catch(e){notify('恢复失败：'+e.message,true)}}
 function attach(){el('issueContextPanel')?.addEventListener('click',e=>{const button=e.target.closest('[data-issue-jump]');if(!button)return;setPage(button.dataset.issueJump);if(button.dataset.issueJump==='data'&&!ui.busy)performSync();});document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));document.querySelectorAll('[data-game]').forEach(b=>b.addEventListener('click',()=>setGame(b.dataset.game)));
  el('researchGenerate').addEventListener('click',()=>{if(getRows().length<30){setPage('data');notify('历史数据不足30期',true);return}try{ui.researchCandidates=createCandidates();ui.researchSignature='';ui.generated=ui.researchCandidates;ui.autoPreview=false;renderAll();notify('已为本期重新生成 A/B/C 三组研究候选')}catch(e){notify(e.message,true)}});
- document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='go-pick'){if(getRows().length>=30&&!ui.generated.length)ensureCandidates();setPage('pick')}else if(a==='go-research')setPage('research');else if(a==='go-data')setPage('data');else if(a==='go-compound')setPage('compound');else if(a==='trend-generate'){buildPicks(['trend']);} }));
+ document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='go-pick'){if(getRows().length>=30&&!ui.generated.length)ensureCandidates();setPage('pick')}else if(a==='go-decision')setPage('decision');else if(a==='go-research')setPage('research');else if(a==='go-data')setPage('data');else if(a==='go-compound')setPage('compound');else if(a==='trend-generate'){buildPicks(['trend']);} }));
  for(const id of ['syncTop','syncData'])el(id).addEventListener('click',performSync);
  el('generateCompound').onclick=generateCompound;
- el('compoundMode').onchange=()=>{ui.compound=null;renderCompound()};el('compoundWindow').onchange=()=>{ui.compound=null;renderCompound()};
+ el('compoundMode').onchange=()=>{ui.compound=null;renderCompound()};el('compoundWindow').onchange=()=>{ui.compound=null;renderCompound()};el('compoundTemplate').onchange=()=>{ui.compound=null;renderCompound()};
  el('compoundCopy').onclick=()=>ui.compound?copyText(compoundLine(ui.compound)):notify('请先生成复式号码',true);
  el('compoundBacktest').onclick=()=>{try{const data=rollingCompoundBacktestV15(getRows(),ui.game,el('compoundMode').value,{train:300,window:Number(el('compoundWindow').value)||120,test:20});
   el('compoundBacktestResult').innerHTML=`<div class="item"><strong>${E(scoreLabel[data.mode])} · 复式滚动回测 ${data.periods}期</strong><p class="small">历史平均主区覆盖 ${data.averages.main.toFixed(2)}（等量随机理论 ${data.randomExpected.main.toFixed(2)}），后区 ${data.averages.extra.toFixed(2)}（随机理论 ${data.randomExpected.extra.toFixed(2)}）。</p><p class="small">最近${Math.min(8,data.items.length)}期：${data.items.slice(-8).map(x=>E(x.issue)+'：'+x.main+'+'+x.extra).join('；')}</p><p class="footnote">${E(data.disclaimer)} 未考虑真实投注成本与实际奖级，不能代表盈利；历史窗口调参会带来过拟合风险。</p></div>`;
@@ -253,7 +267,7 @@ function attach(){el('issueContextPanel')?.addEventListener('click',e=>{const bu
  for(const id of ['trendWindow','trendPart'])el(id).addEventListener('change',()=>{if(ui.page==='trend')renderTrend()});el('calculateKill').onclick=updateKill;el('killBacktest').onclick=runKillBacktest;el('killGenerate').onclick=()=>{try{const ban=currentBans();renderKill();buildPicks(['analyst','veteran','trend'],ban)}catch(e){notify(e.message,true)}};
  for(const id of ['killMode','killWindow','killMain','killExtra'])el(id).addEventListener('change',()=>{ui.kill=null;if(ui.page==='kill')renderKill()});
  el('runBacktest').onclick=runBacktest;el('exportBacktest').onclick=()=>{if(!ui.lastBacktest){notify('请先运行回测',true);return}downloadFile('双彩同算法滚动回测_'+ui.game+'.json',JSON.stringify(ui.lastBacktest,null,2))};el('exportRecords').onclick=()=>downloadFile('双彩研究锁定档案_'+ui.game+'.json',JSON.stringify({format:'lottery-research-v12',exportedAt:new Date().toISOString(),records:ui.state.records.filter(x=>x.game===ui.game),warning:'本机锁定不是不可篡改证明'},null,2));
- el('historySearch').oninput=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyLimit').onchange=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyMore').onclick=()=>{ui.historyShown+=Number(el('historyLimit').value);renderHistory()};el('importCSV').onclick=()=>importCsvText(el('csvText').value);el('csvInput').onchange=e=>useFile(e.target,importCsvText,6e6);el('backupAll').onclick=()=>downloadFile('双彩研究工作台_V17_完整备份.json',JSON.stringify(fullBackup(ui.state),null,2));el('backupCSV').onclick=backupCSV;el('restoreJSON').onchange=e=>useFile(e.target,restoreBackup,8e6);
+ el('historySearch').oninput=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyLimit').onchange=()=>{ui.historyShown=Number(el('historyLimit').value);renderHistory()};el('historyMore').onclick=()=>{ui.historyShown+=Number(el('historyLimit').value);renderHistory()};el('importCSV').onclick=()=>importCsvText(el('csvText').value);el('csvInput').onchange=e=>useFile(e.target,importCsvText,6e6);el('backupAll').onclick=()=>downloadFile('双彩研究工作台_V18_完整备份.json',JSON.stringify(fullBackup(ui.state),null,2));el('backupCSV').onclick=backupCSV;el('restoreJSON').onchange=e=>useFile(e.target,restoreBackup,8e6);
  window.addEventListener('resize',()=>{if(ui.page==='trend')renderTrend()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ui.state){loadPublicLog();loadHealth();const last=ui.state.meta.lastSync?Date.parse(ui.state.meta.lastSync):0;if(!ui.busy&&(!last||Date.now()-last>20*60e3))performSync();else renderIssueBanner();}});
  }
@@ -267,11 +281,11 @@ async function init(){
   loadPublicLog();loadHealth();
   if(!getRows().length||!last||Date.now()-last>20*60e3)performSync();
  }catch(e){
-  console.error('V17.2.1 初始化失败',e);
+  console.error('V18 初始化失败',e);
   if(!ui.state)ui.state={draws:{ssq:[],dlt:[]},tickets:{ssq:[],dlt:[]},compounds:{ssq:[],dlt:[]},records:[],meta:{provenance:{},quarantine:[]},settings:{}};
   try{renderAll()}catch(renderError){console.error('启动备用界面也失败',renderError)}
   notify('页面初始化异常，请尝试“同步”；原有 GitHub 开奖文件未删除。'+e.message,true);
  }
- if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=17.2.1').catch(()=>{});
+ if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js?v=18.0').catch(()=>{});
 }
 init();

@@ -1,6 +1,6 @@
 /** V17: auditable shape/kill/coverage diagnostics. No draw probabilities inferred from trends. */
-import {GAMES} from './core.js?v=17.2';
-import {featuresOf} from './shape-engine.js?v=17.2';
+import {GAMES} from './core.js?v=18.0';
+import {featuresOf} from './shape-engine.js?v=18.0';
 export const EVIDENCE_POLICY='evidence-v17.0';
 export const MODE_NAMES={analyst:'A 数据',veteran:'B 经验',trend:'C 走势',random:'随机'};
 export function choose(n,k){if(!Number.isInteger(n)||!Number.isInteger(k)||k<0||k>n)return 0;let v=1;for(let i=1;i<=k;i++)v=v*(n-i+1)/i;return Math.round(v)}

@@ -1,7 +1,7 @@
 /* V15 mobile multi-window research report UI. No purchase functionality. */
-import {factTable,patterns,pickV15,makeCompoundV15,backtestV15,WINDOWS,MODE_LABELS,MW_POLICY} from './multiwindow.js?v=17.2';
-import {GAMES,pad,hash,escapeHTML as E} from './core.js?v=17.2';
-import {issueContext,fmtTarget,fmtBase,statusText} from './issue-context.js?v=17.2';
+import {factTable,patterns,pickV15,makeCompoundV15,backtestV15,WINDOWS,MODE_LABELS,MW_POLICY} from './multiwindow.js?v=18.0';
+import {GAMES,pad,hash,escapeHTML as E} from './core.js?v=18.0';
+import {issueContext,fmtTarget,fmtBase,statusText} from './issue-context.js?v=18.0';
 const $=id=>document.getElementById(id);
 let report=null,oldKey='',lastBacktest=null;
 function stage(c){return issueContext(c.game,c.rows,c.publicLog)}

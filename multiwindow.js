@@ -3,8 +3,8 @@
  * All heuristics are exploratory scores, NOT calibrated draw probabilities.
  * Draws must be supplied in newest-first order; backtests use only past draws.
  */
-import {GAMES,hash} from './core.js?v=17.2';
-import {shapePlan,shapePenalty,softKill,extraShapePenalty,extraShape,SHAPE_POLICY} from './shape-engine.js?v=17.2';
+import {GAMES,hash} from './core.js?v=18.0';
+import {shapePlan,shapePenalty,softKill,extraShapePenalty,extraShape,SHAPE_POLICY} from './shape-engine.js?v=18.0';
 
 export const MW_POLICY='research-v17.0-shape-first';
 export const WINDOWS=[20,60,120,300];

@@ -1,8 +1,8 @@
 /** V17 phone-first public forward-record diagnostics; uses exact prior locks only. */
-import {GAMES,pad,escapeHTML as esc} from './core.js?v=17.2';
-import {settledAudit,findDrawForRecord,templateOptions,deterministicAlternatives,templateCoverage,MODE_NAMES} from './evidence.js?v=17.2';
-import {makeCompoundV15} from './multiwindow.js?v=17.2';
-import {tentativeIssue,recordStage} from './issue-context.js?v=17.2';
+import {GAMES,pad,escapeHTML as esc} from './core.js?v=18.0';
+import {settledAudit,findDrawForRecord,templateOptions,deterministicAlternatives,templateCoverage,MODE_NAMES} from './evidence.js?v=18.0';
+import {makeCompoundV15} from './multiwindow.js?v=18.0';
+import {tentativeIssue,recordStage} from './issue-context.js?v=18.0';
 const el=id=>document.getElementById(id);
 const names={ssq:'双色球',dlt:'大乐透'};
 const fmt=a=>a.map(x=>pad(x)).join(' ');

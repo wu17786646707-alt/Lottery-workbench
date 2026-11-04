@@ -1,6 +1,6 @@
 /* PWA cache v17: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
-const CACHE='dual-lottery-v17.2.1-recovery';
-const ASSETS=['./startup-recovery.js?v=17.2.1','./issue-context.js?v=17.2','./','./index.html','./styles.css?v=17.2.1','./core.js?v=17.2.1','./engine.js?v=17.2','./app.js?v=17.2.1','./coverage.js?v=17.2.1','./multiwindow.js?v=17.2','./shape-engine.js?v=17.2','./shape-ui.js?v=17.2.1','./review-ui.js?v=17.2.1','./evidence.js?v=17.2','./multiwindow-ui.js?v=17.2.1','./official_latest.json','./icon.svg','./manifest.webmanifest'];
+const CACHE='dual-lottery-v18.0-decision';
+const ASSETS=['./startup-recovery.js?v=18.0','./decision-engine.js?v=18.0','./decision-ui.js?v=18.0','./issue-context.js?v=18.0','./','./index.html','./styles.css?v=18.0','./core.js?v=18.0','./engine.js?v=18.0','./app.js?v=18.0','./coverage.js?v=18.0','./multiwindow.js?v=18.0','./shape-engine.js?v=18.0','./shape-ui.js?v=18.0','./review-ui.js?v=18.0','./evidence.js?v=18.0','./multiwindow-ui.js?v=18.0','./official_latest.json','./icon.svg','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(x=>x!==CACHE).map(x=>caches.delete(x)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;if((u.pathname.endsWith('/history.json')||u.pathname.endsWith('/research.json')||u.pathname.endsWith('/health.json'))){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return}
