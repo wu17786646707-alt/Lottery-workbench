@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-04T17:20:45.225Z",
+  "generatedAt": "2026-11-04T18:16:10.292Z",
   "games": {
     "ssq": {
       "latestIssue": "2026126",
@@ -9,7 +9,7 @@
       "sourceRows": 3523,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-04T17:20:45.225Z",
+      "lastCheckAt": "2026-11-04T18:16:10.292Z",
       "firstObservedAt": "2026-11-04T01:59:54.811Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
@@ -25,7 +25,7 @@
       "sourceRows": 2943,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-04T17:20:45.225Z",
+      "lastCheckAt": "2026-11-04T18:16:10.292Z",
       "firstObservedAt": null,
       "statusCode": "lagging",
       "delayDays": 2,
