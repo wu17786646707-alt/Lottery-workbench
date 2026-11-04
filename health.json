@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-04T02:56:36.736Z",
+  "generatedAt": "2026-11-04T15:16:24.270Z",
   "games": {
     "ssq": {
       "latestIssue": "2026126",
@@ -9,7 +9,7 @@
       "sourceRows": 3523,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-04T02:56:36.736Z",
+      "lastCheckAt": "2026-11-04T15:16:24.270Z",
       "firstObservedAt": "2026-11-04T01:59:54.811Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
@@ -21,15 +21,15 @@
     "dlt": {
       "latestIssue": "2026125",
       "latestDate": "2026-11-02",
-      "expectedBySchedule": "2026-11-02",
+      "expectedBySchedule": "2026-11-04",
       "sourceRows": 2943,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-04T02:56:36.736Z",
+      "lastCheckAt": "2026-11-04T15:16:24.270Z",
       "firstObservedAt": null,
-      "statusCode": "on-schedule",
-      "delayDays": 0,
-      "freshness": "最新开奖覆盖常规日程",
+      "statusCode": "lagging",
+      "delayDays": 2,
+      "freshness": "数据可能滞后（常规日程）",
       "settlement": "已核对2条，暂无逾期待核对记录",
       "officialError": "HTTP Error 567: Unknown Status",
       "mirrorError": ""
@@ -37,6 +37,7 @@
   },
   "alerts": [
     "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
+    "超级大乐透：最新2026-11-02，常规日程预期2026-11-04；自动核对可能滞后",
     "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
   "note": "绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。"
