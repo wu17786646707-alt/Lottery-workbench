@@ -32,10 +32,18 @@ export function fillUnique(g,existing,target){if(!Number.isInteger(target)||targ
 export function toCsv(g,tickets){return '\uFEFF彩种,主区,后区,组合来源\n'+tickets.map(t=>[GAME_CONFIG[g].name,`"${t.main.map(pad).join(' ')}"`,`"${t.extra.map(pad).join(' ')}"`,t.source].join(',')).join('\n')+'\n'}
 export function line(t){return`${t.main.map(pad).join(' ')} + ${t.extra.map(pad).join(' ')}`}
 const $=id=>document.getElementById(id);
-const ui={game:'ssq',tickets:{ssq:[],dlt:[]},locked:{ssq:false,dlt:false},lastMessage:''};
+const ui={game:'ssq',tickets:{ssq:[],dlt:[]},baseIssues:{ssq:null,dlt:null},locked:{ssq:false,dlt:false},lastMessage:''};
 const money=g=>Number($('oddsBudget')?.value||GAME_CONFIG[g].defaultBudget);
 function getGame(){return document.querySelector('[data-game].active')?.dataset.game||'ssq'}
+function issue(){const c=typeof window.getLotteryIssueContext==='function'?window.getLotteryIssueContext():null;return c?.game===getGame()?c:null}
+function safeBasket(){const c=issue(),g=getGame();return !!c?.canRecommend&&(!ui.baseIssues[g]||ui.baseIssues[g]===c.baseIssue)}
+function tagBasket(){const c=issue();if(c)ui.baseIssues[getGame()]=c.baseIssue}
+
 function render(){if(!$('oddsSummary'))return;ui.game=getGame();const g=ui.game,c=GAME_CONFIG[g],p=ticketUniverse(g),n=ui.tickets[g].length,b=Math.min(500,Math.max(0,money(g))),goal=Math.floor(b/2),compound=choose(c.compoundMain,c.mainSize)*choose(c.compoundExtra,c.extraSize);const exact=probability(g,n);
+ const target=issue(),oldBase=ui.baseIssues[g],mismatch=!!oldBase&&target?.baseIssue!==oldBase,blocked=!target?.canRecommend||mismatch;
+ const msg=!target?.latest?'尚未取得有效历史基准，先同步开奖数据。':mismatch?`此篮子来自历史基准第${oldBase}期，当前已经更新到第${target.baseIssue}期。旧号码不会自动转成新一期推荐。可在清单中长按复制旧数据保存，之后点击“清空本页篮子”重新生成。`:!target.canRecommend?'目标开奖时间可能已过，必须先同步开奖后再为下一期准备组合。':`研究目标：预计第${target.targetIssue||'待确认'}期（${target.targetDate}）；历史基准：第${target.baseIssue}期。本页只是模拟清单，不是GitHub赛前锁定档案。`;
+ if($('oddsTargetStatus')){$('oddsTargetStatus').textContent=msg;$('oddsTargetStatus').className='issue-budget-note'+(blocked?' outdated':'');}
+ for(const id of ['oddsResearchers','oddsImport','oddsFill','oddsCopy','oddsExport'])if($(id))$(id).disabled=blocked;
  $('oddsGameTitle').textContent=c.name+` · 一等奖覆盖 ${p.toLocaleString('zh-CN')} 种开奖结果`;
  $('oddsComboHint').textContent=`${c.compoundMain}+${c.compoundExtra} 复式 = ${compound}注 = ${compound*2}元；相同的${compound}注不同单式具有相同一等奖概率。`;
  $('oddsBudgetLabel').textContent=`￥${b.toFixed(0)}，最多 ${goal} 注不重复单式`;
@@ -44,16 +52,16 @@ function render(){if(!$('oddsSummary'))return;ui.game=getGame();const g=ui.game,
  $('oddsStatus').textContent=ui.lastMessage||'只生成研究清单，不会自动购买彩票。';
 }
 function setMessage(msg){ui.lastMessage=msg;render()}
-function captureMix(){const g=getGame(),getter=window.getResearchPicksForCoverage;const picks=typeof getter==='function'?getter():[];
+function captureMix(){if(!safeBasket()){setMessage('旧号码或目标时间不符合当前下一期开奖，请同步/清空后重新生成');return}const g=getGame(),getter=window.getResearchPicksForCoverage;const picks=typeof getter==='function'?getter():[];
  if(!picks.length){setMessage('A/B/C 尚无可用号码。请先同步至少30期真实历史数据，或直接生成不重复组合。');return;}
  const next=uniqueTickets(g,[...ui.tickets[g],...picks.map(p=>single(g,p.main,p.extra,'研究员 '+(p.mode==='analyst'?'A':p.mode==='veteran'?'B':'C')))]);
- ui.tickets[g]=next.valid;setMessage(`已加入${picks.length}组研究员候选；本次合并剔除${next.duplicates.length}组重复组合。研究员号码与其他不重复组合的一等奖概率相同。`)
+ ui.tickets[g]=next.valid;tagBasket();setMessage(`已加入${picks.length}组研究员候选；本次合并剔除${next.duplicates.length}组重复组合。研究员号码与其他不重复组合的一等奖概率相同。`)
 }
-function importText(){const g=getGame();try{const t=parseLines(g,$('oddsPaste').value);const merged=uniqueTickets(g,[...ui.tickets[g],...t.tickets]);ui.tickets[g]=merged.valid;setMessage(`已识别${t.tickets.length}注（复式已展开）；合并后${merged.valid.length}注不同组合，重复${merged.duplicates.length}注。${t.errors.length?'输入问题：'+t.errors.slice(0,3).join('；'):''}`)}catch(e){setMessage('导入失败：'+e.message)}}
-function fill(){const g=getGame(),budget=money(g);if(!Number.isFinite(budget)||budget<2||budget>500||budget%2!==0){setMessage('请输入2～500元的偶数预算；仅为研究试算，不建议根据概率提高原定预算。');return}
- try{ui.tickets[g]=fillUnique(g,ui.tickets[g],budget/2);setMessage(`已达到￥${budget}预算上限，生成 ${ui.tickets[g].length}注完全不重复的有效组合；数学上一等奖概率为 ${(ui.tickets[g].length/ticketUniverse(g)*100).toFixed(7)}%。`)}catch(e){setMessage(e.message)}}
-function copy(){const g=getGame(),str=ui.tickets[g].map(line).join('\n');if(!str){setMessage('没有可复制的组合');return}if(navigator.clipboard?.writeText){navigator.clipboard.writeText(str).then(()=>setMessage('号码已复制，保留在本机。')).catch(()=>setMessage('复制受限，请长按下方列表复制。'))}else setMessage('请长按下方列表复制。')}
-function exportCsv(){const g=getGame(),tickets=ui.tickets[g];if(!tickets.length){setMessage('没有可导出的组合');return}const blob=new Blob([toCsv(g,tickets)],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`一等奖不重复覆盖_${g}_${tickets.length}注.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);setMessage('已下载 CSV。此研究清单不包含购票凭证。')}
+function importText(){if(!safeBasket()){setMessage('当前篮子期次已过期，或最新开奖未同步；请先清空或刷新');return}const g=getGame();try{const t=parseLines(g,$('oddsPaste').value);const merged=uniqueTickets(g,[...ui.tickets[g],...t.tickets]);ui.tickets[g]=merged.valid;tagBasket();setMessage(`已识别${t.tickets.length}注（复式已展开）；合并后${merged.valid.length}注不同组合，重复${merged.duplicates.length}注。${t.errors.length?'输入问题：'+t.errors.slice(0,3).join('；'):''}`)}catch(e){setMessage('导入失败：'+e.message)}}
+function fill(){if(!safeBasket()){setMessage('当前篮子使用了旧历史基准，或最新开奖未同步；请先清空或刷新');return}const g=getGame(),budget=money(g);if(!Number.isFinite(budget)||budget<2||budget>500||budget%2!==0){setMessage('请输入2～500元的偶数预算；仅为研究试算，不建议根据概率提高原定预算。');return}
+ try{ui.tickets[g]=fillUnique(g,ui.tickets[g],budget/2);tagBasket();setMessage(`已达到￥${budget}预算上限，生成 ${ui.tickets[g].length}注完全不重复的有效组合；数学上一等奖概率为 ${(ui.tickets[g].length/ticketUniverse(g)*100).toFixed(7)}%。`)}catch(e){setMessage(e.message)}}
+function copy(){if(!safeBasket()){setMessage('历史基准已过期，不能以“本期”名义复制旧组合；请先确认目标开奖');return}const g=getGame(),str=ui.tickets[g].map(line).join('\n');if(!str){setMessage('没有可复制的组合');return}if(navigator.clipboard?.writeText){navigator.clipboard.writeText(str).then(()=>setMessage('号码已复制，保留在本机。')).catch(()=>setMessage('复制受限，请长按下方列表复制。'))}else setMessage('请长按下方列表复制。')}
+function exportCsv(){if(!safeBasket()){setMessage('研究篮子属于上一历史基准或数据尚未同步；请重新生成后再导出');return}const g=getGame(),tickets=ui.tickets[g];if(!tickets.length){setMessage('没有可导出的组合');return}const blob=new Blob([toCsv(g,tickets)],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`一等奖不重复覆盖_${g}_${tickets.length}注.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2500);setMessage('已下载 CSV。此研究清单不包含购票凭证。')}
 function init(){if(!$('oddsBudget'))return;
  // 每个彩种分别记录用户填写的模拟预算，不自动增加投入。
  const limits={ssq:56,dlt:42};const btns=document.querySelectorAll('[data-game]');btns.forEach(btn=>btn.addEventListener('click',()=>{const g=btn.dataset.game;const curr=getGame();if(g!==ui.game){ui.game=g;$('oddsBudget').value=limits[g];ui.lastMessage='';render()}}));
@@ -62,7 +70,7 @@ function init(){if(!$('oddsBudget'))return;
  $('oddsImport').addEventListener('click',importText);
  $('oddsResearchers').addEventListener('click',captureMix);
  $('oddsFill').addEventListener('click',fill);
- $('oddsClear').addEventListener('click',()=>{ui.tickets[getGame()]=[];ui.lastMessage='已清空本页研究篮子，不影响守号或公开研究档案。';render()});
+ $('oddsClear').addEventListener('click',()=>{ui.tickets[getGame()]=[];ui.baseIssues[getGame()]=null;ui.lastMessage='已清空本页研究篮子，不影响守号或公开研究档案。';render()});
  $('oddsCopy').addEventListener('click',copy);
  $('oddsExport').addEventListener('click',exportCsv);
  render();}

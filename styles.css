@@ -77,3 +77,21 @@
 .v17-variant p{margin:8px 0}
 #review label{display:block;margin:10px 0}
 #review select{max-width:100%;width:100%;margin-top:6px}
+
+/* V17.2 explicit base/target identity on all mobile pages */
+.issue-context{border:1px solid #5a738a;border-radius:14px;padding:14px;margin:10px 0 16px;background:#152639;color:#e4effa}
+.issue-context .issue-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.issue-context .issue-grid>div{display:flex;flex-direction:column;gap:6px;min-width:0;background:rgba(255,255,255,.035);padding:10px;border-radius:9px}
+.issue-context strong{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.issue-tag{font-size:11px;color:#adc3df;letter-spacing:.2px}
+.issue-status{font-size:12px;line-height:1.65;color:#cbdaeb;margin:9px 2px 0}
+.issue-context.issue-attention{border-color:#e6a06d;background:#37251b}
+.issue-context.issue-attention .issue-tag{color:#ffd09c}
+.issue-budget-note{border-left:3px solid #5e95db;padding:9px 12px;margin:12px 0;background:rgba(94,149,219,.09);font-size:13px;line-height:1.6}
+.issue-budget-note.outdated{border-color:#f1a674;background:rgba(197,95,54,.13)}
+@media(max-width:440px){.issue-context .issue-grid{grid-template-columns:1fr}.issue-context{padding:10px}.issue-context strong{font-size:13px}}
+
+.issue-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.issue-actions button{background:#294969;border:1px solid #50799a;color:#e5f1fc;border-radius:9px;padding:8px 10px;min-height:34px;font-size:12px;cursor:pointer}
+.issue-actions button:focus-visible{outline:2px solid #8bbcf0;outline-offset:2px}
+.issue-attention .issue-actions button:first-child{background:#65452b;border-color:#bd9564}

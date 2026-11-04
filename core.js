@@ -1,5 +1,5 @@
 /* 双彩研究工作台 V15 — 数据层。无第三方运行时依赖。 */
-export const VERSION='17.0.0';
+export const VERSION='17.2.0';
 export const POLICY='research-v17.0';
 export const GAMES={
  ssq:{name:'双色球',mainName:'红球',extraName:'蓝球',mainMax:33,extraMax:16,mainCount:6,extraCount:1},
@@ -65,7 +65,7 @@ export function safeRecord(raw){if(!raw||typeof raw!=='object'||!GAMES[raw.game]
  if(!Array.isArray(raw.picks)||raw.picks.length<1||raw.picks.length>4)return null;
  const picks=raw.picks.map(p=>{const t=safeTicket(p,raw.game);if(!t)return null;const legacyMode=raw.policy||raw.model||'旧版';const mode=p.mode==='trend'&&legacyMode==='dual-v9'?'analyst':p.mode;return {mode:['analyst','veteran','trend','random'].includes(mode)?mode:'analyst',main:t.main,extra:t.extra,explanations:Array.isArray(p.explanations)?p.explanations.map(x=>String(x).slice(0,300)).slice(0,20):[],bans:{main:Array.isArray(p.bans?.main)?p.bans.main.filter(n=>Number.isInteger(n)&&n>=1&&n<=GAMES[raw.game].mainMax).slice(0,24):[],extra:Array.isArray(p.bans?.extra)?p.bans.extra.filter(n=>Number.isInteger(n)&&n>=1&&n<=GAMES[raw.game].extraMax).slice(0,10):[]},killContext:p.killContext&&typeof p.killContext==='object'?{method:['cold','hot','miss'].includes(p.killContext.method)?p.killContext.method:'cold',window:Math.max(0,Math.min(200,Number(p.killContext.window)||0))}:null}});if(picks.some(x=>!x))return null;
  const time=new Date(raw.lockedAt);if(!Number.isFinite(time.getTime()))return null;
- return {id:String(raw.id||hash(JSON.stringify({baseIssue,picks,time}))).slice(0,64),game:raw.game,baseIssue,lockedAt:time.toISOString(),snapshotHash:String(raw.snapshotHash||'').slice(0,64),window:Math.max(0,Math.min(1000,Number(raw.window)||0)),policy:String(raw.policy||'旧版记录').slice(0,50),picks,localOnly:true};
+ return {id:String(raw.id||hash(JSON.stringify({baseIssue,picks,time}))).slice(0,64),game:raw.game,baseIssue,lockedAt:time.toISOString(),snapshotHash:String(raw.snapshotHash||'').slice(0,64),window:Math.max(0,Math.min(1000,Number(raw.window)||0)),policy:String(raw.policy||'旧版记录').slice(0,50),targetDate:/^20\d{2}-\d{2}-\d{2}$/.test(String(raw.targetDate||''))?String(raw.targetDate):'',picks,localOnly:true};
 }
 export function migrateLegacy(legacy={},legacyResearch=[]){const s=newState();for(const g of Object.keys(GAMES)){s.draws[g]=mergeDraws([],legacy.draws?.[g]||[],g).rows;s.tickets[g]=(legacy.tickets?.[g]||[]).slice(0,10000).map(x=>safeTicket(x,g)).filter(Boolean)}s.records=(Array.isArray(legacyResearch)?legacyResearch:[]).slice(0,5000).map(safeRecord).filter(Boolean);s.meta.migration='已检查并迁移本机旧版本记录（无效项目已跳过）';return s}
 function validateState(raw){const s=newState();if(!raw||typeof raw!=='object')return s;for(const g of Object.keys(GAMES)){s.draws[g]=mergeDraws([],raw.draws?.[g]||[],g).rows;s.tickets[g]=(Array.isArray(raw.tickets?.[g])?raw.tickets[g]:[]).slice(0,15000).map(x=>safeTicket(x,g)).filter(Boolean);s.compounds[g]=(Array.isArray(raw.compounds?.[g])?raw.compounds[g]:[]).slice(0,500).map(x=>safeCompound(x,g)).filter(Boolean)}s.records=(Array.isArray(raw.records)?raw.records:[]).slice(0,10000).map(safeRecord).filter(Boolean);if(raw.meta&&typeof raw.meta==='object')s.meta={...s.meta,lastSync:String(raw.meta.lastSync||'').slice(0,40),status:String(raw.meta.status||'').slice(0,150),quarantine:Array.isArray(raw.meta.quarantine)?raw.meta.quarantine.slice(-150):[],provenance:raw.meta.provenance&&typeof raw.meta.provenance==='object'?raw.meta.provenance:{},migration:String(raw.meta.migration||'').slice(0,140)};if(raw.settings&&typeof raw.settings==='object')s.settings={window:[30,60,100,200].includes(Number(raw.settings.window))?Number(raw.settings.window):60,train:[30,60,100].includes(Number(raw.settings.train))?Number(raw.settings.train):60,test:[20,40,60,120].includes(Number(raw.settings.test))?Number(raw.settings.test):60};return s}
@@ -87,7 +87,7 @@ export function downloadFile(filename,content,type='application/json'){const blo
 const MIRRORS=['https://cdn.jsdelivr.net/gh/yangxb919/lottery-data@main/data/','https://raw.githubusercontent.com/yangxb919/lottery-data/main/data/'];
 async function getJSON(url,timeout=18000){const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),timeout);try{const r=await fetch(url,{cache:'no-store',signal:ctl.signal});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
 export async function syncData(s){
- const reports=[],errors=[],snapshots=[];
+ const reports=[],errors=[],snapshots=[],remoteGames={ssq:false,dlt:false};
  if(typeof location!=='undefined'&&location.hostname.endsWith('.github.io')){
   const owner=location.hostname.split('.')[0],repo=location.pathname.split('/').filter(Boolean)[0];
   if(/^[a-zA-Z0-9_-]+$/.test(owner)&&/^[a-zA-Z0-9_.-]+$/.test(repo)){
@@ -123,6 +123,7 @@ export async function syncData(s){
    if(valid.length>=20)options.push({rows:valid,kind:src.kind,source:src.source,latest:valid.reduce((a,x)=>a>x.issue?a:x.issue,'')});
   }
   options.sort((a,b)=>b.latest.localeCompare(a.latest)||b.rows.length-a.rows.length);
+  remoteGames[g]=options.length>0;
   let result={rows:s.draws[g],quarantine:[],report:{added:0,verified:0,conflicts:0},suspectedGaps:0},add=0,conflicts=0,sources=[];
   // Merge newer source first. Cross-source discrepancies are quarantined, never silently overwritten.
   for(const x of options){result=mergeDraws(result.rows,x.rows,g,{source:x.source});add+=result.report.added;conflicts+=result.report.conflicts;sources.push(x.source);s.meta.quarantine=[...s.meta.quarantine,...result.quarantine].slice(-150)}
@@ -142,6 +143,7 @@ export async function syncData(s){
   s.meta.provenance[g]={source:sourceLabel,verification:verificationLabel,latest:latest.issue,count:result.rows.length,updated:new Date().toISOString(),suspectedGaps:auditIssues(result.rows).suspectedGaps,conflicts,stale};
   reports.push(`${GAMES[g].name} 最新${latest.issue}（${latest.date}），共${result.rows.length}期，新增${add}期${!options.length&&!manual.length?'；本次未取得可用远程数据':''}${stale?'；⚠距最近记录已'+gap+'天，请核验官方':''}`);
  }
- if(reports.length){s.meta.lastSync=new Date().toISOString();s.meta.status=reports.join('；')+(errors.length?'；部分线路不可用':'')}
- return {reports,errors};
+ if(Object.values(remoteGames).some(Boolean))s.meta.lastSync=new Date().toISOString();
+ s.meta.status=reports.join('；')+(Object.values(remoteGames).every(Boolean)?'':'；⚠部分或全部远程开奖未取得，请核对数据源')+(errors.length?'；部分线路不可用':'');
+ return {reports,errors,remoteGames};
 }
