@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#10182a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>双彩研究工作台 V17.0</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=17.0">
+<title>双彩研究工作台 V17.0.1</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=17.0">
 </head>
 <body>
 <header class="mast container">
@@ -12,7 +12,7 @@
 </header>
 <div class="container"><div class="info-banner" role="note">V17 新增“形态先行·一组复式”：三位研究员同时研究，但默认只选一组主展示。软杀号、形态和走势图用于透明研究，不能可靠改变公平开奖的单注一等奖概率。</div>
 <div class="toolbar"><div class="tabs" role="group" aria-label="彩种"><button class="tab active" data-game="ssq">双色球 <small>6+1</small></button><button class="tab" data-game="dlt">超级大乐透 <small>5+2</small></button></div><div class="top-meta"><strong id="topCount">0 期</strong><span id="latestIssue">待加载</span></div></div>
-<nav class="nav" aria-label="页面导航"><button class="active" data-page="home">总览</button><button data-page="trend">走势与图表</button><button data-page="pick">三路选号</button><button data-page="insights">多窗口研究报告</button><button data-page="shape">形态先行·一组复式</button><button data-page="compound">复式选号</button><button data-page="coverage">一等奖概率</button><button data-page="kill">杀号实验室</button><button data-page="research">研究战绩</button><button data-page="review">复盘诊断 V17</button><button data-page="history">历史开奖</button><button data-page="data">数据与备份</button></nav>
+<nav class="nav" aria-label="页面导航"><button class="active" data-page="home">总览</button><button data-page="trend">走势与图表</button><button data-page="pick">三路选号</button><button data-page="insights">多窗口研究报告</button><button data-page="shape">形态先行·一组复式</button><button data-page="compound">复式选号</button><button data-page="coverage">一等奖概率</button><button data-page="kill">杀号实验室</button><button data-page="research">研究战绩</button><button data-page="review">复盘诊断 V17.0.1</button><button data-page="history">历史开奖</button><button data-page="data">数据与备份</button></nav>
 <div id="alert" role="status" aria-live="polite" class="alert hidden"></div>
 <main>
 <section id="home" class="page active">
@@ -114,9 +114,10 @@
  <article class="panel"><h3>仓库后台自动化状态</h3><div id="healthData" class="stack"></div><p class="sub" id="publicDataStatus">读取公开研究记录中……</p><p class="footnote">后台定时更新要求在仓库的 .github/workflows 目录安装 GitHub Actions 工作流，并赋予 Actions 读取和写入仓库的权限。若未安装，当前只是浏览器手动同步。单源记录不可冒充双源独立核验。</p></article>
  <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V17.0.0</p></article>
 </section>
-</main><footer class="footer">双彩研究工作台 V17.0 · 形态先行 · 一组复式 · 随机对照 · 仅供统计研究与娱乐，量力而行</footer></div>
+</main><footer class="footer">双彩研究工作台 V17.0.1 · 复盘修复 · 形态先行 · 一组复式 · 随机对照 · 仅供统计研究与娱乐，量力而行</footer></div>
 <script type="module" src="app.js?v=17.0"></script>
 <script type="module" src="coverage.js?v=17.0"></script>
 <script type="module" src="multiwindow-ui.js?v=17.0"></script>
 <script type="module" src="shape-ui.js?v=17.0"></script>
+<script type="module" src="review-ui.js?v=17.0.1"></script>
 </body></html>

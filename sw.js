@@ -1,6 +1,6 @@
 /* PWA cache v17: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
-const CACHE='dual-lottery-v17.0.0';
-const ASSETS=['./','./index.html','./styles.css?v=17.0','./core.js?v=17.0','./engine.js?v=17.0','./app.js?v=17.0','./coverage.js?v=17.0','./multiwindow.js?v=17.0','./shape-engine.js?v=17.0','./shape-ui.js?v=17.0','./review-ui.js?v=17.0','./evidence.js?v=17.0','./multiwindow-ui.js?v=17.0','./official_latest.json','./icon.svg','./manifest.webmanifest'];
+const CACHE='dual-lottery-v17.0.1-reviewfix';
+const ASSETS=['./','./index.html','./styles.css?v=17.0','./core.js?v=17.0','./engine.js?v=17.0','./app.js?v=17.0','./coverage.js?v=17.0','./multiwindow.js?v=17.0','./shape-engine.js?v=17.0','./shape-ui.js?v=17.0','./review-ui.js?v=17.0.1','./evidence.js?v=17.0','./multiwindow-ui.js?v=17.0','./official_latest.json','./icon.svg','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(x=>x!==CACHE).map(x=>caches.delete(x)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;if((u.pathname.endsWith('/history.json')||u.pathname.endsWith('/research.json')||u.pathname.endsWith('/health.json'))){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return}
