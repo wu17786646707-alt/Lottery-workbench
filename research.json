@@ -1,6 +1,6 @@
 {
   "schema": "lottery-public-research-v1",
-  "generatedAt": "2026-11-11T02:57:29.993Z",
+  "generatedAt": "2026-11-12T02:57:21.695Z",
   "records": [
     {
       "id": "d9fc9018",
@@ -16791,7 +16791,7 @@
       "policy": "research-v17.0-shape-first",
       "window": 120,
       "origin": "GitHub Actions public automation; not the user's private device records",
-      "status": "pending",
+      "status": "settled",
       "picks": [
         {
           "mode": "analyst",
@@ -19181,6 +19181,325 @@
         },
         "method": "V17形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率",
         "policy": "research-v17.0-shape-first"
+      },
+      "firstSettledAt": "2026-11-12T02:57:21.695Z",
+      "outcome": {
+        "analyst": {
+          "main": 0,
+          "extra": 0
+        },
+        "veteran": {
+          "main": 2,
+          "extra": 1
+        },
+        "trend": {
+          "main": 2,
+          "extra": 0
+        },
+        "random": {
+          "main": 0,
+          "extra": 0
+        }
+      },
+      "actual": {
+        "issue": "2026129",
+        "date": "2026-11-11",
+        "main": [
+          2,
+          12,
+          14,
+          17,
+          33
+        ],
+        "extra": [
+          7,
+          8
+        ],
+        "verification": "single-source"
+      },
+      "audit": {
+        "game": "dlt",
+        "policy": "research-v17.0-shape-first",
+        "baseIssue": "2026128",
+        "targetDate": "2026-11-11",
+        "actualIssue": "2026129",
+        "actualShape": {
+          "head": 2,
+          "tail": 33,
+          "zones": [
+            2,
+            2,
+            1
+          ],
+          "odd": 2,
+          "large": 1,
+          "sum": 78,
+          "span": 31,
+          "repeat": 0,
+          "adj": 0,
+          "neighbor": 4,
+          "diagonal": 0
+        },
+        "byMode": {
+          "analyst": {
+            "hitMain": 0,
+            "hitExtra": 0,
+            "predicted": {
+              "head": 9,
+              "tail": 26,
+              "zones": [
+                2,
+                1,
+                2
+              ],
+              "odd": 3,
+              "large": 2,
+              "sum": 83,
+              "span": 17,
+              "repeat": 2,
+              "adj": 2,
+              "neighbor": 1,
+              "diagonal": 0
+            },
+            "errors": {
+              "head": 7,
+              "tail": 7,
+              "zonesL1": 2,
+              "sum": 5,
+              "span": 14,
+              "odd": 1,
+              "large": 1,
+              "repeat": 2,
+              "adj": 2,
+              "neighbor": 3,
+              "diagonal": 0
+            },
+            "softKills": {
+              "main": [
+                31,
+                30,
+                7,
+                16
+              ],
+              "extra": [
+                5
+              ],
+              "mainMistakes": 0,
+              "extraMistakes": 0,
+              "mainRandomExpected": 0.571,
+              "extraRandomExpected": 0.167
+            },
+            "wasPredictedBeforeDraw": true
+          },
+          "veteran": {
+            "hitMain": 2,
+            "hitExtra": 1,
+            "predicted": {
+              "head": 4,
+              "tail": 25,
+              "zones": [
+                2,
+                2,
+                1
+              ],
+              "odd": 2,
+              "large": 2,
+              "sum": 82,
+              "span": 21,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 3,
+              "diagonal": 0
+            },
+            "errors": {
+              "head": 2,
+              "tail": 8,
+              "zonesL1": 0,
+              "sum": 4,
+              "span": 10,
+              "odd": 0,
+              "large": 1,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 1,
+              "diagonal": 0
+            },
+            "softKills": {
+              "main": [
+                31,
+                30,
+                7,
+                16
+              ],
+              "extra": [
+                5
+              ],
+              "mainMistakes": 0,
+              "extraMistakes": 0,
+              "mainRandomExpected": 0.571,
+              "extraRandomExpected": 0.167
+            },
+            "wasPredictedBeforeDraw": true
+          },
+          "trend": {
+            "hitMain": 2,
+            "hitExtra": 0,
+            "predicted": {
+              "head": 12,
+              "tail": 27,
+              "zones": [
+                1,
+                2,
+                2
+              ],
+              "odd": 3,
+              "large": 3,
+              "sum": 99,
+              "span": 15,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 1,
+              "diagonal": 0
+            },
+            "errors": {
+              "head": 10,
+              "tail": 6,
+              "zonesL1": 2,
+              "sum": 21,
+              "span": 16,
+              "odd": 1,
+              "large": 2,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 3,
+              "diagonal": 0
+            },
+            "softKills": {
+              "main": [
+                31,
+                30,
+                7,
+                16
+              ],
+              "extra": [
+                5
+              ],
+              "mainMistakes": 0,
+              "extraMistakes": 0,
+              "mainRandomExpected": 0.571,
+              "extraRandomExpected": 0.167
+            },
+            "wasPredictedBeforeDraw": true
+          },
+          "random": {
+            "hitMain": 0,
+            "hitExtra": 0,
+            "predicted": {
+              "head": 1,
+              "tail": 19,
+              "zones": [
+                2,
+                3,
+                0
+              ],
+              "odd": 4,
+              "large": 2,
+              "sum": 62,
+              "span": 18,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 1,
+              "diagonal": 0
+            },
+            "errors": {
+              "head": 1,
+              "tail": 14,
+              "zonesL1": 2,
+              "sum": 16,
+              "span": 13,
+              "odd": 2,
+              "large": 1,
+              "repeat": 1,
+              "adj": 1,
+              "neighbor": 3,
+              "diagonal": 0
+            },
+            "softKills": {
+              "main": [],
+              "extra": [],
+              "mainMistakes": 0,
+              "extraMistakes": 0,
+              "mainRandomExpected": 0,
+              "extraRandomExpected": 0
+            },
+            "wasPredictedBeforeDraw": true
+          }
+        },
+        "verified": "single-source",
+        "note": "旧版本无赛前软杀号记录的项目显示未记录，不得事后补算为提前预测。形态误差是事后审计而非中一等奖概率。"
+      },
+      "compoundOutcome": {
+        "analyst": {
+          "mainHits": 1,
+          "extraHits": 0,
+          "distributions": [
+            {
+              "main": 0,
+              "extra": 0,
+              "tickets": 6
+            },
+            {
+              "main": 1,
+              "extra": 0,
+              "tickets": 15
+            }
+          ],
+          "total": 21
+        },
+        "veteran": {
+          "mainHits": 2,
+          "extraHits": 1,
+          "distributions": [
+            {
+              "main": 0,
+              "extra": 1,
+              "tickets": 1
+            },
+            {
+              "main": 1,
+              "extra": 1,
+              "tickets": 10
+            },
+            {
+              "main": 2,
+              "extra": 1,
+              "tickets": 10
+            }
+          ],
+          "total": 21
+        },
+        "trend": {
+          "mainHits": 2,
+          "extraHits": 0,
+          "distributions": [
+            {
+              "main": 0,
+              "extra": 0,
+              "tickets": 1
+            },
+            {
+              "main": 1,
+              "extra": 0,
+              "tickets": 10
+            },
+            {
+              "main": 2,
+              "extra": 0,
+              "tickets": 10
+            }
+          ],
+          "total": 21
+        }
       }
     },
     {
@@ -21588,6 +21907,2409 @@
         "method": "V17形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率",
         "policy": "research-v17.0-shape-first"
       }
+    },
+    {
+      "primaryCompoundMode": "veteran",
+      "compoundDecision": "三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。",
+      "id": "7d9a90b1",
+      "game": "dlt",
+      "targetDate": "2026-11-14",
+      "baseIssue": "2026129",
+      "createdAt": "2026-11-12T02:57:21.695Z",
+      "policy": "research-v17.0-shape-first",
+      "window": 120,
+      "origin": "GitHub Actions public automation; not the user's private device records",
+      "status": "pending",
+      "picks": [
+        {
+          "mode": "analyst",
+          "label": "数据研究员 A",
+          "main": [
+            8,
+            12,
+            18,
+            26,
+            29
+          ],
+          "extra": [
+            1,
+            12
+          ],
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|analyst|research-v17.0-shape-first|5|120",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 5,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 8,
+              "observed": 14,
+              "expected": 17.14,
+              "miss": 8,
+              "recent": 2,
+              "previous": 5,
+              "reason": "近20期2次，60期7次，120期14次（随机理论约17.14次），300期48次，全历史394次；当前遗漏8期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分-0.08，并非下一期开奖概率。",
+              "score": -0.08,
+              "counts": {
+                "20": 2,
+                "60": 7,
+                "120": 14,
+                "300": 48,
+                "all": 394
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 23,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期23次（随机理论约17.14次），300期50次，全历史399次；当前遗漏0期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.57，并非下一期开奖概率。",
+              "score": 0.57,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 23,
+                "300": 50,
+                "all": 399
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 18,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期18次（随机理论约17.14次），300期46次，全历史403次；当前遗漏2期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.177，并非下一期开奖概率。",
+              "score": 0.177,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 18,
+                "300": 46,
+                "all": 403
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.1,
+                "40": -0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 27,
+              "expected": 17.14,
+              "miss": 11,
+              "recent": 3,
+              "previous": 10,
+              "reason": "近20期3次，60期13次，120期27次（随机理论约17.14次），300期46次，全历史412次；当前遗漏11期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.693，并非下一期开奖概率。",
+              "score": 0.693,
+              "counts": {
+                "20": 3,
+                "60": 13,
+                "120": 27,
+                "300": 46,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.3,
+                "20": 0,
+                "40": -0.1
+              }
+            },
+            {
+              "kind": "main",
+              "number": 29,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 4,
+              "recent": 4,
+              "previous": 4,
+              "reason": "近20期4次，60期8次，120期18次（随机理论约17.14次），300期50次，全历史504次；当前遗漏4期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.171，并非下一期开奖概率。",
+              "score": 0.171,
+              "counts": {
+                "20": 4,
+                "60": 8,
+                "120": 18,
+                "300": 50,
+                "all": 504
+              },
+              "trend": {
+                "10": -0.2,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 1,
+              "observed": 25,
+              "expected": 20,
+              "miss": 5,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期25次（随机理论约20次），300期57次，全历史470次；当前遗漏5期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.49，并非下一期开奖概率。",
+              "score": 0.49,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 25,
+                "300": 57,
+                "all": 470
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": 0.1
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 12,
+              "observed": 26,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 8,
+              "reason": "近20期6次，60期14次，120期26次（随机理论约20次），300期51次，全历史506次；当前遗漏1期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.496，并非下一期开奖概率。",
+              "score": 0.496,
+              "counts": {
+                "20": 6,
+                "60": 14,
+                "120": 26,
+                "300": 51,
+                "all": 506
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": 0.025
+              }
+            }
+          ],
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 0
+          },
+          "summary": "A 数据研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号1个、连号0对，主区研究评分0.133。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                2,
+                1,
+                2
+              ],
+              "odd": 2,
+              "large": 3,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                58,
+                115
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "数据型关注第二组高频形态并兼顾号码得分；目标三区2:1:2，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 8,
+            "tail": 29,
+            "zones": [
+              2,
+              1,
+              2
+            ],
+            "odd": 1,
+            "large": 3,
+            "sum": 93,
+            "span": 21,
+            "repeat": 1,
+            "adj": 0,
+            "neighbor": 1,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        },
+        {
+          "mode": "veteran",
+          "label": "经验研究员 B",
+          "main": [
+            2,
+            3,
+            22,
+            24,
+            27
+          ],
+          "extra": [
+            4,
+            7
+          ],
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|veteran|research-v17.0-shape-first|5|120",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 5,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 2,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 4,
+              "previous": 4,
+              "reason": "近20期4次，60期8次，120期17次（随机理论约17.14次），300期46次，全历史423次；当前遗漏0期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.001，并非下一期开奖概率。",
+              "score": -0.001,
+              "counts": {
+                "20": 4,
+                "60": 8,
+                "120": 17,
+                "300": 46,
+                "all": 423
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 3,
+              "observed": 22,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 4,
+              "previous": 7,
+              "reason": "近20期4次，60期11次，120期22次（随机理论约17.14次），300期50次，全历史436次；当前遗漏1期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.023，并非下一期开奖概率。",
+              "score": 0.023,
+              "counts": {
+                "20": 4,
+                "60": 11,
+                "120": 22,
+                "300": 50,
+                "all": 436
+              },
+              "trend": {
+                "10": -0.2,
+                "20": 0,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 19,
+              "expected": 17.14,
+              "miss": 5,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期19次（随机理论约17.14次），300期53次，全历史460次；当前遗漏5期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.009，并非下一期开奖概率。",
+              "score": 0.009,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 19,
+                "300": 53,
+                "all": 460
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.1,
+                "40": 0
+              }
+            },
+            {
+              "kind": "main",
+              "number": 24,
+              "observed": 16,
+              "expected": 17.14,
+              "miss": 7,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期16次（随机理论约17.14次），300期36次，全历史375次；当前遗漏7期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.005，并非下一期开奖概率。",
+              "score": -0.005,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 16,
+                "300": 36,
+                "all": 375
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": -0.05
+              }
+            },
+            {
+              "kind": "main",
+              "number": 27,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 2,
+              "previous": 8,
+              "reason": "近20期2次，60期10次，120期17次（随机理论约17.14次），300期39次，全历史409次；当前遗漏2期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.001，并非下一期开奖概率。",
+              "score": -0.001,
+              "counts": {
+                "20": 2,
+                "60": 10,
+                "120": 17,
+                "300": 39,
+                "all": 409
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0,
+                "40": -0.075
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 4,
+              "observed": 22,
+              "expected": 20,
+              "miss": 3,
+              "recent": 3,
+              "previous": 9,
+              "reason": "近20期3次，60期12次，120期22次（随机理论约20次），300期55次，全历史477次；当前遗漏3期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.009，并非下一期开奖概率。",
+              "score": 0.009,
+              "counts": {
+                "20": 3,
+                "60": 12,
+                "120": 22,
+                "300": 55,
+                "all": 477
+              },
+              "trend": {
+                "10": 0.1,
+                "20": -0.15,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 7,
+              "observed": 24,
+              "expected": 20,
+              "miss": 0,
+              "recent": 5,
+              "previous": 8,
+              "reason": "近20期5次，60期13次，120期24次（随机理论约20次），300期54次，全历史526次；当前遗漏0期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.018，并非下一期开奖概率。",
+              "score": 0.018,
+              "counts": {
+                "20": 5,
+                "60": 13,
+                "120": 24,
+                "300": 54,
+                "all": 526
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": 0.05
+              }
+            }
+          ],
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "summary": "B 经验研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号1个、连号1对，主区研究评分-0.602。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                2,
+                2,
+                1
+              ],
+              "odd": 2,
+              "large": 3,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                58,
+                115
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "经验型优先考虑常见分区结构；目标三区2:2:1，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 2,
+            "tail": 27,
+            "zones": [
+              2,
+              2,
+              1
+            ],
+            "odd": 2,
+            "large": 3,
+            "sum": 78,
+            "span": 25,
+            "repeat": 1,
+            "adj": 1,
+            "neighbor": 1,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        },
+        {
+          "mode": "trend",
+          "label": "走势图独立选号 C",
+          "main": [
+            12,
+            17,
+            18,
+            25,
+            26
+          ],
+          "extra": [
+            9,
+            12
+          ],
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|trend|research-v17.0-shape-first|5|120",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 5,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 23,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期23次（随机理论约17.14次），300期50次，全历史399次；当前遗漏0期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.725，并非下一期开奖概率。",
+              "score": 0.725,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 23,
+                "300": 50,
+                "all": 399
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 17,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期17次（随机理论约17.14次），300期33次，全历史391次；当前遗漏0期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.599，并非下一期开奖概率。",
+              "score": 0.599,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 17,
+                "300": 33,
+                "all": 391
+              },
+              "trend": {
+                "10": 0.2,
+                "20": -0.05,
+                "40": 0.175
+              }
+            },
+            {
+              "kind": "main",
+              "number": 18,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期18次（随机理论约17.14次），300期46次，全历史403次；当前遗漏2期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.531，并非下一期开奖概率。",
+              "score": 0.531,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 18,
+                "300": 46,
+                "all": 403
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.1,
+                "40": -0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 25,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 6,
+              "previous": 6,
+              "reason": "近20期6次，60期12次，120期18次（随机理论约17.14次），300期42次，全历史420次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分1.006，并非下一期开奖概率。",
+              "score": 1.006,
+              "counts": {
+                "20": 6,
+                "60": 12,
+                "120": 18,
+                "300": 42,
+                "all": 420
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.15,
+                "40": 0.1
+              }
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 27,
+              "expected": 17.14,
+              "miss": 11,
+              "recent": 3,
+              "previous": 10,
+              "reason": "近20期3次，60期13次，120期27次（随机理论约17.14次），300期46次，全历史412次；当前遗漏11期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分-0.387，并非下一期开奖概率。",
+              "score": -0.387,
+              "counts": {
+                "20": 3,
+                "60": 13,
+                "120": 27,
+                "300": 46,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.3,
+                "20": 0,
+                "40": -0.1
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 9,
+              "observed": 22,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 11,
+              "reason": "近20期6次，60期17次，120期22次（随机理论约20次），300期51次，全历史493次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.487，并非下一期开奖概率。",
+              "score": 0.487,
+              "counts": {
+                "20": 6,
+                "60": 17,
+                "120": 22,
+                "300": 51,
+                "all": 493
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.1,
+                "40": 0.25
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 12,
+              "observed": 26,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 8,
+              "reason": "近20期6次，60期14次，120期26次（随机理论约20次），300期51次，全历史506次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.639，并非下一期开奖概率。",
+              "score": 0.639,
+              "counts": {
+                "20": 6,
+                "60": 14,
+                "120": 26,
+                "300": 51,
+                "all": 506
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": 0.025
+              }
+            }
+          ],
+          "pattern": {
+            "repeat": 2,
+            "adjacent": 2
+          },
+          "summary": "C 走势研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号2个、连号2对，主区研究评分0.518。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                1,
+                2,
+                2
+              ],
+              "odd": 2,
+              "large": 3,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                58,
+                115
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "走势型保留第三组形态进行差异研究；目标三区1:2:2，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 12,
+            "tail": 26,
+            "zones": [
+              1,
+              2,
+              2
+            ],
+            "odd": 2,
+            "large": 3,
+            "sum": 98,
+            "span": 14,
+            "repeat": 2,
+            "adj": 2,
+            "neighbor": 1,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        },
+        {
+          "mode": "random",
+          "label": "随机基准",
+          "main": [
+            1,
+            6,
+            11,
+            16,
+            27
+          ],
+          "extra": [
+            7,
+            10
+          ],
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|random|research-v17.0-shape-first|5|120",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 5,
+            "compound": false
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 1,
+              "observed": 14,
+              "expected": 17.14,
+              "miss": 9,
+              "recent": 2,
+              "previous": 6,
+              "reason": "近20期2次，60期8次，120期14次（随机理论约17.14次），300期37次，全历史432次；当前遗漏9期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 2,
+                "60": 8,
+                "120": 14,
+                "300": 37,
+                "all": 432
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.05,
+                "40": 0.05
+              }
+            },
+            {
+              "kind": "main",
+              "number": 6,
+              "observed": 19,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期19次（随机理论约17.14次），300期50次，全历史417次；当前遗漏2期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 19,
+                "300": 50,
+                "all": 417
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.1,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 11,
+              "observed": 16,
+              "expected": 17.14,
+              "miss": 3,
+              "recent": 3,
+              "previous": 5,
+              "reason": "近20期3次，60期8次，120期16次（随机理论约17.14次），300期43次，全历史427次；当前遗漏3期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 3,
+                "60": 8,
+                "120": 16,
+                "300": 43,
+                "all": 427
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0,
+                "40": 0.05
+              }
+            },
+            {
+              "kind": "main",
+              "number": 16,
+              "observed": 13,
+              "expected": 17.14,
+              "miss": 20,
+              "recent": 0,
+              "previous": 8,
+              "reason": "近20期0次，60期8次，120期13次（随机理论约17.14次），300期40次，全历史358次；当前遗漏20期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 0,
+                "60": 8,
+                "120": 13,
+                "300": 40,
+                "all": 358
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.15,
+                "40": -0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 27,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 2,
+              "previous": 8,
+              "reason": "近20期2次，60期10次，120期17次（随机理论约17.14次），300期39次，全历史409次；当前遗漏2期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 2,
+                "60": 10,
+                "120": 17,
+                "300": 39,
+                "all": 409
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0,
+                "40": -0.075
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 7,
+              "observed": 24,
+              "expected": 20,
+              "miss": 0,
+              "recent": 5,
+              "previous": 8,
+              "reason": "近20期5次，60期13次，120期24次（随机理论约20次），300期54次，全历史526次；当前遗漏0期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 5,
+                "60": 13,
+                "120": 24,
+                "300": 54,
+                "all": 526
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": 0.05
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 10,
+              "observed": 18,
+              "expected": 20,
+              "miss": 4,
+              "recent": 3,
+              "previous": 4,
+              "reason": "近20期3次，60期7次，120期18次（随机理论约20次），300期50次，全历史524次；当前遗漏4期。等概率随机抽取。研究分0，并非下一期开奖概率。",
+              "score": 0,
+              "counts": {
+                "20": 3,
+                "60": 7,
+                "120": 18,
+                "300": 50,
+                "all": 524
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": -0.05
+              }
+            }
+          ],
+          "pattern": {
+            "repeat": 0,
+            "adjacent": 0
+          },
+          "summary": "随机基准：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号0个、连号0对，主区研究评分-0.315。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                3,
+                1,
+                1
+              ],
+              "odd": 2,
+              "large": 3,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                58,
+                115
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "随机基准不限制形态；目标三区3:1:1，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 1,
+            "tail": 27,
+            "zones": [
+              3,
+              1,
+              1
+            ],
+            "odd": 3,
+            "large": 1,
+            "sum": 61,
+            "span": 26,
+            "repeat": 0,
+            "adj": 0,
+            "neighbor": 3,
+            "diagonal": 2
+          },
+          "softKills": {
+            "main": [],
+            "extra": []
+          }
+        }
+      ],
+      "compoundPicks": [
+        {
+          "mode": "analyst",
+          "main": [
+            8,
+            10,
+            12,
+            18,
+            25,
+            26,
+            29
+          ],
+          "extra": [
+            1,
+            12
+          ],
+          "bets": 21,
+          "cost": 42,
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|analyst|research-v17.0-shape-first|5|120|extension",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 7,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 8,
+              "observed": 14,
+              "expected": 17.14,
+              "miss": 8,
+              "recent": 2,
+              "previous": 5,
+              "reason": "近20期2次，60期7次，120期14次（随机理论约17.14次），300期48次，全历史394次；当前遗漏8期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分-0.08，并非下一期开奖概率。",
+              "score": -0.08,
+              "counts": {
+                "20": 2,
+                "60": 7,
+                "120": 14,
+                "300": 48,
+                "all": 394
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 23,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期23次（随机理论约17.14次），300期50次，全历史399次；当前遗漏0期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.57，并非下一期开奖概率。",
+              "score": 0.57,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 23,
+                "300": 50,
+                "all": 399
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 18,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期18次（随机理论约17.14次），300期46次，全历史403次；当前遗漏2期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.177，并非下一期开奖概率。",
+              "score": 0.177,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 18,
+                "300": 46,
+                "all": 403
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.1,
+                "40": -0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 27,
+              "expected": 17.14,
+              "miss": 11,
+              "recent": 3,
+              "previous": 10,
+              "reason": "近20期3次，60期13次，120期27次（随机理论约17.14次），300期46次，全历史412次；当前遗漏11期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.693，并非下一期开奖概率。",
+              "score": 0.693,
+              "counts": {
+                "20": 3,
+                "60": 13,
+                "120": 27,
+                "300": 46,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.3,
+                "20": 0,
+                "40": -0.1
+              }
+            },
+            {
+              "kind": "main",
+              "number": 29,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 4,
+              "recent": 4,
+              "previous": 4,
+              "reason": "近20期4次，60期8次，120期18次（随机理论约17.14次），300期50次，全历史504次；当前遗漏4期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.171，并非下一期开奖概率。",
+              "score": 0.171,
+              "counts": {
+                "20": 4,
+                "60": 8,
+                "120": 18,
+                "300": 50,
+                "all": 504
+              },
+              "trend": {
+                "10": -0.2,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 1,
+              "observed": 25,
+              "expected": 20,
+              "miss": 5,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期25次（随机理论约20次），300期57次，全历史470次；当前遗漏5期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.49，并非下一期开奖概率。",
+              "score": 0.49,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 25,
+                "300": 57,
+                "all": 470
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": 0.1
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 12,
+              "observed": 26,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 8,
+              "reason": "近20期6次，60期14次，120期26次（随机理论约20次），300期51次，全历史506次；当前遗漏1期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.496，并非下一期开奖概率。",
+              "score": 0.496,
+              "counts": {
+                "20": 6,
+                "60": 14,
+                "120": 26,
+                "300": 51,
+                "all": 506
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 10,
+              "observed": 25,
+              "expected": 17.14,
+              "miss": 9,
+              "recent": 4,
+              "previous": 10,
+              "reason": "近20期4次，60期14次，120期25次（随机理论约17.14次），300期53次，全历史412次；当前遗漏9期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.792，并非下一期开奖概率。",
+              "score": 0.792,
+              "counts": {
+                "20": 4,
+                "60": 14,
+                "120": 25,
+                "300": 53,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.2,
+                "20": -0.05,
+                "40": 0
+              }
+            },
+            {
+              "kind": "main",
+              "number": 25,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 6,
+              "previous": 6,
+              "reason": "近20期6次，60期12次，120期18次（随机理论约17.14次），300期42次，全历史420次；当前遗漏1期。综合长短窗的标准化频率与遗漏分数，且对小样本波动做收缩。研究分0.267，并非下一期开奖概率。",
+              "score": 0.267,
+              "counts": {
+                "20": 6,
+                "60": 12,
+                "120": 18,
+                "300": 42,
+                "all": 420
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.15,
+                "40": 0.1
+              }
+            }
+          ],
+          "summary": "A 数据研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号1个、连号0对，主区研究评分0.133。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                3,
+                1,
+                3
+              ],
+              "odd": 3,
+              "large": 4,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                81,
+                161
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "数据型关注第二组高频形态并兼顾号码得分；目标三区3:1:3，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 8,
+            "tail": 29,
+            "zones": [
+              3,
+              1,
+              3
+            ],
+            "odd": 2,
+            "large": 4,
+            "sum": 128,
+            "span": 21,
+            "repeat": 1,
+            "adj": 1,
+            "neighbor": 1,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        },
+        {
+          "mode": "veteran",
+          "main": [
+            2,
+            3,
+            10,
+            19,
+            22,
+            24,
+            27
+          ],
+          "extra": [
+            4,
+            7
+          ],
+          "bets": 21,
+          "cost": 42,
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|veteran|research-v17.0-shape-first|5|120|extension",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 7,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 1,
+            "adjacent": 1
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 2,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 4,
+              "previous": 4,
+              "reason": "近20期4次，60期8次，120期17次（随机理论约17.14次），300期46次，全历史423次；当前遗漏0期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.001，并非下一期开奖概率。",
+              "score": -0.001,
+              "counts": {
+                "20": 4,
+                "60": 8,
+                "120": 17,
+                "300": 46,
+                "all": 423
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 3,
+              "observed": 22,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 4,
+              "previous": 7,
+              "reason": "近20期4次，60期11次，120期22次（随机理论约17.14次），300期50次，全历史436次；当前遗漏1期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.023，并非下一期开奖概率。",
+              "score": 0.023,
+              "counts": {
+                "20": 4,
+                "60": 11,
+                "120": 22,
+                "300": 50,
+                "all": 436
+              },
+              "trend": {
+                "10": -0.2,
+                "20": 0,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 22,
+              "observed": 19,
+              "expected": 17.14,
+              "miss": 5,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期19次（随机理论约17.14次），300期53次，全历史460次；当前遗漏5期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.009，并非下一期开奖概率。",
+              "score": 0.009,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 19,
+                "300": 53,
+                "all": 460
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.1,
+                "40": 0
+              }
+            },
+            {
+              "kind": "main",
+              "number": 24,
+              "observed": 16,
+              "expected": 17.14,
+              "miss": 7,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期16次（随机理论约17.14次），300期36次，全历史375次；当前遗漏7期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.005，并非下一期开奖概率。",
+              "score": -0.005,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 16,
+                "300": 36,
+                "all": 375
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": -0.05
+              }
+            },
+            {
+              "kind": "main",
+              "number": 27,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 2,
+              "previous": 8,
+              "reason": "近20期2次，60期10次，120期17次（随机理论约17.14次），300期39次，全历史409次；当前遗漏2期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.001，并非下一期开奖概率。",
+              "score": -0.001,
+              "counts": {
+                "20": 2,
+                "60": 10,
+                "120": 17,
+                "300": 39,
+                "all": 409
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0,
+                "40": -0.075
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 4,
+              "observed": 22,
+              "expected": 20,
+              "miss": 3,
+              "recent": 3,
+              "previous": 9,
+              "reason": "近20期3次，60期12次，120期22次（随机理论约20次），300期55次，全历史477次；当前遗漏3期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.009，并非下一期开奖概率。",
+              "score": 0.009,
+              "counts": {
+                "20": 3,
+                "60": 12,
+                "120": 22,
+                "300": 55,
+                "all": 477
+              },
+              "trend": {
+                "10": 0.1,
+                "20": -0.15,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 7,
+              "observed": 24,
+              "expected": 20,
+              "miss": 0,
+              "recent": 5,
+              "previous": 8,
+              "reason": "近20期5次，60期13次，120期24次（随机理论约20次），300期54次，全历史526次；当前遗漏0期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.018，并非下一期开奖概率。",
+              "score": 0.018,
+              "counts": {
+                "20": 5,
+                "60": 13,
+                "120": 24,
+                "300": 54,
+                "all": 526
+              },
+              "trend": {
+                "10": -0.1,
+                "20": 0.05,
+                "40": 0.05
+              }
+            },
+            {
+              "kind": "main",
+              "number": 10,
+              "observed": 25,
+              "expected": 17.14,
+              "miss": 9,
+              "recent": 4,
+              "previous": 10,
+              "reason": "近20期4次，60期14次，120期25次（随机理论约17.14次），300期53次，全历史412次；当前遗漏9期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分0.037，并非下一期开奖概率。",
+              "score": 0.037,
+              "counts": {
+                "20": 4,
+                "60": 14,
+                "120": 25,
+                "300": 53,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.2,
+                "20": -0.05,
+                "40": 0
+              }
+            },
+            {
+              "kind": "main",
+              "number": 19,
+              "observed": 16,
+              "expected": 17.14,
+              "miss": 6,
+              "recent": 3,
+              "previous": 4,
+              "reason": "近20期3次，60期7次，120期16次（随机理论约17.14次），300期35次，全历史429次；当前遗漏6期。按和值、奇偶、重号、连号等经验结构筛选；这是偏好而非概率优势。研究分-0.005，并非下一期开奖概率。",
+              "score": -0.005,
+              "counts": {
+                "20": 3,
+                "60": 7,
+                "120": 16,
+                "300": 35,
+                "all": 429
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0,
+                "40": 0.025
+              }
+            }
+          ],
+          "summary": "B 经验研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号1个、连号1对，主区研究评分-0.602。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                3,
+                3,
+                1
+              ],
+              "odd": 3,
+              "large": 4,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                81,
+                161
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "经验型优先考虑常见分区结构；目标三区3:3:1，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 2,
+            "tail": 27,
+            "zones": [
+              3,
+              3,
+              1
+            ],
+            "odd": 3,
+            "large": 4,
+            "sum": 107,
+            "span": 25,
+            "repeat": 1,
+            "adj": 1,
+            "neighbor": 1,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        },
+        {
+          "mode": "trend",
+          "main": [
+            6,
+            12,
+            13,
+            17,
+            18,
+            25,
+            26
+          ],
+          "extra": [
+            9,
+            12
+          ],
+          "bets": 21,
+          "cost": 42,
+          "snapshot": {
+            "baseIssue": "2026129",
+            "window": 120,
+            "policy": "research-v17.0-shape-first",
+            "seed": "dlt|2026129|trend|research-v17.0-shape-first|5|120|extension",
+            "hash": "ba308412",
+            "search": 360,
+            "mainCount": 7,
+            "compound": true
+          },
+          "pattern": {
+            "repeat": 2,
+            "adjacent": 3
+          },
+          "explanations": [
+            {
+              "kind": "main",
+              "number": 12,
+              "observed": 23,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期23次（随机理论约17.14次），300期50次，全历史399次；当前遗漏0期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.725，并非下一期开奖概率。",
+              "score": 0.725,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 23,
+                "300": 50,
+                "all": 399
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.05,
+                "40": 0.075
+              }
+            },
+            {
+              "kind": "main",
+              "number": 17,
+              "observed": 17,
+              "expected": 17.14,
+              "miss": 0,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期17次（随机理论约17.14次），300期33次，全历史391次；当前遗漏0期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.599，并非下一期开奖概率。",
+              "score": 0.599,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 17,
+                "300": 33,
+                "all": 391
+              },
+              "trend": {
+                "10": 0.2,
+                "20": -0.05,
+                "40": 0.175
+              }
+            },
+            {
+              "kind": "main",
+              "number": 18,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 4,
+              "previous": 5,
+              "reason": "近20期4次，60期9次，120期18次（随机理论约17.14次），300期46次，全历史403次；当前遗漏2期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.531，并非下一期开奖概率。",
+              "score": 0.531,
+              "counts": {
+                "20": 4,
+                "60": 9,
+                "120": 18,
+                "300": 46,
+                "all": 403
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.1,
+                "40": -0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 25,
+              "observed": 18,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 6,
+              "previous": 6,
+              "reason": "近20期6次，60期12次，120期18次（随机理论约17.14次），300期42次，全历史420次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分1.006，并非下一期开奖概率。",
+              "score": 1.006,
+              "counts": {
+                "20": 6,
+                "60": 12,
+                "120": 18,
+                "300": 42,
+                "all": 420
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.15,
+                "40": 0.1
+              }
+            },
+            {
+              "kind": "main",
+              "number": 26,
+              "observed": 27,
+              "expected": 17.14,
+              "miss": 11,
+              "recent": 3,
+              "previous": 10,
+              "reason": "近20期3次，60期13次，120期27次（随机理论约17.14次），300期46次，全历史412次；当前遗漏11期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分-0.387，并非下一期开奖概率。",
+              "score": -0.387,
+              "counts": {
+                "20": 3,
+                "60": 13,
+                "120": 27,
+                "300": 46,
+                "all": 412
+              },
+              "trend": {
+                "10": -0.3,
+                "20": 0,
+                "40": -0.1
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 9,
+              "observed": 22,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 11,
+              "reason": "近20期6次，60期17次，120期22次（随机理论约20次），300期51次，全历史493次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.487，并非下一期开奖概率。",
+              "score": 0.487,
+              "counts": {
+                "20": 6,
+                "60": 17,
+                "120": 22,
+                "300": 51,
+                "all": 493
+              },
+              "trend": {
+                "10": 0,
+                "20": -0.1,
+                "40": 0.25
+              }
+            },
+            {
+              "kind": "extra",
+              "number": 12,
+              "observed": 26,
+              "expected": 20,
+              "miss": 1,
+              "recent": 6,
+              "previous": 8,
+              "reason": "近20期6次，60期14次，120期26次（随机理论约20次），300期51次，全历史506次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.639，并非下一期开奖概率。",
+              "score": 0.639,
+              "counts": {
+                "20": 6,
+                "60": 14,
+                "120": 26,
+                "300": 51,
+                "all": 506
+              },
+              "trend": {
+                "10": 0,
+                "20": 0.15,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 6,
+              "observed": 19,
+              "expected": 17.14,
+              "miss": 2,
+              "recent": 5,
+              "previous": 5,
+              "reason": "近20期5次，60期10次，120期19次（随机理论约17.14次），300期50次，全历史417次；当前遗漏2期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.585，并非下一期开奖概率。",
+              "score": 0.585,
+              "counts": {
+                "20": 5,
+                "60": 10,
+                "120": 19,
+                "300": 50,
+                "all": 417
+              },
+              "trend": {
+                "10": 0.1,
+                "20": 0.1,
+                "40": 0.025
+              }
+            },
+            {
+              "kind": "main",
+              "number": 13,
+              "observed": 22,
+              "expected": 17.14,
+              "miss": 1,
+              "recent": 4,
+              "previous": 4,
+              "reason": "近20期4次，60期8次，120期22次（随机理论约17.14次），300期47次，全历史393次；当前遗漏1期。对比10/20/40期前后窗口频率变化，未假设趋势必然持续。研究分0.58，并非下一期开奖概率。",
+              "score": 0.58,
+              "counts": {
+                "20": 4,
+                "60": 8,
+                "120": 22,
+                "300": 47,
+                "all": 393
+              },
+              "trend": {
+                "10": 0.2,
+                "20": 0.2,
+                "40": -0.15
+              }
+            }
+          ],
+          "summary": "C 走势研究员：对照20/60/120/300期（数据不足时使用现有期数），参考10/20/40期短窗变化；本注重号2个、连号2对，主区研究评分0.518。评分只描述规则优先级，不是开出概率。",
+          "shapePlan": {
+            "target": {
+              "zones": [
+                1,
+                3,
+                3
+              ],
+              "odd": 3,
+              "large": 4,
+              "repeat": 0,
+              "adj": 0,
+              "headBand": [
+                1,
+                12
+              ],
+              "tailBand": [
+                22,
+                35
+              ],
+              "sumBand": [
+                81,
+                161
+              ],
+              "spanBand": [
+                15,
+                31
+              ],
+              "neighbor": 1.27,
+              "diagonal": 0.2
+            },
+            "reason": "走势型保留第三组形态进行差异研究；目标三区1:3:3，龙头观察1～12，凤尾观察22～35；全部是历史偏好，不是中奖概率。",
+            "empirical": {
+              "sample": 300,
+              "commonZones": [
+                {
+                  "value": "2:2:1",
+                  "n": 50,
+                  "frequency": 0.167
+                },
+                {
+                  "value": "2:1:2",
+                  "n": 46,
+                  "frequency": 0.153
+                },
+                {
+                  "value": "1:2:2",
+                  "n": 35,
+                  "frequency": 0.117
+                }
+              ]
+            }
+          },
+          "shapeActual": {
+            "head": 6,
+            "tail": 26,
+            "zones": [
+              2,
+              3,
+              2
+            ],
+            "odd": 3,
+            "large": 3,
+            "sum": 117,
+            "span": 20,
+            "repeat": 2,
+            "adj": 3,
+            "neighbor": 2,
+            "diagonal": 0
+          },
+          "softKills": {
+            "main": [
+              31,
+              30,
+              7,
+              16
+            ],
+            "extra": [
+              5
+            ]
+          }
+        }
+      ],
+      "featureSnapshot": {
+        "previousIssue": "2026129",
+        "patternHistory": {
+          "sample": 59,
+          "meanRepeat": 0.8305084745762712,
+          "meanAdjacent": 0.576271186440678,
+          "currentAdjacent": 0,
+          "previousMain": [
+            2,
+            12,
+            14,
+            17,
+            33
+          ],
+          "records": [
+            {
+              "issue": "2026129",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026128",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026127",
+              "repeat": 2,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026126",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026125",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026124",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026123",
+              "repeat": 0,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026122",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026121",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026120",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026119",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026118",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026117",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026116",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026115",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026114",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026113",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026112",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026111",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026110",
+              "repeat": 0,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026109",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026108",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026107",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026106",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026105",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026104",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026103",
+              "repeat": 1,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026102",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026101",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026100",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026099",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026098",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026097",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026096",
+              "repeat": 2,
+              "adjacent": 3
+            },
+            {
+              "issue": "2026095",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026094",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026093",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026092",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026091",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026090",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026089",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026088",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026087",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026086",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026085",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026084",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026083",
+              "repeat": 2,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026082",
+              "repeat": 2,
+              "adjacent": 2
+            },
+            {
+              "issue": "2026081",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026080",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026079",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026078",
+              "repeat": 0,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026077",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026076",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026075",
+              "repeat": 1,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026074",
+              "repeat": 3,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026073",
+              "repeat": 0,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026072",
+              "repeat": 2,
+              "adjacent": 1
+            },
+            {
+              "issue": "2026071",
+              "repeat": 2,
+              "adjacent": 0
+            },
+            {
+              "issue": "2026070",
+              "repeat": 0,
+              "adjacent": 1
+            }
+          ],
+          "repeatDistribution": {
+            "0": 22,
+            "1": 26,
+            "2": 10,
+            "3": 1,
+            "4": 0,
+            "5": 0
+          },
+          "adjacentDistribution": {
+            "0": 32,
+            "1": 21,
+            "2": 5,
+            "3": 1,
+            "4": 0
+          }
+        },
+        "method": "V17形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率",
+        "policy": "research-v17.0-shape-first"
+      }
     }
   ],
   "summary": {
@@ -21618,28 +24340,28 @@
       }
     },
     "dlt": {
-      "settled": 5,
+      "settled": 6,
       "pending": 1,
       "byMode": {
         "analyst": {
-          "n": 5,
-          "meanMain": 0.8,
-          "meanExtra": 0.6
+          "n": 6,
+          "meanMain": 0.667,
+          "meanExtra": 0.5
         },
         "veteran": {
-          "n": 5,
-          "meanMain": 1.2,
-          "meanExtra": 0.4
+          "n": 6,
+          "meanMain": 1.333,
+          "meanExtra": 0.5
         },
         "trend": {
-          "n": 5,
-          "meanMain": 0.4,
-          "meanExtra": 0.2
+          "n": 6,
+          "meanMain": 0.667,
+          "meanExtra": 0.167
         },
         "random": {
-          "n": 5,
-          "meanMain": 1,
-          "meanExtra": 0.2
+          "n": 6,
+          "meanMain": 0.833,
+          "meanExtra": 0.167
         }
       }
     }
@@ -21649,12 +24371,12 @@
     "ssq": {
       "latest": "2026129",
       "target": "2026-11-12",
-      "readiness": "新建公开候选，待工作流提交到 GitHub"
+      "readiness": "目标开奖日已存在锁定记录"
     },
     "dlt": {
-      "latest": "2026128",
-      "target": "2026-11-11",
-      "readiness": "目标开奖日已存在锁定记录"
+      "latest": "2026129",
+      "target": "2026-11-14",
+      "readiness": "新建公开候选，待工作流提交到 GitHub"
     }
   }
 }

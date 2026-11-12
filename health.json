@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-11T17:27:02.717Z",
+  "generatedAt": "2026-11-12T02:57:21.695Z",
   "games": {
     "ssq": {
       "latestIssue": "2026129",
@@ -9,7 +9,7 @@
       "sourceRows": 3526,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-11T17:27:02.717Z",
+      "lastCheckAt": "2026-11-12T02:57:21.695Z",
       "firstObservedAt": "2026-11-11T02:57:29.993Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
@@ -19,27 +19,25 @@
       "mirrorError": ""
     },
     "dlt": {
-      "latestIssue": "2026128",
-      "latestDate": "2026-11-09",
+      "latestIssue": "2026129",
+      "latestDate": "2026-11-11",
       "expectedBySchedule": "2026-11-11",
-      "sourceRows": 2946,
+      "sourceRows": 2947,
       "independentlyVerified": 0,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-11T17:27:02.717Z",
-      "firstObservedAt": "2026-11-10T02:57:00.038Z",
-      "statusCode": "lagging",
-      "delayDays": 2,
-      "freshness": "数据可能滞后（常规日程）",
-      "settlement": "1条到期记录尚未核对",
+      "lastCheckAt": "2026-11-12T02:57:21.695Z",
+      "firstObservedAt": "2026-11-12T02:57:21.695Z",
+      "statusCode": "on-schedule",
+      "delayDays": 0,
+      "freshness": "最新开奖覆盖常规日程",
+      "settlement": "已核对6条，暂无逾期待核对记录",
       "officialError": "HTTP Error 567: Unknown Status",
       "mirrorError": ""
     }
   },
   "alerts": [
     "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
-    "超级大乐透：最新2026-11-09，常规日程预期2026-11-11；自动核对可能滞后",
-    "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status",
-    "超级大乐透有1条到期研究记录尚未核对"
+    "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
   "note": "绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。"
 }
