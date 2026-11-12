@@ -1,8 +1,12 @@
-/* PWA cache v17: network-first navigation, versioned same-origin assets, never cache remote lottery records. */
-const CACHE='dual-lottery-v18.0-decision';
-const ASSETS=['./startup-recovery.js?v=18.0','./decision-engine.js?v=18.0','./decision-ui.js?v=18.0','./issue-context.js?v=18.0','./','./index.html','./styles.css?v=18.0','./core.js?v=18.0','./engine.js?v=18.0','./app.js?v=18.0','./coverage.js?v=18.0','./multiwindow.js?v=18.0','./shape-engine.js?v=18.0','./shape-ui.js?v=18.0','./review-ui.js?v=18.0','./evidence.js?v=18.0','./multiwindow-ui.js?v=18.0','./official_latest.json','./icon.svg','./manifest.webmanifest'];
+/* V18.3: network-first PWA, preserve existing V18 app and avoid stale audit bundle. */
+const CACHE='dual-lottery-v18.3-evidence';
+const ASSETS=['./startup-recovery.js?v=18.0','./audit-v183.html?v=18.3','./decision-engine.js?v=18.0','./decision-ui.js?v=18.0','./issue-context.js?v=18.0','./','./index.html','./styles.css?v=18.0','./core.js?v=18.0','./engine.js?v=18.0','./app.js?v=18.0','./coverage.js?v=18.0','./multiwindow.js?v=18.0','./shape-engine.js?v=18.0','./shape-ui.js?v=18.0','./review-ui.js?v=18.0','./evidence.js?v=18.0','./multiwindow-ui.js?v=18.0','./official_latest.json','./icon.svg','./manifest.webmanifest'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(x=>x!==CACHE).map(x=>caches.delete(x)))),self.clients.claim()])));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;if((u.pathname.endsWith('/history.json')||u.pathname.endsWith('/research.json')||u.pathname.endsWith('/health.json'))){e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));return}
- if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).then(r=>{const c=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,c));return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))));return}
- e.respondWith(fetch(e.request).then(n=>{if(n.ok)caches.open(CACHE).then(c=>c.put(e.request,n.clone()));return n}).catch(()=>caches.match(e.request)));});
+self.addEventListener('fetch',e=>{
+ if(e.request.method!=='GET')return;
+ const u=new URL(e.request.url);if(u.origin!==self.location.origin)return;
+ if(['history.json','research.json','health.json'].some(x=>u.pathname.endsWith('/'+x))){e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request)));return;}
+ if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).then(r=>{if(r.ok){const clone=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,clone));}return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))));return;}
+ e.respondWith(fetch(e.request).then(n=>{if(n.ok)caches.open(CACHE).then(c=>c.put(e.request,n.clone()));return n}).catch(()=>caches.match(e.request)));
+});

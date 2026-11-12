@@ -1,0 +1,58 @@
+name: Lottery data and public research
+on:
+  workflow_dispatch:
+  schedule:
+    # Beijing 22:26, 23:26, 00:26, 01:26, 10:16. UTC offsets, GitHub schedule may be delayed.
+    - cron: '26 14,15,16,17 * * *'
+    - cron: '16 2 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: lottery-data-and-research
+  cancel-in-progress: false
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source code, 2026 prize rules, and independent-source reconciliation
+        run: |
+          node --check core.js
+          node --check engine.js
+          node --check app.js
+          node --check automation_research.mjs
+          node --check startup-recovery.js
+          node --check sw.js
+          node --test test_audit_v183.mjs
+          if [ -d tests ] && ls tests/*.test.mjs >/dev/null 2>&1; then node --test tests/*.test.mjs; fi
+          python -m py_compile sync_history.py reconcile_official_v183.py
+          python -m unittest -v test_reconcile_official_v183
+          node --input-type=module -e "import fs from 'node:fs'; import {pick} from './engine.js'; const h=JSON.parse(fs.readFileSync('history.json','utf8')); for(const g of ['ssq','dlt']) { if(h[g].length<30) throw Error(g+' too few draws'); const p=pick(h[g],g,'analyst',{window:60}); if(!p.main.length) throw Error('empty strategy'); }"
+      - name: Fetch archive / attempt original independent official APIs
+        run: python sync_history.py
+      - name: Supplemental independent SSQ source from Shanghai Welfare Lottery (best effort)
+        run: python reconcile_official_v183.py
+      - name: Integrate V18.3 audit tab into V18 main navigation (idempotent)
+        run: python apply_v183_integration.py
+      - name: Reconcile previous locks and write future pre-draw research records
+        run: node automation_research.mjs
+      - name: Commit verified history, preserved locks and transparent health status
+        run: |
+          git add history.json research.json health.json index.html styles.css
+          if git diff --cached --quiet; then
+            echo 'No updates to commit'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'data: refresh history, public research and health status'
+          git push
