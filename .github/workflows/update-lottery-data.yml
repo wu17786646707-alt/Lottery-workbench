@@ -1,8 +1,11 @@
 name: Lottery data and public research
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-lottery-data.yml'
   schedule:
-    # Beijing 22:26, 23:26, 00:26, 01:26, 10:16. UTC offsets, GitHub schedule may be delayed.
     - cron: '26 14,15,16,17 * * *'
     - cron: '16 2 * * *'
 permissions:
@@ -24,27 +27,56 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate existing source code
+      - name: Validate core and V18.3 audit code
         run: |
           node --check core.js
           node --check engine.js
           node --check app.js
           node --check automation_research.mjs
-          if [ -d tests ] && ls tests/*.test.mjs >/dev/null 2>&1; then node --test tests/*.test.mjs; else echo "No repository test suite installed; syntax checks still run"; fi
-          python -m py_compile sync_history.py
-          node --input-type=module -e "import fs from 'node:fs'; import {pick} from './engine.js'; const h=JSON.parse(fs.readFileSync('history.json','utf8')); for(const g of ['ssq','dlt']) { if(h[g].length<30) throw Error(g+' too few draws'); const p=pick(h[g],g,'analyst',{window:60}); if(!p.main.length) throw Error('empty strategy'); }"
-      - name: Fetch and independently compare draw results (best effort)
+          python -m py_compile sync_history.py apply_v183_integration.py reconcile_official_v183.py
+          node --test test_audit_v183.mjs
+          python -m unittest -q test_v183_integration test_reconcile_official_v183
+          if [ -d tests ] && ls tests/*.test.mjs >/dev/null 2>&1; then node --test tests/*.test.mjs; fi
+      - name: Fetch real historical draws
         run: python sync_history.py
-      - name: Write public pre-draw A/B/C snapshots and reconcile older locks
-        run: node automation_research.mjs
-      - name: Commit changed public data and transparent health alerts
+      - name: Independently verify via official fallback when available
         run: |
-          git add history.json research.json health.json
+          python reconcile_official_v183.py || echo 'Official fallback unavailable; do not mark as verified'
+      - name: Reconcile publicly locked predictions
+        run: node automation_research.mjs
+      - name: Integrate existing V18.3 audit into home page
+        run: |
+          python apply_v183_integration.py
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          changes = [
+            ('双彩研究工作台 V18.0 · 选号决策中心', '双彩研究工作台 V18.3 · 选号决策与核奖'),
+            ('双彩研究工作台 <span>V18.0</span>', '双彩研究工作台 <span>V18.3</span>'),
+            ('id="versionInfo">版本 V18.0.0', 'id="versionInfo">版本 V18.3（核心选号引擎延续V18.0）'),
+            ('双彩研究工作台 V18.0 · 下一期30期数据决策', '双彩研究工作台 V18.3 · 下一期30期数据决策'),
+          ]
+          for old, new in changes:
+              if old in s:
+                  if s.count(old) != 1:
+                      raise RuntimeError('Version marker unexpectedly duplicated: ' + old)
+                  s = s.replace(old, new, 1)
+              elif new not in s:
+                  raise RuntimeError('Neither old nor upgraded version marker found: ' + old)
+          if 'audit-v183.html?v=18.3' not in s:
+              raise RuntimeError('V18.3 audit entry missing')
+          p.write_text(s, encoding='utf-8')
+          print('V18.3 version, audit navigation and styles integrated')
+          PY
+      - name: Publish updates without overwriting history with packaged files
+        run: |
+          git add index.html styles.css history.json research.json health.json
           if git diff --cached --quiet; then
-            echo 'No updates to commit'
+            echo 'Already up to date'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'data: refresh history, public research and health status'
+          git commit -m 'fix: integrate V18.3 UI and reconcile lottery evidence'
           git push
