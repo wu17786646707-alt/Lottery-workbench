@@ -1,4 +1,4 @@
-name: Lottery data and public research
+name: Lottery data + V18.4 one-file recovery
 on:
   workflow_dispatch:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/update-lottery-data.yml'
   schedule:
+    # UTC: daily Beijing 10:16, and around 22:26–01:26
     - cron: '26 14,15,16,17 * * *'
     - cron: '16 2 * * *'
 permissions:
@@ -18,65 +19,323 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout public research repository
+        uses: actions/checkout@v4
+      - name: Python 3.12
+        uses: actions/setup-python@v5
         with:
-          persist-credentials: true
-      - uses: actions/setup-python@v5
+          python-version: "3.12"
+      - name: Node 22
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Validate core and V18.3 audit code
+          node-version: "22"
+      - name: Validate original strategy and 2026 prize-rule tests
         run: |
           node --check core.js
           node --check engine.js
           node --check app.js
           node --check automation_research.mjs
-          python -m py_compile sync_history.py apply_v183_integration.py reconcile_official_v183.py
           node --test test_audit_v183.mjs
           python -m unittest -q test_v183_integration test_reconcile_official_v183
           if [ -d tests ] && ls tests/*.test.mjs >/dev/null 2>&1; then node --test tests/*.test.mjs; fi
-      - name: Fetch real historical draws
-        run: python sync_history.py
-      - name: Independently verify via official fallback when available
+      - name: Refresh public mirror history (retain old data if upstream unavailable)
+        continue-on-error: true
         run: |
-          python reconcile_official_v183.py || echo 'Official fallback unavailable; do not mark as verified'
-      - name: Reconcile publicly locked predictions
-        run: node automation_research.mjs
-      - name: Integrate existing V18.3 audit into home page
+          python sync_history.py
+      - name: Attempt independent Shanghai official verification
+        continue-on-error: true
         run: |
-          python apply_v183_integration.py
+          python reconcile_official_v183.py
+      - name: Repair missing 2026-11-12 to 2026-11-15 official results; reject conflicts
+        run: |
           python - <<'PY'
+          """V18.4 official-evidence recovery; small static 2026-11 bootstrap and live official DLT fallback.
+          Run AFTER sync_history.py and optional Shanghai official verification.
+          Never overwrite a conflicting existing result.
+          """
+          from datetime import datetime, timezone
+          from html.parser import HTMLParser
           from pathlib import Path
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
-          changes = [
-            ('双彩研究工作台 V18.0 · 选号决策中心', '双彩研究工作台 V18.3 · 选号决策与核奖'),
-            ('双彩研究工作台 <span>V18.0</span>', '双彩研究工作台 <span>V18.3</span>'),
-            ('id="versionInfo">版本 V18.0.0', 'id="versionInfo">版本 V18.3（核心选号引擎延续V18.0）'),
-            ('双彩研究工作台 V18.0 · 下一期30期数据决策', '双彩研究工作台 V18.3 · 下一期30期数据决策'),
+          from zoneinfo import ZoneInfo
+          import json, re, urllib.request
+          
+          PATH = Path('history.json')
+          OFFICIAL_SSQ = 'https://www.swlc.net.cn/'
+          OFFICIAL_SSQ_HISTORY = 'https://appsh.swlc.net.cn/shfcoc_datachart/datachart/ssq/lskj/ls_award.html'
+          OFFICIAL_DLT = 'https://www.gstc.org.cn/wanfa/dlt'
+          
+          # Official site pages were independently checked on Nov 16, 2026. This is a
+          # fixed, timestamped safety net, NOT a continuously updated live results feed.
+          CONFIRMED = [
+              ('ssq','2026130','2026-11-12',[1,2,6,16,20,28],[2],OFFICIAL_SSQ_HISTORY),
+              ('ssq','2026131','2026-11-15',[1,10,19,26,31,33],[15],OFFICIAL_SSQ),
+              ('dlt','2026130','2026-11-14',[1,7,11,27,29],[2,6],OFFICIAL_DLT),
           ]
-          for old, new in changes:
-              if old in s:
-                  if s.count(old) != 1:
-                      raise RuntimeError('Version marker unexpectedly duplicated: ' + old)
-                  s = s.replace(old, new, 1)
-              elif new not in s:
-                  raise RuntimeError('Neither old nor upgraded version marker found: ' + old)
-          if 'audit-v183.html?v=18.3' not in s:
-              raise RuntimeError('V18.3 audit entry missing')
-          p.write_text(s, encoding='utf-8')
-          print('V18.3 version, audit navigation and styles integrated')
+          
+          class Text(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.parts = []
+              def handle_data(self, s):
+                  s = s.strip()
+                  if s:self.parts.append(s)
+          
+          def latest_dlt_from_official():
+              """Best effort; reject ambiguous/partial markup instead of guessing."""
+              req = urllib.request.Request(OFFICIAL_DLT, headers={
+                  'User-Agent':'Mozilla/5.0 (compatible; lottery-integrity-check/18.4)',
+                  'Accept':'text/html,application/xhtml+xml'})
+              with urllib.request.urlopen(req, timeout=12) as response:
+                  if response.status != 200:raise RuntimeError('official DLT HTTP '+str(response.status))
+                  raw = response.read(1_500_001)
+                  if len(raw)>1_500_000:raise RuntimeError('official DLT page over limit')
+                  char = response.headers.get_content_charset() or 'utf-8'
+                  html=raw.decode(char, errors='replace')
+              p=Text();p.feed(html)
+              body=' '.join(p.parts)
+              # Anchor to "super lotto / issue / draw date / seven balls" in the official page.
+              m = re.search(r'超级大乐透\s*(?:第\s*)?(\d{5}|20\d{5})\s*期\s*开奖日期\s*[：:]\s*(20\d\d-\d\d-\d\d).*?开奖号码\s*[：:]\s*((?:\d{1,2}\s+){6}\d{1,2})',body[:5000])
+              if not m:raise ValueError('DLT official markup not recognized')
+              issue=m.group(1) if len(m.group(1))==7 else '20'+m.group(1)
+              date=m.group(2); nums=[int(v) for v in m.group(3).split()]
+              if len(nums)!=7 or len(set(nums[:5]))!=5 or len(set(nums[5:]))!=2 or any(not 1<=v<=35 for v in nums[:5]) or any(not 1<=v<=12 for v in nums[5:]):
+                  raise ValueError('DLT official numbers invalid')
+              if issue[:4]!=date[:4] or datetime.fromisoformat(date).date()>datetime.now(ZoneInfo('Asia/Shanghai')).date():
+                  raise ValueError('DLT official issue/date invalid')
+              return ('dlt',issue,date,sorted(nums[:5]),sorted(nums[5:]),OFFICIAL_DLT)
+          
+          def is_valid(g,issue,date,main,extra):
+              if not re.fullmatch(r'20\d{5}',issue):return False
+              try:d=datetime.fromisoformat(date).date()
+              except ValueError:return False
+              if str(d.year)!=issue[:4] or not 1<=int(issue[4:])<=366:return False
+              nm,ne,mm,me=(6,1,33,16) if g=='ssq' else (5,2,35,12)
+              return len(main)==nm and len(extra)==ne and len(set(main))==nm and len(set(extra))==ne and all(isinstance(n,int) and 1<=n<=mm for n in main) and all(isinstance(n,int) and 1<=n<=me for n in extra)
+          
+          def apply(path=PATH,live=False, today=None):
+              obj=json.loads(path.read_text('utf-8'))
+              today=today or datetime.now(ZoneInfo('Asia/Shanghai')).date()
+              confirmed=list(CONFIRMED)
+              if live:
+                  try:
+                      z=latest_dlt_from_official(); confirmed.append(z)
+                      print('Official Gansu体彩 latest DLT:',z[1],z[2])
+                  except Exception as e:
+                      print('::warning::Official DLT dynamic fallback unavailable:',str(e)[:160])
+              changed=False;additions=[];matches=[]
+              for g,issue,date,main,extra,url in confirmed:
+                  if datetime.fromisoformat(date).date()>today:continue
+                  if not is_valid(g,issue,date,main,extra):raise ValueError('Invalid official snapshot '+g+issue)
+                  existing=next((r for r in obj[g] if str(r.get('issue'))==issue),None)
+                  if existing:
+                      if (existing.get('date'),existing.get('main'),existing.get('extra'))!=(date,main,extra):
+                          raise RuntimeError('BLOCKED conflicting official result: '+g+'/'+issue+'; manual review required')
+                      # Keep previous verification category. No unfounded upgrade to cross-checked.
+                      matches.append(g+'/'+issue)
+                  else:
+                      obj[g].append({'issue':issue,'date':date,'main':main,'extra':extra,
+                                     'verification':'official-only','sources':[url]})
+                      additions.append(g+'/'+issue);changed=True
+              if changed:
+                  for g in ('ssq','dlt'):
+                      obj[g].sort(key=lambda row:str(row['issue']),reverse=True)
+                      obj.setdefault('provenance',{}).setdefault(g,{})['latestIssue']=obj[g][0]['issue']
+                      obj['provenance'][g]['rows']=len(obj[g])
+                      obj['provenance'][g]['snapshotRecovery']='官方公告一次性核对快照；不等同于持续独立双源验证'
+                  obj['generatedAt']=datetime.now(timezone.utc).isoformat()
+                  tmp=path.with_suffix('.tmp')
+                  tmp.write_text(json.dumps(obj,ensure_ascii=False,separators=(',',':'))+'\n','utf-8')
+                  tmp.replace(path)
+              print('V18.4 draw recovery added:',additions,'already matched:',matches)
+              return additions
+          
+          if __name__=='__main__':apply(live=True)
           PY
-      - name: Publish updates without overwriting history with packaged files
+      - name: Settle ONLY truly public pre-draw records and lock new future strategies
         run: |
-          git add index.html styles.css history.json research.json health.json
+          node automation_research.mjs
+      - name: Create equal-cost random compound controls ONLY for new future records
+        run: |
+          python - <<'PY'
+          """Add unbiased equal-cost compound control ONLY to newly-created future locks."""
+          from pathlib import Path
+          from datetime import datetime,timezone,timedelta
+          from zoneinfo import ZoneInfo
+          import json,secrets
+          
+          FILE=Path('research.json')
+          
+          def apply(path=FILE,now=None):
+              now=now or datetime.now(timezone.utc)
+              obj=json.loads(path.read_text('utf-8'))
+              changed=[];picker=secrets.SystemRandom()
+              for r in obj['records']:
+                  if r.get('status')!='pending' or r.get('game') not in ('ssq','dlt'):continue
+                  try:created=datetime.fromisoformat(r['createdAt'].replace('Z','+00:00'))
+                  except (KeyError,ValueError):continue
+                  # Never back-fill controls to last week's public records.
+                  if not timedelta(0)<=now-created<=timedelta(minutes=30):continue
+                  target=datetime.fromisoformat(r['targetDate']).date()
+                  if target < now.astimezone(ZoneInfo('Asia/Shanghai')).date():continue
+                  if any(p.get('mode')=='random' for p in r.get('compoundPicks',[])):continue
+                  g=r['game']
+                  main=sorted(picker.sample(range(1,34 if g=='ssq' else 36),8 if g=='ssq' else 7))
+                  extra=sorted(picker.sample(range(1,17 if g=='ssq' else 13),1 if g=='ssq' else 2))
+                  r.setdefault('compoundPicks',[]).append({
+                      'mode':'random','main':main,'extra':extra,
+                      'bets':28 if g=='ssq' else 21,'cost':56 if g=='ssq' else 42,
+                      'policy':'V18.4 prospective equal-cost random compound baseline',
+                      'createdAt':now.isoformat()})
+                  changed.append(g+'/'+r['targetDate'])
+              if changed:
+                  obj['generatedAt']=now.isoformat()
+                  path.write_text(json.dumps(obj,ensure_ascii=False,indent=2)+'\n','utf-8')
+              print('V18.4 new (non-retrospective) compound controls:',changed)
+              return changed
+          
+          if __name__=='__main__':apply()
+          PY
+      - name: Integrate actual audit page, PWA cache and home version V18.4
+        run: |
+          python - <<'PY'
+          """Make the already uploaded V18.3 audit visible; add V18.4 health/missing-lock layer."""
+          from pathlib import Path
+          import re
+          
+          SEED=Path('audit-v183.html')
+          HOME=Path('index.html')
+          
+          def apply(root=Path('.')):
+              old=(root/SEED).read_text('utf-8')
+              if '<header>' not in old or '</body>' not in old:raise ValueError('V18.3 audit source layout incompatible')
+              upgraded=old.replace('V18.3','V18.4')
+              # Preserve the original reviewed audit and all its built-in prize-rule tests.
+              banner='''<section id="v184-summary" aria-label="V18.4资料与赛前锁定检查" style="width:min(100% - 24px,1050px);margin:8px auto 16px;padding:16px;border-radius:14px;border:1px solid #3b5872;background:#142338;color:#e5f3ff;line-height:1.7">
+          <strong>V18.4 · 最新开奖、同期研究与核验状态</strong>
+          <div id="v184-rows" style="margin-top:8px">正在读取仓库真实资料……</div>
+          <p style="font-size:12px;color:#a9c0d4;margin:10px 0 0">没有赛前 GitHub 锁定记录的期次，明确标为「无赛前记录」，不能把事后生成的号码计入战绩。随机复式从 V18.4 起只向未来期次新增，过去比赛不会补造对照数据。</p>
+          </section>'''
+              upgraded=upgraded.replace('</header>','</header>\n'+banner,1)
+              new_script='''<script type="module">
+          (async()=>{
+          const out=document.getElementById('v184-rows');
+          function line(s){const p=document.createElement('div');p.textContent=s;p.style.marginBottom='5px';out.appendChild(p)}
+          try{
+           const resp=await Promise.all(['history.json','research.json','health.json'].map(async f=>{
+             const r=await fetch('./'+f+'?v184='+Date.now(),{cache:'no-store'});
+             if(!r.ok)throw Error(f+' HTTP '+r.status);
+             return r.json();
+           }));
+           const [history,research,health]=resp;
+           out.replaceChildren();
+           for(const [g,label] of [['ssq','双色球'],['dlt','大乐透']]){
+             const latest=[...(history[g]||[])].sort((a,b)=>String(b.issue).localeCompare(String(a.issue)))[0];
+             if(!latest){line(label+'：没有有效开奖历史');continue}
+             const verified=latest.verification||'未标记';
+             line(label+'最新：'+latest.issue+'（'+latest.date+'） · '+latest.main.map(n=>String(n).padStart(2,'0')).join(' ')+' + '+latest.extra.map(n=>String(n).padStart(2,'0')).join(' ')+' · 来源级别 '+verified);
+             const settled=(research.records||[]).find(r=>r.game===g&&r.status==='settled'&&r.actual?.issue===latest.issue);
+             const pending=(research.records||[]).find(r=>r.game===g&&r.targetDate===latest.date&&r.status==='pending');
+             if(settled){
+               line('该期赛前锁定：有 · '+(settled.picks||[]).map(p=>{const actual=settled.actual;
+                 const a=p.main.filter(n=>actual.main.includes(n)).length,b=p.extra.filter(n=>actual.extra.includes(n)).length;
+                 return ({analyst:'A',veteran:'B',trend:'C',random:'随机'})[p.mode]+' '+a+'+'+b;
+               }).join(' / '));
+             }else if(pending){line('该期赛前锁定：有，但公开数据尚未结算；需检查自动同步')}else{line('该期：无赛前公开锁定记录，不纳入研究员成绩')}
+             const count=(research.records||[]).filter(r=>r.game===g&&r.status==='pending'&&r.targetDate<latest.date).length;
+             if(count)line('注意：更早期次仍有 '+count+' 条逾期未结算记录');
+             const hs=health?.games?.[g];if(hs)line('数据诊断：'+(hs.freshness||'未报告')+'；'+(hs.settlement||'未报告'));
+           }
+           if((health.alerts||[]).length){line('后台告警：'+health.alerts.slice(0,3).join('；'))}
+          }catch(e){out.textContent='无法读取在线公开数据：'+e.message+'。此页面不提供模拟或虚构开奖结果。'}
+          })();
+          </script>'''
+              upgraded=upgraded.replace('</body>',new_script+'\n</body>',1)
+              assert 'v184-rows' in upgraded and upgraded.count('v184-rows')>=2
+              (root/'audit-v184.html').write_text(upgraded,'utf-8')
+          
+              hp=root/HOME
+              home=hp.read_text('utf-8')
+              if '双彩研究工作台' not in home:raise ValueError('unexpected home layout')
+              if home.count('class="nav"')<1:raise ValueError('navigation missing')
+              home=re.sub(r'(<title>)双彩研究工作台 V18(?:\.\d+)?[^<]*(</title>)',r'\1双彩研究工作台 V18.4 · 实盘核验与选号决策\2',home,count=1)
+              home=re.sub(r'(<h1>双彩研究工作台 <span>)V18(?:\.\d+)?(</span>)',r'\1V18.4\2',home,count=1)
+              home=re.sub(r'(id="versionInfo">)版本 V18\.\d+(?:\.\d+)?[^<]*',r'\1版本 V18.4（原有选号引擎不变）',home,count=1)
+              home=home.replace('双彩研究工作台 V18.0 · 下一期30期数据决策','双彩研究工作台 V18.4 · 实盘核验 · 下一期数据决策')
+              anchor='</nav>'
+              link='<a class="v184-nav" href="./audit-v184.html?v=18.4">V18.4 复盘与数据诊断</a>'
+              if link not in home:
+                  if home.count(anchor)!=1:raise ValueError('Expected exactly one navigation closing tag')
+                  home=home.replace(anchor,link+anchor,1)
+              if '双彩研究工作台 <span>V18.4</span>' not in home or 'audit-v184.html' not in home:
+                  raise ValueError('V18.4 heading or audit link failed to integrate')
+              home=home.replace('src="app.js?v=18.0"','src="app.js?v=18.4"').replace('href="styles.css?v=18.0"','href="styles.css?v=18.4"')
+              hp.write_text(home,'utf-8')
+              css=root/'styles.css';styles=css.read_text('utf-8')
+              mark='/* V18.4 audit navigation */'
+              if mark not in styles:styles+='\n'+mark+'\n.nav a.v184-nav{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #368ca5;border-radius:8px;background:#1d5066;color:#e2f8ff;font-weight:700;text-decoration:none;font-size:12px}\n'
+              css.write_text(styles,'utf-8')
+              app=root/'app.js'
+              if app.exists():
+                  js=app.read_text('utf-8')
+                  old="el(\'versionInfo\').textContent=`前端 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`"
+                  new="el(\'versionInfo\').textContent=`界面 V18.4 / 选号核心 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`"
+                  if old in js:js=js.replace(old,new,1)
+                  elif new not in js:raise ValueError('Unexpected application version widget; abort before publish')
+                  app.write_text(js,'utf-8')
+              sw=root/'sw.js'
+              if sw.exists():
+                  s=sw.read_text('utf-8')
+                  s=s.replace("dual-lottery-v18.3-evidence","dual-lottery-v18.4-evidence")
+                  if "./audit-v184.html?v=18.4" not in s:
+                      s=s.replace("'./audit-v183.html?v=18.3',","'./audit-v183.html?v=18.3','./audit-v184.html?v=18.4',")
+                  s=s.replace("'./styles.css?v=18.0'","'./styles.css?v=18.4'")
+                  s=s.replace("'./app.js?v=18.0'","'./app.js?v=18.4'")
+                  sw.write_text(s,'utf-8')
+              print('V18.4 audit, home and PWA integrated')
+              return True
+          
+          if __name__=='__main__':apply()
+          PY
+      - name: Validate recovered draws, provenance, settled locks, UI and trial budget
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          h=json.loads(Path('history.json').read_text('utf-8'))
+          r=json.loads(Path('research.json').read_text('utf-8'))
+          health=json.loads(Path('health.json').read_text('utf-8'))
+          expected={'ssq':{'2026130':([1,2,6,16,20,28],[2]),'2026131':([1,10,19,26,31,33],[15])},'dlt':{'2026130':([1,7,11,27,29],[2,6])}}
+          for g,issues in expected.items():
+              m={x['issue']:x for x in h[g]}
+              for issue,(a,b) in issues.items():
+                  assert m[issue]['main']==a and m[issue]['extra']==b,(g,issue)
+              assert health['games'][g]['latestIssue']>=max(issues),g
+          for g,target in [('ssq','2026-11-12'),('dlt','2026-11-14')]:
+              # The published 2026-11-14 DLT and 2026-11-12 SSQ pre-draw locks must settle.
+              hits=[x for x in r['records'] if x['game']==g and x['targetDate']==target]
+              assert len(hits)==1 and hits[0]['status']=='settled',(g,target,hits)
+          # Never manufacture a retrospective 2026-11-15 SSQ pre-draw lock.
+          assert not any(x for x in r['records'] if x['game']=='ssq' and x['targetDate']=='2026-11-15' and x.get('origin','').startswith('GitHub Actions'))
+          html=Path('index.html').read_text('utf-8')
+          audit=Path('audit-v184.html').read_text('utf-8')
+          assert '<span>V18.4</span>' in html and './audit-v184.html?v=18.4' in html and 'app.js?v=18.4' in html
+          assert '界面 V18.4 / 选号核心 ${VERSION}' in Path('app.js').read_text('utf-8')
+          assert 'v184-rows' in audit and len(audit)>20000
+          for x in r['records']:
+              for p in x.get('compoundPicks',[]):
+                  if p.get('mode')=='random':
+                      assert x['status'] in ('pending','settled')
+                      assert (p['bets'],p['cost'])==((28,56) if x['game']=='ssq' else (21,42))
+          print('PASS: official snapshots, honest historical locks, equal budget and V18.4 UI')
+          PY
+      - name: Commit ONLY real records and V18.4 site sources
+        run: |
+          git add history.json research.json health.json index.html styles.css app.js sw.js audit-v184.html
           if git diff --cached --quiet; then
-            echo 'Already up to date'
+            echo 'Already up to date; no empty commit'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'fix: integrate V18.3 UI and reconcile lottery evidence'
+          git commit -m 'release: V18.4 restore evidence, same-budget baseline and current audit'
           git push
