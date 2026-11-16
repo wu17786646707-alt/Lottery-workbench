@@ -1,42 +1,41 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-12T02:57:21.695Z",
+  "generatedAt": "2026-11-16T03:10:21.450Z",
   "games": {
     "ssq": {
-      "latestIssue": "2026129",
-      "latestDate": "2026-11-10",
-      "expectedBySchedule": "2026-11-10",
-      "sourceRows": 3526,
-      "independentlyVerified": 0,
-      "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-12T02:57:21.695Z",
-      "firstObservedAt": "2026-11-11T02:57:29.993Z",
-      "statusCode": "on-schedule",
-      "delayDays": 0,
-      "freshness": "最新开奖覆盖常规日程",
-      "settlement": "已核对5条，暂无逾期待核对记录",
-      "officialError": "HTTP Error 403: Forbidden",
-      "mirrorError": ""
-    },
-    "dlt": {
-      "latestIssue": "2026129",
-      "latestDate": "2026-11-11",
-      "expectedBySchedule": "2026-11-11",
-      "sourceRows": 2947,
-      "independentlyVerified": 0,
-      "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-12T02:57:21.695Z",
-      "firstObservedAt": "2026-11-12T02:57:21.695Z",
+      "latestIssue": "2026131",
+      "latestDate": "2026-11-15",
+      "expectedBySchedule": "2026-11-15",
+      "sourceRows": 3528,
+      "independentlyVerified": 30,
+      "sourceVerification": "cross-checked",
+      "lastCheckAt": "2026-11-16T03:10:21.450Z",
+      "firstObservedAt": "2026-11-16T03:10:21.450Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
       "freshness": "最新开奖覆盖常规日程",
       "settlement": "已核对6条，暂无逾期待核对记录",
+      "officialError": "",
+      "mirrorError": ""
+    },
+    "dlt": {
+      "latestIssue": "2026130",
+      "latestDate": "2026-11-14",
+      "expectedBySchedule": "2026-11-14",
+      "sourceRows": 2948,
+      "independentlyVerified": 0,
+      "sourceVerification": "single-source",
+      "lastCheckAt": "2026-11-16T03:10:21.450Z",
+      "firstObservedAt": "2026-11-16T03:10:21.450Z",
+      "statusCode": "on-schedule",
+      "delayDays": 0,
+      "freshness": "最新开奖覆盖常规日程",
+      "settlement": "已核对7条，暂无逾期待核对记录",
       "officialError": "HTTP Error 567: Unknown Status",
       "mirrorError": ""
     }
   },
   "alerts": [
-    "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
     "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
   "note": "绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。"

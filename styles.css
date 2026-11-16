@@ -104,3 +104,6 @@
 .v18-table th{white-space:nowrap}.v18-table .v18-selected{background:rgba(67,131,222,.15)}
 .v18-error{color:#ff939b;font-size:13px}.v18-fact-block details summary{padding:10px 0;cursor:pointer}
 @media(max-width:600px){.v18-ticket{padding:10px}.v18-table{font-size:11px}.v18-table th,.v18-table td{padding:6px}.v18-ticket .balls{flex-wrap:wrap}}
+
+/* V18.4 audit navigation */
+.nav a.v184-nav{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #368ca5;border-radius:8px;background:#1d5066;color:#e2f8ff;font-weight:700;text-decoration:none;font-size:12px}

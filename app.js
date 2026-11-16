@@ -117,7 +117,7 @@ function renderAll(){ensureCandidates();const rows=getRows(),r=gameRule(),meta=u
  renderIssueBanner();el('homeCandidateList').innerHTML=researchCardsHTML();el('freshnessStatus').textContent=rows.length&&meta.stale?'⚠ 最近记录可能滞后，请到数据中心核验官方开奖':rows.length?'依据已收录真实数据生成':'请先同步历史开奖记录';
  const done=records.map(rec=>({rec,draw:nextDraw(ui.state.draws[rec.game],rec.baseIssue)}));const matched=done.filter(x=>x.draw).length;el('homeResearch').innerHTML=`<p><strong>下一目标：${E(fmtTarget(currentIssue()))}</strong>。以下本机锁定与 GitHub 公开提前研究档案彼此独立。</p><p><strong>${records.length}</strong> 份本机研究快照，<strong>${matched}</strong> 份已可核对下一期开奖。</p><p class="sub">本机时间锁定不可作第三方防篡改证明；历史模拟战绩不会混进实盘成绩。</p>`;
  el('boardMainLabel').textContent=r.mainName+'（选'+r.mainCount+'个）';el('boardExtraLabel').textContent=r.extraName+'（选'+r.extraCount+'个）';el('storeLabel').textContent=storageName();el('storageNotice').textContent=`当前持久化方式：${storageName()}。请定期导出完整备份。更新网页前先备份；清除 Safari 网站数据可能丢失本机研究档案。`;
- renderPublicLog();el('syncSummary').textContent=ui.state.meta.status||'尚未同步';el('versionInfo').textContent=`前端 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`;renderPage();}
+ renderPublicLog();el('syncSummary').textContent=ui.state.meta.status||'尚未同步';el('versionInfo').textContent=`界面 V18.4 / 选号核心 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`;renderPage();}
 function renderPatternStats(){
  const rows=getRows();if(!el('patternStats'))return;
  if(rows.length<31){el('patternStats').textContent='至少需要31期才能比较重号和连号';return}
