@@ -107,3 +107,6 @@
 
 /* V18.4 audit navigation */
 .nav a.v184-nav{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #368ca5;border-radius:8px;background:#1d5066;color:#e2f8ff;font-weight:700;text-decoration:none;font-size:12px}
+
+/* V18.5 optimizer entry */
+.nav a.v185-nav{display:inline-flex;align-items:center;white-space:nowrap;padding:9px 12px;border:1px solid #33a99b;border-radius:8px;background:#15544f;color:#e2fff8;font-weight:700;text-decoration:none;font-size:12px}
