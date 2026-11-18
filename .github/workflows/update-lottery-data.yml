@@ -1,4 +1,4 @@
-name: Lottery data + V18.7 joint kill-selection and new compound modes
+name: Lottery data + V18.7.1 repaired joint kill-selection + compound modes
 on:
   workflow_dispatch:
   push:
@@ -331,7 +331,7 @@ jobs:
                   old="el(\'versionInfo\').textContent=`前端 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`"
                   new="el(\'versionInfo\').textContent=`界面 V18.4 / 选号核心 ${VERSION} / 策略 ${POLICY} / ${storageName()}；前端同步为打开网页后尝试。`"
                   if old in js:js=js.replace(old,new,1)
-                  elif new not in js and new.replace('界面 V18.4', '界面 V18.5') not in js and new.replace('界面 V18.4', '界面 V18.6') not in js:raise ValueError('Unexpected application version widget; abort before publish')
+                  elif new not in js and not any(new.replace('界面 V18.4', '界面 V18.'+v) in js for v in ('5','6','7')):raise ValueError('Unexpected application version widget; abort before publish')
                   app.write_text(js,'utf-8')
               sw=root/'sw.js'
               if sw.exists():
@@ -369,7 +369,7 @@ jobs:
           assert not any(x for x in r['records'] if x['game']=='ssq' and x['targetDate']=='2026-11-15' and x.get('origin','').startswith('GitHub Actions'))
           html=Path('index.html').read_text('utf-8')
           audit=Path('audit-v184.html').read_text('utf-8')
-          assert '<span>V18.4</span>' in html and './audit-v184.html?v=18.4' in html and 'app.js?v=18.4' in html
+          assert '<span>V18.4</span>' in html and './audit-v184.html?v=18.4' in html and any('app.js?v=18.'+v in html for v in ('4','5','6','7')), 'V18.4 audit installed but existing JS cache-version differs'
           assert any(x in Path('app.js').read_text('utf-8') for x in ('界面 V18.4 / 选号核心 ${VERSION}', '界面 V18.5 / 选号核心 ${VERSION}'))
           assert 'v184-rows' in audit and len(audit)>20000
           for x in r['records']:
@@ -548,6 +548,7 @@ jobs:
           css.write_text(styles,'utf-8')
           app=ROOT/'app.js'
           code=app.read_text('utf-8')
+          if '界面 V18.7 / 选号核心' in code: code=code.replace('界面 V18.7 / 选号核心','界面 V18.5 / 选号核心',1)
           if '界面 V18.6 / 选号核心' in code: code=code.replace('界面 V18.6 / 选号核心','界面 V18.5 / 选号核心',1)
           if '界面 V18.4 / 选号核心' in code: code=code.replace('界面 V18.4 / 选号核心','界面 V18.5 / 选号核心',1)
           if '界面 V18.5 / 选号核心' not in code:raise RuntimeError('V18.5 dynamic footer not found')
@@ -558,7 +559,7 @@ jobs:
           if "'./optimizer-v185.html?v=18.5'" not in pwa:
               if "'./audit-v184.html?v=18.4'," not in pwa:raise RuntimeError('V18.4 precache anchor missing')
               pwa=pwa.replace("'./audit-v184.html?v=18.4',","'./audit-v184.html?v=18.4','./optimizer-v185.html?v=18.5',",1)
-          pwa=pwa.replace('dual-lottery-v18.4-evidence','dual-lottery-v18.5-evidence')
+          pwa=pwa.replace('dual-lottery-v18.7-evidence','dual-lottery-v18.5-evidence').replace('dual-lottery-v18.6-evidence','dual-lottery-v18.5-evidence').replace('dual-lottery-v18.4-evidence','dual-lottery-v18.5-evidence')
           pwa=pwa.replace("'./app.js?v=18.4'","'./app.js?v=18.5'").replace("'./styles.css?v=18.4'","'./styles.css?v=18.5'")
           if 'dual-lottery-v18.5' not in pwa:raise RuntimeError('V18.5 cache version not set')
           sw.write_text(pwa,'utf-8')
