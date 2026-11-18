@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#10182a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>双彩研究工作台 V18.5 · 组合优化与选号决策</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=18.5">
+<title>双彩研究工作台 V18.7 · 新复式与联动诊断</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=18.7">
 </head>
 <body>
 <header class="mast container">
- <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V18.5</span></h1></div></div>
+ <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V18.7</span></h1></div></div>
  <div class="head-actions"><span id="storeLabel" class="tag muted-tag">存储检测中</span><button id="syncTop" class="mini-accent" type="button">↻ 同步</button></div>
 </header>
 <div class="container"><div class="info-banner" role="note">V18 新增“下一期选号决策中心”：每组号码显示目标期、近30／120／300期统计与遗漏，正式支持双色球8+1／7+4、大乐透7+2／5+7同预算单组复式。历史热冷不等于下一期概率优势。</div>
 <div class="toolbar"><div class="tabs" role="group" aria-label="彩种"><button class="tab active" data-game="ssq">双色球 <small>6+1</small></button><button class="tab" data-game="dlt">超级大乐透 <small>5+2</small></button></div><div class="top-meta"><strong id="topCount">0 期</strong><span id="latestIssue">待加载</span></div></div>
 <section id="issueContextPanel" class="issue-context" aria-live="polite">正在确定历史基准与下一目标开奖期次……</section>
-<nav class="nav" aria-label="页面导航"><button class="active" data-page="home">总览</button><button data-page="decision">下一期选号决策 ★</button><button data-page="trend">走势与图表</button><button data-page="pick">三路选号</button><button data-page="insights">多窗口研究报告</button><button data-page="shape">形态先行·一组复式</button><button data-page="compound">复式选号</button><button data-page="coverage">一等奖概率</button><button data-page="kill">杀号实验室</button><button data-page="research">研究战绩</button><button data-page="review">复盘诊断 V18</button><button data-page="history">历史开奖</button><button data-page="data">数据与备份</button><a class="v184-nav" href="./audit-v184.html?v=18.4">V18.4 复盘与数据诊断</a><a class="v185-nav" href="./optimizer-v185.html?v=18.5">V18.5 同预算组合优化</a></nav>
+<nav class="nav" aria-label="页面导航"><button class="active" data-page="home">总览</button><button data-page="decision">下一期选号决策 ★</button><button data-page="trend">走势与图表</button><button data-page="pick">三路选号</button><button data-page="insights">多窗口研究报告</button><button data-page="shape">形态先行·一组复式</button><button data-page="compound">复式选号</button><button data-page="coverage">一等奖概率</button><button data-page="kill">杀号实验室</button><button data-page="research">研究战绩</button><button data-page="review">复盘诊断 V18</button><button data-page="history">历史开奖</button><button data-page="data">数据与备份</button><a class="v184-nav" href="./audit-v184.html?v=18.4">V18.4 复盘与数据诊断</a><a class="v185-nav" href="./optimizer-v185.html?v=18.5">V18.5 同预算组合优化</a><a class="v186-nav" href="./pool-lab-v186.html?v=18.6">V18.6 逐球走势·号码池</a><a class="v187-nav" href="./compound-lab-v187.html?v=18.7">V18.7 新复式·选号杀号联动</a></nav>
 <div id="alert" role="status" aria-live="polite" class="alert hidden"></div>
 <div id="appRecoveryBanner" class="info-banner" role="status" hidden>正在核对网站的历史开奖数据……</div>
 <main>
@@ -127,11 +127,11 @@
  <article class="panel"><h3>本地 CSV 导入</h3><p class="sub">格式：<code>game,issue,date,main,extra</code>。号码用空格分隔；game 为 ssq 或 dlt；支持五位、七位期号自动统一。</p><input type="file" id="csvInput" accept=".csv,text/csv"><textarea id="csvText" placeholder="game,issue,date,main,extra&#10;ssq,2026123,2026-10-27,04 05 20 21 26 30,12"></textarea><button id="importCSV">从文本导入并核验</button><p id="csvImportResult" class="footnote"></p></article>
  <article class="panel"><h3>完整备份与恢复</h3><p class="sub">一次备份包含历史数据、单式/复式守号、三路研究锁定记录、参数及来源状态。恢复会覆盖当前 V17 数据（兼容 V12 存储），请先备份。</p><div class="inline-actions"><button id="backupAll" class="accent">下载完整 JSON 备份</button><button id="backupCSV">导出历史 CSV</button></div><label class="file-choice">导入 V12 完整备份 <input type="file" id="restoreJSON" accept=".json,application/json"></label><p id="storageNotice" class="footnote"></p></article>
  <article class="panel"><h3>仓库后台自动化状态</h3><div id="healthData" class="stack"></div><p class="sub" id="publicDataStatus">读取公开研究记录中……</p><p class="footnote">后台定时更新要求在仓库的 .github/workflows 目录安装 GitHub Actions 工作流，并赋予 Actions 读取和写入仓库的权限。若未安装，当前只是浏览器手动同步。单源记录不可冒充双源独立核验。</p></article>
- <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V18.5（选号核心沿用 V18.0）</p></article>
+ <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V18.7（选号核心沿用V18.0；新增7+4、5+7和60期联动诊断）</p></article>
 </section>
 </main><footer class="footer">双彩研究工作台 V18.5 · 实盘核验 · 下一期数据决策 · 单组同预算复式 · 形态复盘 · 仅供统计研究与娱乐，量力而行</footer></div>
 <script src="startup-recovery.js?v=18.0" defer></script>
-<script type="module" src="app.js?v=18.5"></script>
+<script type="module" src="app.js?v=18.7"></script>
 <script type="module" src="coverage.js?v=18.0"></script>
 <script type="module" src="multiwindow-ui.js?v=18.0"></script>
 <script type="module" src="shape-ui.js?v=18.0"></script>

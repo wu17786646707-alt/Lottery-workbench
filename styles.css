@@ -110,3 +110,9 @@
 
 /* V18.5 optimizer entry */
 .nav a.v185-nav{display:inline-flex;align-items:center;white-space:nowrap;padding:9px 12px;border:1px solid #33a99b;border-radius:8px;background:#15544f;color:#e2fff8;font-weight:700;text-decoration:none;font-size:12px}
+
+/* V18.6 candidate-pool navigation */
+.nav a.v186-nav{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #2b8dbe;border-radius:8px;background:#214e70;color:#effaff;font-weight:700;text-decoration:none;font-size:12px}
+
+/* V18.7 compound choice nav */
+.nav a.v187-nav{display:inline-flex;align-items:center;padding:9px 12px;border:1px solid #338d7e;border-radius:8px;background:#18554c;color:#effff8;font-weight:700;text-decoration:none;font-size:12px}
