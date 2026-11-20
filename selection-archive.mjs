@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {canLock,makeTrial,modes,roadStats,summary} from './selection-engine.js';
 import './v187-core.js';
+import {updatePositionStudy} from './position-study.js';
 const read=path=>JSON.parse(fs.readFileSync(path,'utf8'));
 const VERSION=1;
 export function update(history,records,prior,now=new Date()){
@@ -18,6 +19,7 @@ export function update(history,records,prior,now=new Date()){
       data.locks.push({game,targetDate:record.targetDate,baseIssue:current.issue,createdAt:now.toISOString(),
         policy:'research-process-1',stats,byMode:Object.fromEntries(modes.map(mode=>[mode,makeTrial(training,game,mode,stats)]))});
     }
+    if(game==='ssq')updatePositionStudy(data,rows,records,now);
     if(data.replay[game]?.baseIssue===current.issue)continue;
     const samples=Object.fromEntries(modes.map(m=>[m,[]]));
     for(let i=0;i<30;i++){

@@ -1,3 +1,4 @@
+import {positionScore,aggregate} from './position-study.js';
 import {roadCounts,roadStats,summary} from './selection-engine.js';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -11,7 +12,7 @@ const author={
  {main:[7,9,11,16,21,24,25,33],extra:[4,9]},
  {main:[7,9,11,21,25,33],extra:[9]}]
 };
-const db={},state={view:'author',game:'ssq',mode:'veteran',date:'',show:true,sample:'replay'};
+const db={},state={view:'author',caseId:'manuscript',positionDate:'',game:'ssq',mode:'veteran',date:'',show:true,sample:'replay'};
 const card=(title,body)=>'<section class="card"><h2>'+esc(title)+'</h2>'+body+'</section>';
 const note=s=>'<p class="note">'+esc(s)+'</p>';
 const hero=(label,title,body)=>'<section class="hero"><small>'+esc(label)+'</small><h2>'+esc(title)+'</h2><p>'+esc(body)+'</p></section>';
@@ -33,8 +34,67 @@ function stage(game,title,pick,draw,meta='',previous=null){
  const hits=draw?['main','extra'].map(k=>pick[k].filter(n=>draw[k].includes(n)).length).join('+'):'';
  return '<article class="stage"><header><h3>'+esc(title)+'</h3><small>'+esc(meta)+'</small></header>'+balls(game,pick,draw)+(draw?'<strong>命中 '+hits+'</strong>':'')+(text?'<div class="muted">'+text+'</div>':'')+'</article>';
 }
+function revealButton(){
+ return '<button class="toggle" id="reveal" aria-pressed="'+state.show+'">'+(state.show?'隐藏开奖，单看选号':'显示开奖，核对每一步')+'</button>';
+}
+function manuscript(){
+ const actual=state.show?{main:[3,9,16,20,25,30],extra:[5]}:null;
+ const line=(title,numbers,verdict)=>'<h3>'+title+'</h3><p>'+esc(numbers)+'</p>'+(actual?note(verdict):'');
+ return hero('11 月 10 日手稿 · 对照双色球 2026129 期','大底、四金胆与独立补位','按截图可见文字重建。红圈与 11 月 10 日开奖结果相符，原始发稿时间未知，最终完整票面未展示。')+
+ revealButton()+card('趋势、大底与金胆',
+ line('趋势观察','02、14、19、26、30','开出 30。它没有进入大底，但作者在凤尾组再次选中了它。')+
+ line('大底 · 去重后 14 红','03、04、09、12、14、15、16、18、20、21、23、24、31、32','覆盖 03、09、16、20。原稿把 18 同时列进奇偶两栏。')+
+ line('四金胆','03、15、16、20','命中 03、16、20。由大底缩到四胆时丢掉了 09。')+
+ line('冷号防守','08、33，另外提示防 33','两个均未开出。'))+
+ card('位置组与二选一',line('三个独立首选','龙头 03/04/05 → 03；中间 14/15/16 → 16；凤尾 30/32/33 → 30。','03 是最小号，30 是最大号，16 排第三。03、16 与金胆重复，只算一次号码命中。')+
+ line('四组搭配','03/04、15/16、17/18、30/33。','按“恰好开一个”评，四组中三组符合；按“最多开一个”评，四组都符合。17/18 两个都没出。'))+
+ card('蓝球从八个缩到四个',line('围蓝 → 定蓝','01、02、03、04、05、06、08、10 → 02、03、04、05','实开 05，两个阶段都保住。图中没有唯一蓝球。'))+
+ (actual?card('开奖核对',balls('ssq',actual,null)+note('25 未出现在截图可见的红球建议里。缺少最终票面，无法核算这一稿的实际奖金。')+'<a href="https://www.swlc.net.cn/lottery/ssq.html?limit=30&amp;view=previous">上海福彩开奖公告</a>'):'');
+}
+function sourceLink(url,label){return '<a href="'+esc(url)+'">'+esc(label)+'</a>';}
+function articles(){
+ const xiaLinks=[['https://sports.sina.com.cn/l/2026-11-10/doc-iniyfkmh9404668.shtml','129 期'],['https://sports.sina.com.cn/l/2026-11-11/doc-iniyitse8549296.shtml','130 期'],['https://sports.sina.com.cn/l/2026-11-15/doc-iniyupui2182676.shtml','131 期']];
+ return hero('公开文章 · 2026 年 11 月','哪些写法值得跟踪','按文章标示的发布时间、实际号码与官方开奖核对。入选依据是可以复算，不按作者自报的奖金排名。')+
+ card('夏师傅｜连续记录四胆','<p>新浪彩票的双色球 129、130、131 期文章都列出四个红胆。三期实际分别命中 25、16、31，每期一个。129 期还把当期开出的 20、30 列入六个杀号。</p>'+note('可借鉴：固定候选数，连续登记命中数和误杀数，保留普通期次。')+xiaLinks.map(x=>sourceLink(...x)).join(' · '))+
+ card('郑容杰｜给每个排序位置一个首选','<p>双色球 133 期文章将第二位定为 10、第三位定为 14。10 开在第二位，14 开在第四位。六个位置首选合计有两个号码开出，仅一个落在指定位置。</p>'+note('可借鉴：分别显示“号码出现”和“位置选准”。')+sourceLink('https://m.55125.cn/ssq/dingdan/20261119_6730093.htm','彩吧网 · 11 月 19 日文章'))+
+ card('不二真探｜检查前后区各自损失','<p>大乐透 26132 期的前区从 15 码缩至 6 码，命中从 3 个降为 2 个，删掉了 02。后区从 5 码缩至 3 码时留下 06，丢了 11。</p>'+note('可借鉴：把前区、后区分开记；大池覆盖与最终票面分别核对。')+sourceLink('https://www.518158.cn/dlt/read_352117.html','新版彩吧 · 11 月 18 日文章'))+
+ card('官方开奖',sourceLink('https://www.swlc.net.cn/lottery/ssq.html?limit=30&view=previous','上海福彩 · 双色球历史开奖')+' · '+sourceLink('https://api.js-lottery.com/cms/post-148272.html','江苏体彩 · 大乐透 26132 期'));
+}
+function positionTotals(s,title){
+ if(!s?.n)return card(title,'<p>暂无已结算的公开样本。</p>');
+ return card(title,'<p>共 '+s.n+' 期；其中 '+s.changed+' 期发生换号。换后红球多中 '+s.better+' 期，少中 '+s.worse+' 期，持平 '+s.tie+' 期。</p>'+
+ '<table><tr><th>8+1 对照</th><th>累计红球</th><th>累计蓝球</th></tr>'+[['原票',s.before,s.blue],['位置补位',s.after,s.blue],['同预算随机',s.randomHits,s.randomBlue]].map(a=>'<tr>'+a.map(n=>'<td>'+esc(n)+'</td>').join('')+'</tr>').join('')+'</table>'+
+ '<p>龙头、凤尾分别对位 '+s.headExact+'、'+s.tailExact+' 次；始终选 01、33 作为首尾的对照分别为 '+s.fixedHead+'、'+s.fixedTail+' 次。</p>'+
+ '<p>四金胆命中 0／1／2／3／4 个的期数依次为 <strong>'+s.hist.join(' / ')+'</strong>。实际共中 '+s.goldHits+' 个；从相同 15 码池随机挑 4 个的条件期望为 '+(s.poolHits*4/15).toFixed(1)+' 个。</p>'+
+ '<p>独立蓝球试验从 8 个缩到 4 个、再到 1 个，分别覆盖 '+s.blueSteps.join(' / ')+' 期。</p>');
+}
+function viewPosition(){
+ const s=db.selection.positionStudy;
+ if(!s){$('filters').innerHTML='';return note('本期补位试验尚未生成，请在数据任务完成后刷新。');}
+ const locks=s.locks.slice().sort((a,b)=>b.targetDate.localeCompare(a.targetDate));
+ const records=db.research.records.filter(r=>r.game==='ssq');
+ const drawFor=l=>records.find(r=>r.targetDate===l.targetDate&&r.baseIssue===l.trial.baseIssue&&r.status==='settled')?.actual;
+ let header=hero('双色球 · B 经验研究员','龙头与凤尾补位','两组都用 8 红 1 蓝、28 注、56 元。用同一个蓝球，单独比较换红球的效果。');
+ const selected=locks.find(l=>l.targetDate===state.positionDate)??locks[0];
+ $('filters').innerHTML=locks.length?'<div class="filters">'+select('positionDate','开奖前锁定记录',Object.fromEntries(locks.map(l=>[l.targetDate,l.targetDate+' · '+(drawFor(l)?.issue??pendingLabel(l))])),selected.targetDate)+'</div>':'';
+ if(selected){
+  const t=selected.trial,draw=drawFor(selected);
+  header+=card('目标开奖日 '+selected.targetDate,'<p>依据 '+esc(t.windowEnd)+' 至 '+esc(t.baseIssue)+' 期。北京时间 '+esc(new Date(selected.createdAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}))+' 单独锁定。</p>'+
+    t.aims.map(a=>'<p><strong>'+a.role+' '+pad(a.number)+'</strong> · 近 30 期在该位置出现 '+a.count+' 次。'+(a.dropped?'从池外补入，换出 '+pad(a.dropped)+'。':t.base.includes(a.number)?'已在原票中。':'已在初选池中，本规则不补入。')+'</p>').join('')+
+    '<p>四金胆 · '+list(t.gold)+(draw?'。开出 '+list(t.gold.filter(n=>draw.main.includes(n))):'')+'</p>'+
+    (draw?note('本期实际龙头 '+pad(Math.min(...draw.main))+'，凤尾 '+pad(Math.max(...draw.main))+'。'):''));
+  header+=stage('ssq','原 B 池内复式',{main:t.base,extra:[t.blue]},draw,'8+1')+stage('ssq','补位对照票',{main:t.revised,extra:[t.blue]},draw,'8+1',{main:t.base,extra:[t.blue]})+
+    card('独立蓝球缩号',t.blueStages.map((p,i)=>'<p>'+['围八','缩四','定一'][i]+' · '+list(p)+(draw?(p.includes(draw.extra[0])?' · 命中':' · 未中'):'')+'</p>').join('')+'<small>按近 30 期频次从高到低，同频小号优先。这三层独立观察，补位对照的两张票共用原蓝球。</small>');
+ }else header+=note('待首条开奖前公开锁定。');
+ const live=locks.filter(l=>drawFor(l)).map(l=>positionScore(l.trial,drawFor(l)));
+ return header+positionTotals(aggregate(live),'公开锁定 · 到期核对')+positionTotals(s.replay,'近 30 期历史回放 · '+s.replay.first+'—'+s.replay.last)+
+ card('规则怎样固定','<p>取此前 30 期中最常见的最小号与最大号，同频分别取较小、较大号码。首选在 B 的 15 红池外才补入，先龙头后凤尾；优先换出原 8 红中出现最少的号码，同频先换较大的。保护两个位置首选和四个金胆。</p><p>四金胆取 15 红池中近 30 期出现最多的四个，同频小号优先。它是工作台此次固定的实验规则，手稿没有公开逐球算法。</p>');
+}
+
 function viewAuthor(){
- $('filters').innerHTML='';
+ $('filters').innerHTML='<div class="filters">'+select('caseId','案例与文章来源',{manuscript:'11 月 10 日 · 手稿与四金胆',original:'11 月 19 日 · 大复式缩号',articles:'公开文章 · 三位作者核对'},state.caseId)+'</div>';
+ if(state.caseId==='manuscript')return manuscript();
+ if(state.caseId==='articles')return articles();
  const actual=state.show?author.draw:null;
  const rules=[['跨度','比较近期周四走势，判断跨度会从 16 回升，落在 26 左右。','实际 19，方向吻合，幅度偏小。'],
  ['重号','预期本期没有与上期重复的红球。','21 连续两期开出。'],
@@ -121,6 +181,7 @@ function render(){
  if(!db.selection||!db.research||(state.view==='roads'&&!db.history)){
    $('filters').innerHTML='';$('content').innerHTML=note(db.error?'本次未能取得完整数据，请重新加载。':'正在读取公开记录…');return;
  }
+ if(state.view==='positions'){$('content').innerHTML=viewPosition();return;}
  const rec=makeFilters();
  $('content').innerHTML=state.view==='work'?work(rec):state.view==='compare'?comparisons():roads(rec);
 }
@@ -129,7 +190,7 @@ document.addEventListener('click',e=>{
  if(tab){state.view=tab.dataset.view;render();}
  if(e.target.id==='reveal'){state.show=!state.show;render();}
 });
-$('filters').addEventListener('change',e=>{const k=e.target.id;if(['game','mode','date','sample'].includes(k)){state[k]=e.target.value;if(k==='game')state.date='';render();}});
+$('filters').addEventListener('change',e=>{const k=e.target.id;if(['game','mode','date','sample','caseId','positionDate'].includes(k)){state[k]=e.target.value;if(k==='game')state.date='';render();}});
 render();
 await Promise.all(Object.entries({research:'research.json',selection:'selection-data.json',history:'history.json'}).map(async ([k,url])=>{
  try{const res=await fetch(url,{cache:'no-cache'});if(!res.ok)throw Error();db[k]=await res.json();}catch{db.error=true;}render();
