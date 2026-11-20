@@ -58,7 +58,7 @@ export function patterns(rows,game,window=300){
  }
  return {sample:data.length,sum:round(avg(data.map(x=>x.sum))),odd:round(avg(data.map(x=>x.odd))),span:round(avg(data.map(x=>x.span))),repeat:round(avg(data.map(x=>x.repeat))),adj:round(avg(data.map(x=>x.adj))),sumSD:Math.max(3,std(data.map(x=>x.sum))),spanSD:Math.max(2,std(data.map(x=>x.span)))};
 }
-function scoreFeature(f,mode,game,part,primary=120){
+export function scoreFeature(f,mode,game,part,primary=120){
  const cfg=GAMES[game],p=part==='main'?cfg.mainCount/cfg.mainMax:cfg.extraCount/cfg.extraMax;
  const zWindow=w=>{
   const n=f.lengths[w],ex=n*p;
@@ -85,7 +85,7 @@ function structureScore(nums,last,profile,mode,baseK){
  const structural=.25*Math.abs(sum-profile.sum*scale)/(profile.sumSD*scale)+.19*Math.abs(span-profile.span)/(profile.spanSD)+.18*Math.abs(odd-n/2)+.15*Math.abs(rep-expectRep)+.13*Math.abs(adj-expectAdj);
  return {penalty:structural*(mode==='veteran'?1.4:mode==='trend'?.32:.48),rep,adj,sum,odd,span};
 }
-function pickPart(rows,game,mode,part,size,seed,banned,search,primary){
+function pickPart(rows,game,mode,part,size,seed,banned,search,primary,options){
  const g=GAMES[game],max=part==='main'?g.mainMax:g.extraMax,baseK=part==='main'?g.mainCount:g.extraCount;
  const f=factTable(rows,game,part),features=f.rows.map(x=>({...x,score:scoreFeature(x,mode,game,part,primary)}));
  const random=rng(seed+'|'+part),profile=part==='main'?patterns(rows,game,300):null,plan=part==='main'?shapePlan(rows,game,mode,size):null;
@@ -96,7 +96,8 @@ function pickPart(rows,game,mode,part,size,seed,banned,search,primary){
   const nums=shuffle(max,size,random,banned),mean=avg(nums.map(n=>features[n-1].score));
   const penalty=profile?structureScore(nums,[...rows[0].main],profile,mode,baseK).penalty:0;
   let val=mode==='veteran'?mean*.15-penalty:mode==='trend'?mean*2.0-penalty:mean*1.5-penalty;
-  if(mode!=='random'){const shp=plan?shapePenalty(nums,rows[0].main,game,plan,rows[1]?.main||[]):extraShapePenalty(nums,game,mode);val-= (mode==='veteran'?.70:mode==='trend'?.42:.32)*shp.penalty;val-=nums.filter(n=>lowered.has(n)).length*.067;}
+  if(mode!=='random'){const shp=plan?shapePenalty(nums,rows[0].main,game,plan,rows[1]?.main||[]):extraShapePenalty(nums,game,mode);val-= (mode==='veteran'?.70:mode==='trend'?.42:.32)*shp.penalty;if(options.useSoftKills!==false)val-=nums.filter(n=>lowered.has(n)).length*.067;
+   if(options.roadAdjustments)val+=avg(nums.map(n=>options.roadAdjustments[part][n%3]));}
   if(best===null||val>bestScore){best=nums;bestScore=val}
  }
  return {numbers:best,score:round(bestScore),features,shapePlan:plan,softKills:[...lowered]};
@@ -115,7 +116,7 @@ export function pickV15(rows,game,mode='analyst',config={}){
  const primaryWindow=[60,120,300].includes(baseWindow)?baseWindow:120;
  const seed=String(config.seed||`${game}|${rows[0].issue}|${mode}|${MW_POLICY}|${mainCount}|${baseWindow}`);
  const search=maxInt(Number(config.search)||360,1,900);
- const a=pickPart(rows,game,mode,'main',mainCount,seed,banned.main,search,primaryWindow),b=pickPart(rows,game,mode,'extra',extraCount,seed,banned.extra,search,primaryWindow);
+ const a=pickPart(rows,game,mode,'main',mainCount,seed,banned.main,search,primaryWindow,config),b=pickPart(rows,game,mode,'extra',extraCount,seed,banned.extra,search,primaryWindow,config);
  const main=a.numbers,extra=b.numbers;
  const patt={repeat:main.filter(n=>rows[0].main.includes(n)).length,adjacent:main.filter((n,i)=>i>0&&n===main[i-1]+1).length};
  const dataHash=hash(JSON.stringify(rows.slice(0,baseWindow).map(x=>[x.issue,x.date,x.main,x.extra])));
@@ -140,7 +141,7 @@ export function makeCompoundV15(rows,game,mode='trend',config={}){
   const plan=shapePlan(rows,game,mode,step+1),options=remaining.filter(r=>!chosen.has(r.n));
   if(!options.length)break;
   const rank=options.map(r=>{const tentative=[...chosen,r.n].sort((a,b)=>a-b),pen=shapePenalty(tentative,rows[0].main,game,plan,rows[1]?.main||[]).penalty;
-   return {n:r.n,val:r.score-(mode==='veteran'?.75:.36)*pen};
+   return {n:r.n,val:r.score+(config.roadAdjustments?.main[r.n%3]||0)-(mode==='veteran'?.75:.36)*pen};
   }).sort((a,b)=>b.val-a.val||a.n-b.n);chosen.add(rank[0].n);
  }
  if(chosen.size!==required)throw Error('剩余候选不足，无法形成复式');

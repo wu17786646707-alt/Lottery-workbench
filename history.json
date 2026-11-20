@@ -1,7 +1,27 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-18T00:30:22.343708+00:00",
+  "generatedAt": "2026-11-20T00:09:02.036033+00:00",
   "ssq": [
+    {
+      "issue": "2026133",
+      "date": "2026-11-19",
+      "main": [
+        7,
+        10,
+        11,
+        14,
+        21,
+        26
+      ],
+      "extra": [
+        13
+      ],
+      "verification": "cross-checked",
+      "sources": [
+        "yangxb919/lottery-data (来源声明500.com)",
+        "上海市福利彩票发行中心(www.swlc.net.cn)"
+      ]
+    },
     {
       "issue": "2026132",
       "date": "2026-11-17",
@@ -67087,6 +67107,25 @@
   ],
   "dlt": [
     {
+      "issue": "2026132",
+      "date": "2026-11-18",
+      "main": [
+        2,
+        9,
+        16,
+        26,
+        35
+      ],
+      "extra": [
+        6,
+        11
+      ],
+      "verification": "single-source",
+      "sources": [
+        "yangxb919/lottery-data (来源声明500.com)"
+      ]
+    },
+    {
       "issue": "2026131",
       "date": "2026-11-16",
       "main": [
@@ -123128,8 +123167,8 @@
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
       "officialError": "",
-      "latestIssue": "2026132",
-      "rows": 3529,
+      "latestIssue": "2026133",
+      "rows": 3530,
       "officialSupplementSource": "上海市福利彩票发行中心(www.swlc.net.cn)",
       "officialSupplementChecked": 30,
       "officialSupplementInserted": 0,
@@ -123144,8 +123183,8 @@
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
       "officialError": "HTTP Error 567: Unknown Status",
-      "latestIssue": "2026131",
-      "rows": 2949
+      "latestIssue": "2026132",
+      "rows": 2950
     }
   },
   "quarantine": []
