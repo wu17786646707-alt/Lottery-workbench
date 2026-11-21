@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-21T17:14:37.642Z",
+  "generatedAt": "2026-11-21T18:06:45.608Z",
   "games": {
     "ssq": {
       "latestIssue": "2026133",
@@ -9,13 +9,13 @@
       "sourceRows": 3530,
       "independentlyVerified": 32,
       "sourceVerification": "cross-checked",
-      "lastCheckAt": "2026-11-21T17:14:37.642Z",
+      "lastCheckAt": "2026-11-21T18:06:45.608Z",
       "firstObservedAt": "2026-11-20T00:09:04.771Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
       "freshness": "最新开奖覆盖常规日程",
       "settlement": "已核对8条，暂无逾期待核对记录",
-      "officialError": "HTTP Error 403: Forbidden",
+      "officialError": "",
       "mirrorError": ""
     },
     "dlt": {
@@ -25,19 +25,18 @@
       "sourceRows": 2951,
       "independentlyVerified": 1,
       "sourceVerification": "official-only",
-      "lastCheckAt": "2026-11-21T17:14:37.642Z",
+      "lastCheckAt": "2026-11-21T18:06:45.608Z",
       "firstObservedAt": "2026-11-21T15:17:08.652Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
       "freshness": "最新开奖覆盖常规日程",
       "settlement": "已核对10条，暂无逾期待核对记录",
-      "officialError": "<urlopen error timed out>",
+      "officialError": "HTTP Error 567: Unknown Status",
       "mirrorError": ""
     }
   },
   "alerts": [
-    "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
-    "超级大乐透 官方独立核验失败：<urlopen error timed out>"
+    "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
   "note": "绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。"
 }
