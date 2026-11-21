@@ -3,6 +3,19 @@ import {pathToFileURL} from 'node:url';
 import {canLock,makeTrial,modes,roadStats,summary} from './selection-engine.js';
 import './v187-core.js';
 import {updatePositionStudy} from './position-study.js';
+import {forecast, usablePair} from './trajectory.js';
+function archiveTrajectory(data,game,rows,records,now){
+  const entry=records.find(r=>r.game===game && canLock(r,now,rows[0]));
+  if(!entry || rows.length<2 || !usablePair([rows[1],rows[0]],2))return;
+  const locks=data.trajectoryLocks??=[];
+  if(locks.some(x=>x.game===game && x.targetDate===entry.targetDate && x.policy==='trajectory-v1'))return;
+  const bases=[rows[1],rows[0]].map(({issue,date,main,extra})=>({issue,date,main,extra}));
+  const projection=forecast(game,...bases);
+  const saved=Object.fromEntries(['main','extra'].map(f=>[f,{
+    pool:[...projection[f].marks.keys()],numbers:projection[f].numbers,fillers:projection[f].fillers
+  }]));
+  locks.push({policy:'trajectory-v1',game,targetDate:entry.targetDate,createdAt:now.toISOString(),bases,saved});
+}
 const read=path=>JSON.parse(fs.readFileSync(path,'utf8'));
 const VERSION=1;
 export function update(history,records,prior,now=new Date()){
@@ -10,6 +23,7 @@ export function update(history,records,prior,now=new Date()){
   if(data.schema!==VERSION || !Array.isArray(data.locks))throw Error('Unexpected selection archive schema');
   for(const game of ['ssq','dlt']){
     const rows=globalThis.V187Core.validRows(game,history[game]);
+    archiveTrajectory(data,game,rows,records,now);
     if(rows.length<330)continue;
     const current=rows[0];
     for(const record of records.filter(r=>r.game===game)){

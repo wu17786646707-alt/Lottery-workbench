@@ -1,0 +1,12 @@
+.filters{align-items:flex-end}.filters label{font-size:.88rem}.filters select{font-size:1rem}
+.board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:9px 0}
+.board button{min-height:42px;background:#f5f7f7;border:1px solid #d9e1e1;border-radius:7px;cursor:pointer;font-variant-numeric:tabular-nums}
+.board button.mark{background:#e0f1ec;border-color:#90bdaf;color:#164d40;font-weight:650}
+.board button.multi{background:#195d51;color:#fff}.board sup{font-size:.7em;margin-left:1px}
+.board button[aria-pressed=true]{outline:2px solid #a25722;outline-offset:0}
+#status{color:#405a69;font-size:.9rem}.card select{max-width:100%}.card h3{margin-top:12px}
+.trace-plot{width:min(100%,365px);height:auto;display:block;color:#215f56;background:#f1f6f4;border-radius:8px;margin:6px 0}
+.trace-plot text{fill:#203545;font:12px system-ui,sans-serif}.trace-plot circle{stroke:#215f56;stroke-width:1.5}
+.trace-plot line{stroke:#267563;stroke-width:2}.trace-plot line.next{stroke-dasharray:4 3}
+.numline{font-variant-numeric:tabular-nums;font-weight:660;font-size:1.12rem}.hero .numline{color:white}
+.hscroll{overflow-x:auto}td,th{font-variant-numeric:tabular-nums}.hscroll table{min-width:350px}.compact{margin-top:7px}.muted{line-height:1.5}

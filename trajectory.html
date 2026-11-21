@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12243a"><title>轨迹选号与回测 · 双彩研究工作台</title>
+<link rel="stylesheet" href="selection.css"><link rel="stylesheet" href="trajectory.css">
+<script type="module" src="trajectory-ui.js"></script>
+</head>
+<body>
+<header><div class="wrap"><a href="./index.html">‹ 双彩研究工作台</a><span>V18.10</span></div></header>
+<main class="wrap">
+<h1>轨迹选号与回测</h1>
+<div class="filters"><label>彩种<select id="game"><option value="ssq">双色球</option><option value="dlt">大乐透</option></select></label>
+<label>查看期次<select id="target"><option value="next">下一期</option></select></label>
+<label>回测窗口<select id="window"><option value="30">近 30 期</option><option value="300">近 300 期</option><option value="600" selected>近 600 期</option><option value="all">全部历史</option></select></label></div>
+<div id="status" role="status">正在读取开奖档案…</div>
+<div id="pick"></div>
+<details class="card"><summary>四种画法和单式选号规则</summary>
+<ol><li><b>斜线</b>　最近两期相差 1 或 2 格，向同一方向再走相同步数。</li><li><b>折返</b>　用同一起点与步数，下一期回到两期前的号码。</li><li><b>三角</b>　上期两点相距 2 或 4 格，下一期取中点。</li><li><b>五角星</b>　中心两侧各距 1 格的两点出现在前两期中的第一期，各距 2 格的两点出现在第二期，下一期标中心。也检查等比例放大一倍的图形。</li></ol>
+<p>同一期同一号码合并计一次。号码越界即舍去。没有轨迹经过的号码也可能开出。</p>
+<p><b>缩成一注</b>　优先取不同画法较多的号码，同分取小号。双色球蓝球先取折返，大乐透后区先取一个折返，再取一个不同的斜线号。余位按同一排序补齐。候选不足时取最长空号区间的中点，长度相同选靠左区间，双中点取较小值，逐个补到足数。补号单列。</p>
+</details>
+<div id="metrics"></div><div id="archive"></div>
+<noscript>请启用 JavaScript 以加载历史回测。</noscript>
+</main></body></html>
