@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-22T16:11:40.172291+00:00",
+  "generatedAt": "2026-11-22T17:11:44.711987+00:00",
   "ssq": [
     {
       "issue": "2026134",
@@ -123198,15 +123198,20 @@
   ],
   "provenance": {
     "ssq": {
-      "status": "尚无交叉核验；官方单源补入0期；其余单源",
+      "status": "备用官方核验与镜像一致29期；官方单源补入0期；冲突0期",
       "officialRows": 0,
       "checked": 0,
       "conflicts": 0,
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
-      "officialError": "HTTP Error 403: Forbidden",
+      "officialError": "",
       "latestIssue": "2026134",
-      "rows": 3531
+      "rows": 3531,
+      "officialSupplementSource": "上海市福利彩票发行中心(www.swlc.net.cn)",
+      "officialSupplementChecked": 29,
+      "officialSupplementInserted": 0,
+      "officialSupplementConflicts": 0,
+      "primaryOfficialError": "HTTP Error 403: Forbidden"
     },
     "dlt": {
       "status": "尚无交叉核验；官方单源补入0期；其余单源",
