@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-23T15:34:03.359541+00:00",
+  "generatedAt": "2026-11-23T17:26:36.744594+00:00",
   "ssq": [
     {
       "issue": "2026134",
@@ -123231,8 +123231,7 @@
       "officialSupplementChecked": 30,
       "officialSupplementInserted": 0,
       "officialSupplementConflicts": 0,
-      "primaryOfficialError": "HTTP Error 403: Forbidden",
-      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
+      "primaryOfficialError": "HTTP Error 403: Forbidden"
     },
     "dlt": {
       "status": "尚无交叉核验；官方单源补入0期；其余单源",
@@ -123243,8 +123242,7 @@
       "mirrorError": "",
       "officialError": "HTTP Error 567: Unknown Status",
       "latestIssue": "2026134",
-      "rows": 2952,
-      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
+      "rows": 2952
     }
   },
   "quarantine": []
