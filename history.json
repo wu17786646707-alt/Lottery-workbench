@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-22T18:05:38.834236+00:00",
+  "generatedAt": "2026-11-23T03:03:18.952020+00:00",
   "ssq": [
     {
       "issue": "2026134",
@@ -16,9 +16,9 @@
       "extra": [
         8
       ],
-      "verification": "official-only",
+      "verification": "single-source",
       "sources": [
-        "上海市福利彩票发行中心(www.swlc.net.cn)"
+        "yangxb919/lottery-data (来源声明500.com)"
       ]
     },
     {
