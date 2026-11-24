@@ -109,3 +109,22 @@ test('the rule-replay article is independent of the outcome and skips a broken 3
  field('handDate').onchange();assert.equal(field('journalBody').innerHTML.split('<h3>开奖后对账')[0],original);
  run("db.history.dlt.splice(10,1)");field('handDate').onchange();assert.match(field('journalBody').textContent,/不完整/);
 });
+
+test('the researcher input reproduces the published column source pool for both games',async()=>{
+ const {columnChoices}=await import('./column-input.js');
+ const {run}=openColumn();
+ for(const g of ['ssq','dlt']){
+  const rows=JSON.parse(JSON.stringify(run("db.history."+g))).sort((a,b)=>b.date.localeCompare(a.date));
+  for(const i of [0,5,20]){
+   const before=rows.slice(i,i+30);
+   const reference=run("handPick("+JSON.stringify(before)+",'"+g+"').levels[0]");
+   for(const mode of ['analyst','veteran','trend']){
+    const plan=columnChoices(before,g,mode);
+    assert.deepEqual(plan.source.main,Array.from(reference[1]));
+    assert.deepEqual(plan.source.extra,Array.from(reference[2]));
+    const changed=columnChoices([...before,{main:[1],extra:[1]}],g,mode);
+    assert.deepEqual(plan,changed);
+   }
+  }
+ }
+});

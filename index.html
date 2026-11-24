@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#10182a">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://raw.githubusercontent.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'">
-<title>双彩研究工作台 V18.16 · 选号过程与复盘</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=18.7">
+<title>双彩研究工作台 V18.18 · 选号过程与复盘</title><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css?v=18.7">
 </head>
 <body>
 <header class="mast container">
- <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V18.16</span></h1></div></div>
+ <div class="brand"><span class="brand-mark">◉</span><div><div class="eyebrow">LOTTERY RESEARCH LAB</div><h1>双彩研究工作台 <span>V18.18</span></h1></div></div>
  <div class="head-actions"><span id="storeLabel" class="tag muted-tag">存储检测中</span><button id="syncTop" class="mini-accent" type="button">↻ 同步</button></div>
 </header>
 <div class="container"><div class="info-banner" role="note">V18 新增“下一期选号决策中心”：每组号码显示目标期、近30／120／300期统计与遗漏，正式支持双色球8+1／7+4、大乐透7+2／5+7同预算单组复式。历史热冷不等于下一期概率优势。</div>
@@ -22,13 +22,13 @@
  <div class="metrics"><article class="metric"><div class="label">历史期数</div><div id="metricCount" class="figure">—</div><small>有效格式校验后</small></article><article class="metric"><div class="label">最近开奖期次</div><div id="metricIssue" class="figure">—</div><small id="metricDate">等待数据</small></article><article class="metric"><div class="label">资料可信度</div><div id="metricQuality" class="figure small-figure">—</div><small id="metricQualityExplain">检查中</small></article><article class="metric"><div class="label">研究记录</div><div id="metricRecords" class="figure">0</div><small>本机锁定，不可作第三方证明</small></article></div>
  <div class="two-col"><article class="panel"><div class="panel-head"><div><h3>最新一期号码</h3><p class="sub" id="latestInfo">未导入开奖数据</p></div><span class="tag" id="latestVerify">待核验</span></div><div class="balls" id="latestBalls"></div><p class="footnote">只有通过真实数据源或手动导入，才会显示号码；本系统不生成虚构开奖记录。</p></article><article class="panel"><h3>当前目标期研究状态</h3><div id="homeResearch" class="stack"><p class="sub">导入至少30期后生成研究候选。</p></div><div id="homeAutomation" class="automation-note">后台研究记录：正在读取……</div><div class="inline-actions"><button data-action="go-research">查看研究员档案</button><button data-action="go-data">数据质量</button></div></article></div>
  <article class="panel"><div class="panel-head"><h3>三种研究角度</h3><span class="tag">相同快照 · 可重复</span></div><div class="strategy-grid"><div class="strategy-card"><span class="tiny-index">A / 统计研究</span><strong>数据研究员</strong><p>频率 + 遗漏 + 形态</p></div><div class="strategy-card"><span class="tiny-index">B / 经验规则</span><strong>经验老彩民</strong><p>奇偶 + 分区 + 组合</p></div><div class="strategy-card emph"><span class="tiny-index">C / 新增</span><strong>走势图独立选号</strong><p>短窗走势 vs 前一窗口</p></div></div><p class="footnote">三种方法都只是不同的候选构造方法，需要与随机基准在同算法滚动回测中比较。</p></article>
- <article class="panel"><div class="panel-head"><div><h3>本机即时研究候选（非公开赛前锁定）</h3><p class="sub" id="freshnessStatus">正在检查数据</p></div><button data-action="go-decision" class="accent">选号决策中心</button></div><div id="homeCandidateList" class="stack"><p class="sub">读取历史数据后自动生成研究候选。</p></div></article>
+ <article class="panel"><div class="panel-head"><div><h3>三位研究员本期单式</h3><p class="sub" id="freshnessStatus">正在检查数据</p></div><button data-action="go-decision" class="accent">选号决策中心</button></div><div id="homeCandidateList" class="stack"><p class="sub">读取历史数据后自动生成研究候选。</p></div></article>
 </section>
 <section id="decision" class="page">
  <div class="page-head"><div><div class="eyebrow">NEXT DRAW · V18 DECISION</div><h2>下一期选号决策中心</h2><p class="sub">给出具体号码、逐球30／120／300期频率与遗漏、研究员选择理由；明确历史基准与未来目标，绝不自动购买。</p></div></div>
  <article class="panel"><h3>① 研究目标与可选方案</h3><p class="sub" id="v18Status">正在获取真实历史开奖和预计研究目标……</p>
   <div class="control-row"><label>选择研究员<select id="v18Mode"><option value="analyst" selected>A 数据统计（默认基准）</option><option value="veteran">B 经验形态</option><option value="trend">C 走势图</option></select></label>
-   <label>统计主参考窗口<select id="v18Window"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label>
+   <label>正式评分窗口<select disabled id="v18Window"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label>
    <label>唯一复式结构<select id="v18Template"><option value="8+1">双色球8+1</option><option value="7+4">双色球7+4</option></select></label>
    <label>复式研究预算上限（元）<input type="number" inputmode="numeric" id="v18Budget" min="0" max="500" step="2" value="56"></label></div>
   <div class="primary-row"><button id="v18Run" class="accent big">生成本目标期具体研究号码</button><button id="v18Copy" disabled>复制目标期与号码</button><button id="v18ToCompound" disabled>只把这一组复式送到保存页</button></div>
@@ -47,7 +47,7 @@
 </section>
 <section id="pick" class="page">
  <div class="page-head"><div><div class="eyebrow">THREE-WAY RESEARCH</div><h2>三路选号工作台</h2><p class="sub">每种方法各生成一注，逐球解释算法为什么选择它</p></div></div>
- <article class="panel"><div class="control-row"><label>主研究参考窗口 <select id="pickWindow"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label><label>选号约束 <select id="pickBan"><option value="none">不应用杀号</option><option value="current">应用当前杀号清单</option></select></label></div><div class="primary-row"><button id="generateAll" class="accent big">生成 A + B + C 三注</button><button id="generateTrend" class="outline big">只按走势图生成一注</button><button data-action="go-compound" class="outline big">选择同预算复式结构</button></div><p class="footnote">V15三位研究员统一使用20/60/120/300期频率分层、10/20/40期走势观察；当前下拉框用于指定主要统计权重及锁定快照长度。评分不是下一期开出概率。</p></article>
+ <article class="panel"><div class="control-row"><label>自定义杀号参考窗口（正式单式固定120期） <select id="pickWindow"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label><label>选号约束 <select id="pickBan"><option value="none">不应用杀号</option><option value="current">应用当前杀号清单</option></select></label></div><div class="primary-row"><button id="generateAll" class="accent big">生成 A + B + C 三注</button><button id="generateTrend" class="outline big">只按走势图生成一注</button><button data-action="go-compound" class="outline big">选择同预算复式结构</button></div><p class="footnote">V15三位研究员统一使用20/60/120/300期频率分层、10/20/40期走势观察；当前下拉框用于指定主要统计权重及锁定快照长度。评分不是下一期开出概率。</p></article>
  <div id="pickResults" class="results"></div>
  <article class="panel"><h3>锁定研究快照</h3><p class="sub">记录每一组号码、策略版本、历史数据指纹及本机时间。锁定后界面不允许编辑；本机记录仍可被设备所有者修改或删除，不能作为第三方时间戳证明。</p><button id="lockPicks" class="accent">锁定当前结果并建立档案</button><p class="footnote" id="pickLockStatus">尚未生成候选</p></article>
  <article class="panel"><h3>手动球盘</h3><p class="sub">点击号码选择；长按号码切换为排除。生成不会改变已锁定研究记录。</p><h4 id="boardMainLabel">红球</h4><div class="ballboard" id="boardMain"></div><h4 id="boardExtraLabel">蓝球</h4><div class="ballboard" id="boardExtra"></div><div class="inline-actions"><button id="boardSave">保存手选号</button><button id="boardClear">清空球盘</button></div><p id="boardStatus" class="footnote"></p></article>
@@ -56,7 +56,7 @@
 <section id="compound" class="page">
  <div class="page-head"><div><div class="eyebrow">COMPOUND RESEARCH</div><h2>复式研究选号</h2><p class="sub" id="compoundPageSub">从历史数据生成一注复式候选，并展示完全展开的注数、价格及每个号码的算法依据。</p></div></div>
  <article class="panel">
-  <div class="control-row"><label>研究策略 <select id="compoundMode"><option value="trend" selected>C 走势图研究员</option><option value="analyst">A 数据研究员</option><option value="veteran">B 经验老彩民</option><option value="random">随机对照</option></select></label><label>主研究参考窗口 <select id="compoundWindow"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label><label>选择唯一复式结构 <select id="compoundTemplate"><option value="8+1">双色球 8+1</option><option value="7+4">双色球 7+4</option><option value="7+2">大乐透 7+2</option><option value="5+7">大乐透 5+7</option></select></label></div>
+  <div class="control-row"><label>研究策略 <select id="compoundMode"><option value="trend" selected>C 走势图研究员</option><option value="analyst">A 数据研究员</option><option value="veteran">B 经验老彩民</option><option value="random">随机对照</option></select></label><label>对照窗口（正式复式固定120期） <select id="compoundWindow"><option value="60">60期</option><option value="120" selected>120期</option><option value="300">300期</option></select></label><label>选择唯一复式结构 <select id="compoundTemplate"><option value="8+1">双色球 8+1</option><option value="7+4">双色球 7+4</option><option value="7+2">大乐透 7+2</option><option value="5+7">大乐透 5+7</option></select></label></div>
   <div class="primary-row"><button id="generateCompound" class="accent big">生成一注复式候选</button><button id="compoundCopy">复制复式号码</button><button id="compoundSave">保存复式守号</button><button id="compoundExport">导出研究卡片</button><button id="compoundBacktest">回测复式近20期</button></div>
   <p id="compoundCostHint" class="compound-cost">双色球8+1／7+4均28注56元；大乐透7+2／5+7均21注42元。</p>
   <p class="footnote">默认仅展示基本投注费用；大乐透追加投注按每注另外1元计算。复式增加覆盖的单式组合和总成本，不提高某一注单式的独立中奖概率。</p>
@@ -108,7 +108,7 @@
 <section id="research" class="page">
  <div class="page-head"><div><div class="eyebrow">RESEARCH & EVIDENCE</div><h2>研究员与战绩中心</h2><p class="sub">真实提前锁定记录 ≠ 历史回放；两者分别呈现</p></div></div>
  <article class="panel"><h3>研究员策略档案</h3><div class="strategy-grid"><div class="strategy-card"><strong>A · 数据研究员</strong><p>基于近期频率、遗漏、冷热变化和整体形态建立评分。</p></div><div class="strategy-card"><strong>B · 经验老彩民</strong><p>把常见经验型规则编码成算法，不冒充真实彩民采访。</p></div><div class="strategy-card emph"><strong>C · 走势图研究员</strong><p>独立评估短窗与前窗频次变化，并提供逐球走势解释。</p></div></div></article>
- <article class="panel"><div class="panel-head"><div><h3>本机即时生成的三位研究员候选（未公开锁定）</h3><p class="sub">直接查看 A / B / C 三组号码和逐球理由，不需先锁定。</p></div><button class="accent" id="researchGenerate">重新研究本期</button></div><div id="researchCurrent" class="stack"><p class="sub">读取历史数据中……</p></div></article>
+ <article class="panel"><div class="panel-head"><div><h3>三位研究员本期单式与公开记录</h3><p class="sub">直接查看 A / B / C 三组号码和逐球理由，不需先锁定。</p></div><button class="accent" id="researchGenerate">刷新本期单式</button></div><div id="researchCurrent" class="stack"><p class="sub">读取历史数据中……</p></div></article>
  <article class="panel"><div class="panel-head"><h3>自动赛季健康状态</h3><span class="tag">实时读取仓库</span></div><div id="healthResearch" class="stack"><p class="sub">等待后台状态快照。</p></div></article>
  <article class="panel"><div class="panel-head"><h3>GitHub 自动研究员 · 公开提前记录</h3><span class="tag">与本机锁定分开</span></div><p class="sub">定时任务在未来开奖前保存 A/B/C 三位研究员及随机基准的号码。随后有了真实开奖结果才会核对。本模块不上传手机上的私人守号。</p><p id="publicResearchStatus" class="footnote">读取公开研究记录中……</p><div id="publicLeaderboard" class="stack"></div><div id="publicResearchList" class="stack"></div></article>
  <article class="panel"><div class="panel-head"><h3>实盘研究档案</h3><button id="exportRecords">导出锁定记录</button></div><div id="recordSummary" class="metrics compact"></div><div id="recordList" class="stack"></div></article>
@@ -127,11 +127,11 @@
  <article class="panel"><h3>本地 CSV 导入</h3><p class="sub">格式：<code>game,issue,date,main,extra</code>。号码用空格分隔；game 为 ssq 或 dlt；支持五位、七位期号自动统一。</p><input type="file" id="csvInput" accept=".csv,text/csv"><textarea id="csvText" placeholder="game,issue,date,main,extra&#10;ssq,2026123,2026-10-27,04 05 20 21 26 30,12"></textarea><button id="importCSV">从文本导入并核验</button><p id="csvImportResult" class="footnote"></p></article>
  <article class="panel"><h3>完整备份与恢复</h3><p class="sub">一次备份包含历史数据、单式/复式守号、三路研究锁定记录、参数及来源状态。恢复会覆盖当前 V17 数据（兼容 V12 存储），请先备份。</p><div class="inline-actions"><button id="backupAll" class="accent">下载完整 JSON 备份</button><button id="backupCSV">导出历史 CSV</button></div><label class="file-choice">导入 V12 完整备份 <input type="file" id="restoreJSON" accept=".json,application/json"></label><p id="storageNotice" class="footnote"></p></article>
  <article class="panel"><h3>仓库后台自动化状态</h3><div id="healthData" class="stack"></div><p class="sub" id="publicDataStatus">读取公开研究记录中……</p><p class="footnote">后台定时更新要求在仓库的 .github/workflows 目录安装 GitHub Actions 工作流，并赋予 Actions 读取和写入仓库的权限。若未安装，当前只是浏览器手动同步。单源记录不可冒充双源独立核验。</p></article>
- <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V18.16 · 分层缩号与漏号复盘</p></article>
+ <article class="panel"><h3>版本与研究边界</h3><ul class="plain"><li>源码模块化：core.js / engine.js / app.js，可独立自动测试。</li><li>本机使用 IndexedDB，若不可用则回退 localStorage；离线能力依赖首次成功加载。</li><li>随包提供 GitHub Actions 自动同步工作流，启用后可将公开来源数据写入本站 history.json。</li><li>历史走势、经验规则、杀号的效果都必须与随机基准比较；不鼓励过度投注。</li></ul><p class="footnote" id="versionInfo">版本 V18.18 · 分层缩号与漏号复盘</p></article>
 </section>
 </main><footer class="footer">双彩研究工作台 V18.5 · 实盘核验 · 下一期数据决策 · 单组同预算复式 · 形态复盘 · 仅供统计研究与娱乐，量力而行</footer></div>
 <script src="startup-recovery.js?v=18.0" defer></script>
-<script type="module" src="app.js?v=18.16"></script>
+<script type="module" src="app.js?v=18.18"></script>
 <script type="module" src="coverage.js?v=18.0"></script>
 <script type="module" src="multiwindow-ui.js?v=18.0"></script>
 <script type="module" src="shape-ui.js?v=18.0"></script>

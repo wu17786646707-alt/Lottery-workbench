@@ -1,5 +1,6 @@
+import {columnChoices} from './column-input.js';
 import {GAMES, hash} from './core.js?v=18.0';
-import {factTable, makeCompoundV15, scoreFeature} from './multiwindow.js?v=18.0';
+import {factTable, pickV15, extendCompound, makeCompoundV15, scoreFeature} from './multiwindow.js?v=18.0';
 
 export const modes = ['analyst', 'veteran', 'trend'];
 const parts = ['main', 'extra'];
@@ -45,6 +46,38 @@ function poolFromScores(rows, game, mode) {
     bans[part]=ranked.slice(size).map(x=>x.n);
   }
   return {pool,bans};
+}
+
+export const processPolicy = 'research-v18.18-column';
+
+export function stagedResearch(history, game, mode) {
+  const rows = history.slice(0, 300);
+  const choice=columnChoices(rows,game,mode);
+  const final=choice.stages[2], budget=choice.stages[1];
+  const cfg=GAMES[game];
+  const exclude=(size,allowed)=>Array.from({length:size},(_,i)=>i+1).filter(n=>!allowed.includes(n));
+  const bans={main:exclude(cfg.mainMax,final.main),extra:exclude(cfg.extraMax,final.extra)};
+  const single=pickV15(rows,game,mode,{bans,search:1});
+  const compound=extendCompound(rows,game,mode,{bans:{main:exclude(cfg.mainMax,budget.main)}},single);
+  for(const p of [single,compound]){
+    p.snapshot.policy=processPolicy;
+    p.summ.text=choice.summary;
+    p.explain=p.explain.map(x=>({...x,reason:'来自专栏大底，区内取舍见本注说明。'+x.reason.split('；')[0].split('。')[0]}));
+  }
+  return {single,compound,stages:choice.stages,source:choice.source};
+}
+
+// Published tickets take priority, including tickets locked before the upgrade.
+export function researcherPlan(rows, game, mode, record) {
+  const saved = record?.picks?.find(p => p.mode === mode);
+  const budget = record?.compoundPicks?.find(p => p.mode === mode);
+  if (!saved) return stagedResearch(rows, game, mode);
+  function restore(p) {
+    return {...p, game, mode, explain:p.explanations || [],
+      summ:{text:p.summary || '开奖前留档'}, published:true};
+  }
+  return {single:restore(saved), compound:budget ? {...restore(budget),single:saved.main} : null,
+    stages:record.stagesByMode?.[mode]};
 }
 
 export function makeTrial(rows,game,mode,stats=roadStats(rows,game)) {

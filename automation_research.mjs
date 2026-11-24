@@ -5,6 +5,7 @@
  * No prediction is invented for past draws. Historical backtests remain separate.
  */
 import fs from 'node:fs';
+import {modes, stagedResearch, processPolicy} from './selection-engine.js';
 import {hit, scoreLabel, compoundHit, historicPatterns} from './engine.js';
 import {pickV15,makeCompoundV15,MW_POLICY} from './multiwindow.js';
 import {GAMES, POLICY, hash} from './core.js';
@@ -102,17 +103,18 @@ export function run(now=new Date(),root='.'){
   if(records.some(x=>x.game===game&&x.targetDate===target)){
    diagnostics[game].readiness='目标开奖日已存在锁定记录';continue;
   }
+  const plans=Object.fromEntries(modes.map(mode=>[mode,stagedResearch(rows,game,mode)]));
   const picks=MODES.map(mode=>{
-   const pred=pickV15(rows,game,mode,{window:120,search:360});
+   const pred=plans[mode]?.single ?? pickV15(rows,game,mode,{window:120,search:360});
    return {mode,label:scoreLabel[mode],main:pred.main,extra:pred.extra,snapshot:pred.snapshot,explanations:pred.explain,pattern:pred.pattern,summary:pred.summ.text,shapePlan:briefShape(pred.shapePlan),shapeActual:pred.shapeActual,softKills:pred.softKills};
   });
   const compoundPicks=['analyst','veteran','trend'].map(mode=>{
-    const p=makeCompoundV15(rows,game,mode,{window:120,search:360});
+    const p=plans[mode].compound;
     return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:p.summ.text,shapePlan:briefShape(p.shapePlan),shapeActual:p.shapeActual,softKills:p.softKills};
   });
-  const rec={primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${MW_POLICY}`),game,targetDate:target,baseIssue:rows[0].issue,
-   createdAt:now.toISOString(),policy:MW_POLICY,window:Math.min(120,rows.length),
-   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'V17形态先行：软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:MW_POLICY}};
+  const rec={columnSource:plans.analyst.source,stagesByMode:Object.fromEntries(modes.map(m=>[m,plans[m].stages])),primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${processPolicy}`),game,targetDate:target,baseIssue:rows[0].issue,
+   createdAt:now.toISOString(),policy:processPolicy,window:Math.min(120,rows.length),
+   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'三阶段正式选号：先按研究员评分圈定初选池，再从池内选出单式并扩为预算复式。形态依据包括软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:processPolicy}};
   records.push(rec);changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
  }
  // Only append true before-the-draw records, no retrospective insertion.

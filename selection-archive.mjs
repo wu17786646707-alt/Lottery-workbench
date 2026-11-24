@@ -31,7 +31,11 @@ export function update(history,records,prior,now=new Date()){
       if(previous||!canLock(record,now,current))continue;
       const training=rows.slice(0,300),stats=roadStats(training,game);
       data.locks.push({game,targetDate:record.targetDate,baseIssue:current.issue,createdAt:now.toISOString(),
-        policy:'research-process-1',stats,byMode:Object.fromEntries(modes.map(mode=>[mode,makeTrial(training,game,mode,stats)]))});
+        policy:record.stagesByMode ? record.policy : 'research-process-1',stats,byMode:Object.fromEntries(modes.map(mode=>{
+          const trial=makeTrial(training,game,mode,stats);
+          if(record.stagesByMode)trial.stages=record.stagesByMode[mode];
+          return [mode,trial];
+        }))});
     }
     if(game==='ssq')updatePositionStudy(data,rows,records,now);
     if(data.replay[game]?.baseIssue===current.issue)continue;

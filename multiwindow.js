@@ -132,6 +132,9 @@ export function pickV15(rows,game,mode='analyst',config={}){
 export function makeCompoundV15(rows,game,mode='trend',config={}){
  // Compound includes the same mode's single ticket for a consistent researcher report.
  const p=pickV15(rows,game,mode,{...config,mainCount:undefined});
+ return extendCompound(rows,game,mode,config,p);
+}
+export function extendCompound(rows,game,mode,config,p){
  const g=GAMES[game],required=game==='ssq'?8:7;
  const scores=factTable(rows,game,'main').rows.map(f=>({n:f.n,score:scoreFeature(f,mode,game,'main',p.snapshot.window)}));
  const chosen=new Set(p.main),exclude=new Set((config.bans?.main||[]).map(Number));
