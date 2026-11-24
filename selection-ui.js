@@ -1,3 +1,4 @@
+import {stageAudit,heatTrial,author134} from './stage-audit.js';
 import {positionScore,aggregate} from './position-study.js';
 import {roadCounts,roadStats,summary} from './selection-engine.js';
 const $=id=>document.getElementById(id);
@@ -12,7 +13,7 @@ const author={
  {main:[7,9,11,16,21,24,25,33],extra:[4,9]},
  {main:[7,9,11,21,25,33],extra:[9]}]
 };
-const db={},state={view:'author',caseId:'manuscript',positionDate:'',game:'ssq',mode:'veteran',date:'',show:true,sample:'replay'};
+const db={},state={view:'author',caseId:'dlt134',positionDate:'',game:'ssq',mode:'veteran',date:'',show:true,sample:'replay'};
 const card=(title,body)=>'<section class="card"><h2>'+esc(title)+'</h2>'+body+'</section>';
 const note=s=>'<p class="note">'+esc(s)+'</p>';
 const hero=(label,title,body)=>'<section class="hero"><small>'+esc(label)+'</small><h2>'+esc(title)+'</h2><p>'+esc(body)+'</p></section>';
@@ -91,8 +92,28 @@ function viewPosition(){
  card('规则怎样固定','<p>取此前 30 期中最常见的最小号与最大号，同频分别取较小、较大号码。首选在 B 的 15 红池外才补入，先龙头后凤尾；优先换出原 8 红中出现最少的号码，同频先换较大的。保护两个位置首选和四个金胆。</p><p>四金胆取 15 红池中近 30 期出现最多的四个，同频小号优先。它是工作台此次固定的实验规则，手稿没有公开逐球算法。</p>');
 }
 
+function auditCards(game, stages, actual, titles){
+ const rows=stageAudit(stages,actual,game);
+ return card('各层覆盖与随机基准',rows.map((parts,i)=>'<h3>'+esc(titles[i])+'</h3>'+parts.map((p,j)=>'<p>'+partNames[game][j]+' · 同规模随机平均 '+p.mean.toFixed(2)+' 个'+(actual?' · 命中 '+list(p.hits)+' · '+(i?'本步删掉的开奖号 ':'初选遗漏 ')+list(p.lost):'')+'</p>').join('')).join(''));
+}
+function case134(){
+ const actual=state.show?author134.draw:null, titles=['公开大底','精推手稿','明灯大底与定蓝'];
+ return hero('大乐透 26134 期 · 作者手稿','从 23 码缩到 12 码','按开奖前分享的截图重建。后区四码是候选池。')+revealButton()+
+ author134.stages.map((p,i)=>stage('dlt',titles[i],p,actual,'观察池',author134.stages[i-1])).join('')+
+ auditCards('dlt',author134.stages,actual,titles)+card('位置与金胆','<p>龙头 03 / 05 / 06 → 03，中段 15 / 17 / 18 → 17，凤尾 28 / 31 / 34 → 28。</p><p>精推金胆 13、22；明灯金胆 03、13、22。</p>'+(actual?note('中段首选 17 命中；凤尾 31 在备选。两组金胆均未命中。'):''));
+}
+function heatCard(r,pool,actual){
+ if(!db.history?.dlt)return '';
+ const h=heatTrial(db.history.dlt,r.baseIssue,pool);
+ if(!h)return '';
+ return card('近 10 / 30 期热号 · 同预算试验',note('以原 7+2 为对照。池外前区近 10 期至少出 4 次且近 30 期至少出 8 次时，最多换一个。按近 10 期次数、近 30 期次数、号码从小到大排序，换出池中排名最后的号码。后区沿用原组合。')+
+ note(h.incoming?'换入 '+pad(h.incoming)+'，换出 '+pad(h.outgoing):'本期没有池外号码触发换号')+balls('dlt',h,actual)+
+ (actual?note('规则回放 · 前区原组合命中 '+list(pool.main.filter(n=>actual.main.includes(n)))+'；试验组合命中 '+list(h.main.filter(n=>actual.main.includes(n)))):note('开奖前试算 · 同为 21 注，仅作研究对照')));
+}
+
 function viewAuthor(){
- $('filters').innerHTML='<div class="filters">'+select('caseId','案例与文章来源',{manuscript:'11 月 10 日 · 手稿与四金胆',original:'11 月 19 日 · 大复式缩号',articles:'公开文章 · 三位作者核对'},state.caseId)+'</div>';
+ $('filters').innerHTML='<div class="filters">'+select('caseId','案例与文章来源',{dlt134:'11 月 23 日 · 大乐透分层缩号',manuscript:'11 月 10 日 · 手稿与四金胆',original:'11 月 19 日 · 大复式缩号',articles:'公开文章 · 三位作者核对'},state.caseId)+'</div>';
+ if(state.caseId==='dlt134')return case134();
  if(state.caseId==='manuscript')return manuscript();
  if(state.caseId==='articles')return articles();
  const actual=state.show?author.draw:null;
@@ -110,6 +131,8 @@ function viewAuthor(){
 function select(id,title,options,value){
  return '<label class="wide">'+esc(title)+'<select id="'+id+'">'+Object.entries(options).map(([k,v])=>'<option value="'+esc(k)+'"'+(k===value?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select></label>';
 }
+const draw134={...author134.draw,issue:'2026134'};
+const settled=r=>r.actual || (r.game==='dlt' && r.targetDate==='2026-11-23' ? draw134 : null);
 const sortedRecords=()=>db.research.records.filter(r=>r.game===state.game).sort((a,b)=>b.targetDate.localeCompare(a.targetDate));
 function pendingLabel(r){
  const time=Date.parse(r.targetDate+'T22:00:00+08:00');
@@ -118,7 +141,7 @@ function pendingLabel(r){
 function makeFilters(){
  const records=sortedRecords();
  if(!records.some(r=>r.targetDate===state.date))state.date=records[0]?.targetDate??'';
- const opts=Object.fromEntries(records.map(r=>[r.targetDate,r.targetDate+' · '+(r.actual?.issue??pendingLabel(r))]));
+ const opts=Object.fromEntries(records.map(r=>[r.targetDate,r.targetDate+' · '+(settled(r)?.issue??pendingLabel(r))]));
  let s=select('game','彩种',names,state.game);
  if(state.view!=='compare')s+=select('date','目标开奖日',opts,state.date);
  if(state.view!=='roads')s+=select('mode','研究员',researchers,state.mode);
@@ -128,7 +151,7 @@ function makeFilters(){
 }
 function work(r){
  if(!r)return note('该彩种还没有公开选号记录。');
- const {game,mode}=state,actual=r.actual;
+ const {game,mode}=state,actual=settled(r);
  const lock=db.selection.locks.find(l=>l.game===game&&l.targetDate===r.targetDate);
  const legacy=r.picks?.find(p=>p.mode===mode),budget=r.compoundPicks?.find(p=>p.mode===mode);
  let s=hero(names[game]+' · '+r.targetDate,actual?'已开奖 · 第 '+actual.issue+' 期':'开奖前记录 · '+pendingLabel(r),'依据第 '+r.baseIssue+' 期及更早数据。'+(actual?'实心号码表示命中。':'开奖结算后显示每一步删去和保留的中奖号码。'));
@@ -137,6 +160,16 @@ function work(r){
   const t=lock.byMode[mode],sizes=game==='ssq'?['15+5','8+1','6+1']:['13+5','7+2','5+2'];
   s+=card('号码池缩号试验','<p>按'+esc(researchers[mode])+'的逐球分排出初选池，同分按号码升序。在池内比较 360 组单式的形态与逐球分，保留得分最高的一组，再补两个主区号形成预算复式。下列三档按覆盖范围展示。</p><small>北京时间 '+esc(new Date(lock.createdAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}))+' 锁定</small>')+
     t.stages.map((p,i)=>stage(game,['初选池','预算内复式','最终单式'][i]+' · '+sizes[i],p,actual,['仅观察',game==='ssq'?'28 注 · 56 元':'21 注 · 42 元','1 注 · 2 元'][i],t.stages[i-1])).join('');
+  const modes=Object.values(lock.byMode).filter(m=>m.stages?.length);
+  if(modes.length>1){
+   const shared=['main','extra'].map((key,i)=>{
+    const common=modes[0].stages.at(-1)[key].filter(n=>modes.every(m=>m.stages.at(-1)[key].includes(n)));
+    return '<p>'+partNames[game][i]+' · '+list(common)+(actual?' · 命中 '+list(common.filter(n=>actual[key].includes(n))):'')+'</p>';
+   });
+   s+=card('各研究员单式共同选择',shared.join('')+note('各方案共享历史输入，重合号码单独记一次。'));
+  }
+  s+=auditCards(game,t.stages,actual,['初选池','预算内复式','最终单式']);
+  if(game==='dlt')s+=heatCard(r,t.stages[1],actual);
  }else s+=note('这一期只保留了原策略的记录。以下展示当时实际保存的选号阶段。');
  if(legacy){
    s+=card('原策略 · 单式扩到复式','<p>'+esc(legacy.shapePlan?.reason??legacy.summary??researchers[mode])+'</p>');
