@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-23T17:26:36.744594+00:00",
+  "generatedAt": "2026-11-24T02:59:19.848433+00:00",
   "ssq": [
     {
       "issue": "2026134",
@@ -67140,9 +67140,9 @@
         6,
         9
       ],
-      "verification": "official-only",
+      "verification": "single-source",
       "sources": [
-        "https://www.gstc.org.cn/wanfa/dlt"
+        "yangxb919/lottery-data (来源声明500.com)"
       ]
     },
     {
