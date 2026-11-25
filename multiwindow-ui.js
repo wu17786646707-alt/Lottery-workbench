@@ -1,3 +1,4 @@
+import {researcherPlan} from './selection-engine.js?v=18.23';
 /* V15 mobile multi-window research report UI. No purchase functionality. */
 import {factTable,patterns,pickV15,makeCompoundV15,backtestV15,WINDOWS,MODE_LABELS,MW_POLICY} from './multiwindow.js?v=18.0';
 import {GAMES,pad,hash,escapeHTML as E} from './core.js?v=18.0';
@@ -6,13 +7,13 @@ const $=id=>document.getElementById(id);
 let report=null,oldKey='',lastBacktest=null;
 function stage(c){return issueContext(c.game,c.rows,c.publicLog)}
 function ctx(){return typeof window.getV15Context==='function'?window.getV15Context():{game:'ssq',rows:[]}}
-function keyOf(c){const fingerprint=hash(JSON.stringify((c.rows||[]).slice(0,300).map(x=>[x.issue,x.date,x.main,x.extra])));return `${c.game}|${c.rows[0]?.issue||'empty'}|${$('v15Primary')?.value||120}|${fingerprint}`} 
+function keyOf(c){const fingerprint=hash(JSON.stringify((c.rows||[]).slice(0,300).map(x=>[x.issue,x.date,x.main,x.extra])));return `${c.game}|${c.rows[0]?.issue||'empty'}|${$('v15Primary')?.value||120}|${stage(c).record?.id||'preview'}|${fingerprint}`} 
 function money(n){return Number(n).toLocaleString('zh-CN')}
 function balls(main,extra){return `<div class="balls">${main.map(n=>`<span class="ball">${pad(n)}</span>`).join('')}${extra.map(n=>`<span class="ball extra">${pad(n)}</span>`).join('')}</div>`}
 const fmt=(p)=>`${p.main.map(pad).join(' ')} + ${p.extra.map(pad).join(' ')}`;
 function ensureReport(){const c=ctx();if(!stage(c).canRecommend)throw Error('开奖目标期次已过或等待数据更新，请先在“数据与备份”同步，再重新生成未来期候选');if(c.rows.length<30)throw Error('有效历史期数不足30期，请先进入“数据与备份”同步');const key=keyOf(c);if(key===oldKey&&report)return report;
  const win=Number($('v15Primary').value)||120,strategies=['analyst','veteran','trend'];
- const picks=strategies.map(mode=>({mode,single:pickV15(c.rows,c.game,mode,{window:win}),compound:makeCompoundV15(c.rows,c.game,mode,{window:win})}));
+ const picks=strategies.map(mode=>({mode,...researcherPlan(c.rows,c.game,mode,stage(c).record)}));
  const sensitivity=Object.fromEntries(strategies.map(mode=>[mode,[60,120,300].map(window=>{const x=pickV15(c.rows,c.game,mode,{window});return {window,main:x.main,extra:x.extra}})]));
  report={schema:'lottery-multiwindow-report-v15',generatedAt:new Date().toISOString(),game:c.game,baseIssue:c.rows[0].issue,baseDate:c.rows[0].date,targetDate:stage(c).targetDate,estimatedTargetIssue:stage(c).targetIssue,
   policy:MW_POLICY,primaryWindow:win,sensitivity,verification:c.rows[0].verification||'unknown',source:c.source,picks,
@@ -35,8 +36,8 @@ function renderFacts(){const c=ctx(),rows=c.rows||[];if(rows.length<30){$('v15Fa
 function renderPicks(){if(!report)return;$('v15Picks').innerHTML=report.picks.map(({mode,single,compound})=>{
  const ex=single.explain.map(x=>`<div class="v15-explain"><b>${x.kind==='main'?'主区':'后区'} ${pad(x.number)}</b><span>${E(x.reason)}</span></div>`).join('');
  const fee=compound.cost,shape=single.pattern;
- return `<article class="v15-researcher"><div class="row wrap"><h3>${E(MODE_LABELS[mode])}</h3><span class="tag">${E(single.snapshot.policy)}</span></div><h4>单式候选（目标${E(fmtTarget(stage(ctx())))}）</h4>${balls(single.main,single.extra)}<p class="small">${E(single.summ.text)}</p><h4>同一策略的${report.game==='ssq'?'8+1':'7+2'}复式</h4>${balls(compound.main,compound.extra)}<p class="small">${compound.bets}注，基本投注${fee}元；${report.game==='dlt'?'若追加则63元；':''}包含上方这注单式。重号${compound.pattern.repeat}个、连号${compound.pattern.adjacent}对。</p><details><summary>逐个号码为什么选它？（含频率、遗漏、评分）</summary><div class="v15-explain-list">${ex}</div><p class="footnote">复式额外选入主区：${compound.main.filter(n=>!single.main.includes(n)).map(pad).join('、')}。这是策略覆盖选择，不是更高的单注一等奖概率。</p></details></article>`;
- }).join('')+'<div class="item"><h3>60 / 120 / 300 期权重敏感性</h3><p class="small">同一历史基准，用不同主参考窗口重新生成的结果。号码变化说明方法依赖参数，并不说明哪个窗口更准确。</p><div class="table-scroll"><table class="v15-table"><thead><tr><th>研究员</th><th>窗口</th><th>主区</th><th>后区</th></tr></thead><tbody>'+Object.entries(report.sensitivity).flatMap(([mode,vals])=>vals.map(v=>'<tr><td>'+E(MODE_LABELS[mode])+'</td><td>'+v.window+'</td><td>'+v.main.map(pad).join(' ')+'</td><td>'+v.extra.map(pad).join(' ')+'</td></tr>')).join('')+'</tbody></table></div></div><p class="footnote">三位研究员都不拥有经独立验证的开奖预测优势。同一彩种的不同有效单式拥有相同一等奖概率；复式与更多不同单式的概率提升来自注数，成本同步上升。</p>';
+ return `<article class="v15-researcher"><div class="row wrap"><h3>${E(MODE_LABELS[mode])}</h3><span class="tag">${E(single.snapshot.policy)}</span></div><h4>单式候选（目标${E(fmtTarget(stage(ctx())))}）</h4>${balls(single.main,single.extra)}<p class="small">${E(single.summ.text)}</p><h4>同一策略的${report.game==='ssq'?'8+2':'7+3'}复式</h4>${balls(compound.main,compound.extra)}<p class="small">${compound.bets}注，基本投注${fee}元；${report.game==='dlt'?'若追加则63元；':''}包含上方这注单式。重号${compound.pattern.repeat}个、连号${compound.pattern.adjacent}对。</p><details><summary>逐个号码为什么选它？（含频率、遗漏、评分）</summary><div class="v15-explain-list">${ex}</div><p class="footnote">复式额外选入主区：${compound.main.filter(n=>!single.main.includes(n)).map(pad).join('、')}。这是策略覆盖选择，不是更高的单注一等奖概率。</p></details></article>`;
+ }).join('')+'<div class="item"><h3>参数实验（单独对照） · 60 / 120 / 300 期</h3><p class="small">同一历史基准，用不同主参考窗口重新生成的结果。号码变化说明方法依赖参数，并不说明哪个窗口更准确。</p><div class="table-scroll"><table class="v15-table"><thead><tr><th>研究员</th><th>窗口</th><th>主区</th><th>后区</th></tr></thead><tbody>'+Object.entries(report.sensitivity).flatMap(([mode,vals])=>vals.map(v=>'<tr><td>'+E(MODE_LABELS[mode])+'</td><td>'+v.window+'</td><td>'+v.main.map(pad).join(' ')+'</td><td>'+v.extra.map(pad).join(' ')+'</td></tr>')).join('')+'</tbody></table></div></div><p class="footnote">三位研究员都不拥有经独立验证的开奖预测优势。同一彩种的不同有效单式拥有相同一等奖概率；复式与更多不同单式的概率提升来自注数，成本同步上升。</p>';
 }
 function render(){status();renderFacts();if(report&&!stage(ctx()).canRecommend){report=null;oldKey='';$('v15Picks').textContent='目标开奖时间已过但数据尚未同步，本机旧候选已暂停展示，请更新真实历史开奖后再生成。';}if(report&&oldKey!==keyOf(ctx())){report=null;lastBacktest=null;$('v15Picks').innerHTML='<p class="sub">彩种、历史数据或参数已改变，请点击“生成三位研究员的本期报告”重新生成。</p>';$('v15BacktestResult').textContent='';}}
 function run(){try{ensureReport();render();renderPicks();$('v15Run').textContent='已生成本期研究报告（可重新生成）'}catch(e){$('v15Picks').textContent='无法生成：'+e.message}}

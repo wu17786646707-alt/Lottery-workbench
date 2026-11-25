@@ -1,4 +1,5 @@
-import {columnChoices} from './column-input.js';
+import {integrated,RULE} from './unified-rule.js';
+import {exactCoverage} from './evidence.js';
 import {GAMES, hash} from './core.js?v=18.0';
 import {factTable, pickV15, extendCompound, makeCompoundV15, scoreFeature} from './multiwindow.js?v=18.0';
 
@@ -48,23 +49,35 @@ function poolFromScores(rows, game, mode) {
   return {pool,bans};
 }
 
-export const processPolicy = 'research-v18.18-column';
+function rankedPoolPlan(rows,game,mode){
+  const {pool,bans}=poolFromScores(rows,game,mode);
+  const single=pickV15(rows,game,mode,{bans});
+  const compound=extendCompound(rows,game,mode,{bans},single);
+  return {single,compound,stages:[pool,ticket(compound),ticket(single)]};
+}
 
-export function stagedResearch(history, game, mode) {
-  const rows = history.slice(0, 300);
-  const choice=columnChoices(rows,game,mode);
-  const final=choice.stages[2], budget=choice.stages[1];
-  const cfg=GAMES[game];
-  const exclude=(size,allowed)=>Array.from({length:size},(_,i)=>i+1).filter(n=>!allowed.includes(n));
-  const bans={main:exclude(cfg.mainMax,final.main),extra:exclude(cfg.extraMax,final.extra)};
-  const single=pickV15(rows,game,mode,{bans,search:1});
-  const compound=extendCompound(rows,game,mode,{bans:{main:exclude(cfg.mainMax,budget.main)}},single);
+export const processPolicy=RULE;
+export const legacyPlan=rankedPoolPlan;
+export function stagedResearch(history,game,mode){
+  const rows=history.slice(0,300),cfg=GAMES[game];
+  const plan=integrated(rows,game,mode);
+  const [source,mid,budget,final]=plan.stages;
+  const excluded=(max,allowed)=>Array.from({length:max},(_,i)=>i+1).filter(n=>!allowed.includes(n));
+  const single=pickV15(rows,game,mode,{bans:{main:excluded(cfg.mainMax,final.main),extra:excluded(cfg.extraMax,final.extra)},search:1});
+  const compound=extendCompound(rows,game,mode,{bans:{main:excluded(cfg.mainMax,budget.main)}},single);
+  compound.extra=[...budget.extra];compound.singleExtra=single.extra;
+  Object.assign(compound,exactCoverage(game,budget.main.length,budget.extra.length));
+  compound.additionalCost=game==='dlt'?3*compound.bets:null;
+  const summary='频次与走势合评，三区和奇偶参与逐层取舍。主区金胆：'+(plan.gold.join('、')||'无')+'。';
   for(const p of [single,compound]){
-    p.snapshot.policy=processPolicy;
-    p.summ.text=choice.summary;
-    p.explain=p.explain.map(x=>({...x,reason:'来自专栏大底，区内取舍见本注说明。'+x.reason.split('；')[0].split('。')[0]}));
+    p.snapshot.policy=RULE;p.summ.text=summary;
+    p.explain=['main','extra'].flatMap(k=>p[k].map(n=>{
+      const f=(k==='main'?plan.ranked:plan.rear).find(x=>x.n===n);
+      return {kind:k,number:n,observed:f.long,expected:Math.min(rows.length,120)*cfg[k+'Count']/cfg[k+'Max'],miss:f.miss,score:f.score,
+        reason:'近10期 '+f.ten+' 次，近30期 '+f.thirty+' 次，近120期 '+f.long+' 次。频次顺位 '+f.frequencyRank+'，趋势顺位 '+f.trendRank+'，综合分 '+f.score.toFixed(3)+'。'};
+    }));
   }
-  return {single,compound,stages:choice.stages,source:choice.source};
+  return {source,stages:[mid,budget,final],gold:plan.gold,single,compound};
 }
 
 // Published tickets take priority, including tickets locked before the upgrade.
@@ -76,17 +89,15 @@ export function researcherPlan(rows, game, mode, record) {
     return {...p, game, mode, explain:p.explanations || [],
       summ:{text:p.summary || '开奖前留档'}, published:true};
   }
-  return {single:restore(saved), compound:budget ? {...restore(budget),single:saved.main} : null,
-    stages:record.stagesByMode?.[mode]};
+  return {single:restore(saved), compound:budget ? {...restore(budget),single:saved.main,singleExtra:saved.extra} : null,
+    source:record.columnSourceByMode?.[mode],gold:record.goldByMode?.[mode],stages:record.stagesByMode?.[mode]};
 }
 
 export function makeTrial(rows,game,mode,stats=roadStats(rows,game)) {
   const base=makeCompoundV15(rows,game,mode);
   const off=makeCompoundV15(rows,game,mode,{useSoftKills:false});
   const road=makeCompoundV15(rows,game,mode,{roadAdjustments:{main:stats.main.adjustment,extra:stats.extra.adjustment}});
-  const {pool,bans}=poolFromScores(rows,game,mode);
-  const restricted=makeCompoundV15(rows,game,mode,{bans});
-  return {stages:[pool,ticket(restricted),{main:restricted.single,extra:restricted.extra}],
+  return {stages:rankedPoolPlan(rows,game,mode).stages,
     kills:base.softKills, arms:{base:ticket(base),off:ticket(off),road:ticket(road),random:control(game,rows[0].issue)}};
 }
 

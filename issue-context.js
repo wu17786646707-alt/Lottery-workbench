@@ -5,6 +5,9 @@
 const DOW={ssq:new Set([0,2,4]),dlt:new Set([1,3,6])};
 export const chinaDate=(now=new Date())=>new Date(now.getTime()+8*3600000).toISOString().slice(0,10);
 export const chinaHour=(now=new Date())=>{const t=new Date(now.getTime()+8*3600000);return t.getUTCHours()+t.getUTCMinutes()/60};
+export function drawDeadline(game,date){
+ return Date.parse(date+'T'+(game==='ssq'?'21:15':'21:25')+':00+08:00');
+}
 export function nextRegularDate(game,baseDate){
  if(!DOW[game]||!/^20\d{2}-\d{2}-\d{2}$/.test(baseDate||''))return null;
  const d=new Date(baseDate+'T00:00:00Z');if(Number.isNaN(d.getTime()))return null;
@@ -24,7 +27,7 @@ export function recordStage(rec,now=new Date()){
  if(!rec)return 'unknown';
  if(rec.status==='settled')return 'settled';
  const day=chinaDate(now),hour=chinaHour(now);
- if(rec.targetDate<day||(rec.targetDate===day&&hour>=22.5))return 'overdue';
+ if(rec.targetDate<day||(rec.targetDate===day&&(rec.game?now.getTime()>=drawDeadline(rec.game,day):hour>=22.5)))return 'overdue';
  if(rec.targetDate===day)return 'today';
  return 'future';
 }
@@ -33,7 +36,7 @@ export function issueContext(game,rows=[],publicLog=null,now=new Date()){
  const locked=(publicLog?.records||[]).filter(r=>r.game===game&&r.status==='pending'&&r.baseIssue===latest.issue&&r.targetDate>latest.date).sort((a,b)=>a.targetDate.localeCompare(b.targetDate))[0]||null;
  const targetDate=locked?.targetDate||nextRegularDate(game,latest.date);
  const targetIssue=tentativeIssue(latest.issue,targetDate);
- const clockStage=recordStage({targetDate,status:'pending'},now);
+ const clockStage=recordStage({game,targetDate,status:'pending'},now);
  const stage=clockStage==='overdue'?'overdue':clockStage;
  return {game,latest,baseIssue:latest.issue,baseDate:latest.date,targetDate,targetIssue,
   day,stage,canRecommend:stage==='future'||stage==='today',

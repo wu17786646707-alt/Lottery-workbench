@@ -53,7 +53,7 @@ export function safeCompound(raw,g){
  if(!raw||typeof raw!=='object'||!GAMES[g])return null;
  const c=GAMES[g];
  const main=arr(raw.main).sort((a,b)=>a-b),extra=arr(raw.extra).sort((a,b)=>a-b);
- const shapes=g==='ssq'?[[8,1],[7,4]]:[[7,2],[5,7]];
+ const shapes=g==='ssq'?[[8,1],[7,4],[8,2]]:[[7,2],[5,7],[7,3]];
  if(!shapes.some(([m,e])=>main.length===m&&extra.length===e)||new Set(main).size!==main.length||new Set(extra).size!==extra.length||
    main.some(n=>!Number.isInteger(n)||n<1||n>c.mainMax)||extra.some(n=>!Number.isInteger(n)||n<1||n>c.extraMax))return null;
  let startIssue='';try{if(raw.startIssue)startIssue=canonicalIssue(raw.startIssue)}catch{}

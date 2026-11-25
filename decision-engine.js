@@ -6,7 +6,7 @@ import {GAMES} from './core.js?v=18.0';
 import {exactCoverage} from './evidence.js?v=18.0';
 import {featuresOf,extraShape} from './shape-engine.js?v=18.0';
 
-export const COMPOUND_TYPES={ssq:['8+1','7+4'],dlt:['7+2','5+7']};
+export const COMPOUND_TYPES={ssq:['8+2','8+1','7+4'],dlt:['7+3','7+2','5+7']};
 export const validTemplate=(game,type)=>!!COMPOUND_TYPES[game]?.includes(type);
 export const as2=n=>String(n).padStart(2,'0');
 function enough(rows){return Array.isArray(rows)&&rows.length>=30}
@@ -37,7 +37,7 @@ function chooseAdditional(rows,game,count,already){
 }
 export function alternativeCompound(rows,game,primary){
  if(!GAMES[game]||primary?.game!==game||!enough(rows))throw Error('复式输入不合法');
- const type=COMPOUND_TYPES[game][1], [m,e]=type.split('+').map(Number),g=GAMES[game];
+ const type=COMPOUND_TYPES[game][2], [m,e]=type.split('+').map(Number),g=GAMES[game];
  const single=Array.isArray(primary.single)?primary.single:[...primary.main].slice(0,g.mainCount);
  if(single.length!==g.mainCount||!single.every(n=>primary.main.includes(n)))throw Error('旧复式没有包含对应单式，不能生成备选结构');
  const main=[...single];if(main.length<m)main.push(...primary.main.filter(n=>!main.includes(n)).slice(0,m-main.length));main.sort((a,b)=>a-b);
@@ -51,7 +51,14 @@ export function alternativeCompound(rows,game,primary){
 }
 export function selectCompound(rows,game,primary,type){
  if(!validTemplate(game,type))throw Error('当前彩种不支持此复式结构');
- const defaultType=COMPOUND_TYPES[game][0];
+ const original=primary.main.length+'+'+primary.extra.length;
+ if(type===original)return {...primary,type};
+ if(type===COMPOUND_TYPES[game][1]&&primary.singleExtra)return {...primary,...exactCoverage(game,primary.main.length,primary.singleExtra.length),extra:primary.singleExtra,type};
+ if(type===COMPOUND_TYPES[game][0]&&original!==type){
+  const extra=[...primary.extra,...chooseAdditional(rows,game,1,new Set(primary.extra)).map(f=>f.n)].sort((a,b)=>a-b);
+  return {...primary,...exactCoverage(game,primary.main.length,extra.length),extra,type};
+ }
+ const defaultType=original;
  if(type===defaultType)return {...primary,type:defaultType,origin:primary.origin||'研究员原始复式候选'};
  return alternativeCompound(rows,game,primary);
 }

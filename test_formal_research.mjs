@@ -8,12 +8,13 @@ import {stagedResearch, researcherPlan, makeTrial, processPolicy, modes} from '.
 
 const history=JSON.parse(fs.readFileSync(new URL('./history.json',import.meta.url)));
 for(const game of ['ssq','dlt']){
- test(game+' official tickets inherit the column pool in all three stages',()=>{
+ test(game+' official tickets follow the same ranked pool in all three stages',()=>{
   const rows=history[game].slice(0,300);
   for(const mode of modes){
    const plan=stagedResearch(rows,game,mode);
-   assert.ok(plan.stages[0].main.every(n=>plan.source.main.includes(n)));
-   assert.ok(plan.stages[0].extra.every(n=>plan.source.extra.includes(n)));
+   assert.equal(plan.source.main.length,23);assert.equal(plan.stages[0].main.length,15);
+   assert.equal(plan.compound.cost,game==='ssq'?112:126);
+   assert.ok(plan.gold.every(n=>plan.single.main.includes(n)));
    assert.deepEqual(plan.single.main,plan.compound.single);
    for(const part of ['main','extra']){
     assert.deepEqual(plan.single[part],plan.stages[2][part]);
@@ -24,7 +25,7 @@ for(const game of ['ssq','dlt']){
   }
  });
 }
-test('publish once, keep old pending tickets, and settle the published singles',()=>{
+test('revise pending tickets once, then settle the last public version',()=>{
  const root=fs.mkdtempSync(path.join(os.tmpdir(),'formal-picks-'));
  try{
   const start='2026-11-18';
@@ -46,13 +47,18 @@ test('publish once, keep old pending tickets, and settle the published singles',
    }
   }
   const old=first.records.find(r=>r.game==='dlt');
-  delete old.stagesByMode;old.policy='legacy';
+  delete old.stagesByMode;delete old.revisionKey;old.policy='legacy';
   fs.writeFileSync(log,JSON.stringify(first));
-  run(now,root);assert.deepEqual(JSON.parse(fs.readFileSync(log)).records,first.records);
+  run(now,root);
+  const revised=JSON.parse(fs.readFileSync(log)).records;
+  const updated=revised.find(r=>r.game==='dlt');
+  assert.equal(updated.policy,processPolicy);assert.equal(updated.revision,2);
+  assert.equal(revised.filter(r=>r.game==='dlt').length,1);
+  run(now,root);assert.deepEqual(JSON.parse(fs.readFileSync(log)).records,revised);
   input.ssq=history.ssq.filter(d=>d.date<='2026-11-19').slice(0,330);
   fs.writeFileSync(draws,JSON.stringify(input));run(new Date('2026-11-20T02:00:00Z'),root);
   const latest=JSON.parse(fs.readFileSync(log)).records;
-  assert.deepEqual(latest.find(r=>r.id===old.id),old);
+  assert.deepEqual(latest.find(r=>r.id===updated.id),updated);
   const settled=latest.find(r=>r.game==='ssq'&&r.targetDate==='2026-11-19');
   assert.equal(settled.status,'settled');
   for(const mode of modes)for(const part of ['main','extra'])

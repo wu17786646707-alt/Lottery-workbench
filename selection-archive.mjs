@@ -1,3 +1,6 @@
+import {replayStages} from './replay-stages.js';
+import {processPolicy} from './selection-engine.js';
+import {drawDeadline} from './issue-context.js';
 import fs from 'node:fs';
 import {pathToFileURL} from 'node:url';
 import {canLock,makeTrial,modes,roadStats,summary} from './selection-engine.js';
@@ -26,16 +29,25 @@ export function update(history,records,prior,now=new Date()){
     archiveTrajectory(data,game,rows,records,now);
     if(rows.length<330)continue;
     const current=rows[0];
+    data.stageReplay??={};
+    const fingerprint=JSON.stringify(rows.slice(0,330).map(r=>[r.issue,r.date,r.main,r.extra]));
+    const previousReplay=data.stageReplay[game];
+    if(previousReplay?.policy!==processPolicy||previousReplay?.fingerprint!==fingerprint)
+      data.stageReplay[game]={...replayStages(rows,game),fingerprint};
     for(const record of records.filter(r=>r.game===game)){
       const previous=data.locks.find(l=>l.game===game&&l.targetDate===record.targetDate);
-      if(previous||!canLock(record,now,current))continue;
+      if(record.revisionKey && record.status==='pending' && record.baseIssue===current.issue
+        && now.getTime()<drawDeadline(game,record.targetDate) && Date.parse(record.createdAt)<=now.getTime()){
+        if(previous?.revisionKey===record.revisionKey)continue;
+      }else if(previous||!canLock(record,now,current))continue;
       const training=rows.slice(0,300),stats=roadStats(training,game);
-      data.locks.push({game,targetDate:record.targetDate,baseIssue:current.issue,createdAt:now.toISOString(),
+      const next={game,targetDate:record.targetDate,baseIssue:current.issue,revisionKey:record.revisionKey,createdAt:record.revisionKey?record.createdAt:now.toISOString(),
         policy:record.stagesByMode ? record.policy : 'research-process-1',stats,byMode:Object.fromEntries(modes.map(mode=>{
           const trial=makeTrial(training,game,mode,stats);
           if(record.stagesByMode)trial.stages=record.stagesByMode[mode];
           return [mode,trial];
-        }))});
+        }))};
+      if(previous)data.locks[data.locks.indexOf(previous)]=next;else data.locks.push(next);
     }
     if(game==='ssq')updatePositionStudy(data,rows,records,now);
     if(data.replay[game]?.baseIssue===current.issue)continue;

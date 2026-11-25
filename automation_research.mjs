@@ -5,6 +5,7 @@
  * No prediction is invented for past draws. Historical backtests remain separate.
  */
 import fs from 'node:fs';
+import {drawDeadline} from './issue-context.js';
 import {modes, stagedResearch, processPolicy} from './selection-engine.js';
 import {hit, scoreLabel, compoundHit, historicPatterns} from './engine.js';
 import {pickV15,makeCompoundV15,MW_POLICY} from './multiwindow.js';
@@ -20,10 +21,11 @@ function cndate(at){const p=CN_DATE.formatToParts(at);const m=Object.fromEntries
 function weekday(day){return new Date(day+'T12:00:00Z').getUTCDay();}
 function dateAdd(day,n){return new Date(Date.parse(day+'T00:00:00Z')+n*864e5).toISOString().slice(0,10);}
 function nextScheduled(game,now){
- // A time lock is produced for a FUTURE draw, never for a draw that already happened.
- // Conservative 19:00 China cutoff; actual draw time is later, making it safe.
- const local=cndate(now),hour=Number(new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Shanghai',hour:'2-digit',hourCycle:'h23'}).format(now));
- for(let i=0;i<8;i++){const day=dateAdd(local,i);if(SCHEDULE[game].includes(weekday(day))&&(i>0||hour<19))return day;}
+ const local=cndate(now);
+ for(let i=0;i<8;i++){
+  const day=dateAdd(local,i);
+  if(SCHEDULE[game].includes(weekday(day))&&now.getTime()<drawDeadline(game,day))return day;
+ }
  return null;
 }
 function latestExpectedDraw(game,now){
@@ -100,8 +102,12 @@ export function run(now=new Date(),root='.'){
    diagnostics[game].readiness=`已知最新开奖${rows[0].date}，按常规日程上期应为${prior}；可能停开或数据未更新，本轮不自动锁定`;
    continue;
   }
-  if(records.some(x=>x.game===game&&x.targetDate===target)){
-   diagnostics[game].readiness='目标开奖日已存在锁定记录';continue;
+  const index=records.findIndex(r=>r.game===game&&r.targetDate===target);
+  const priorRecord=records[index];
+  if(priorRecord&&(priorRecord.status!=='pending'||Date.parse(priorRecord.createdAt)>now.getTime()))continue;
+  const revisionKey=hash(JSON.stringify([processPolicy,rows.slice(0,300).map(d=>[d.issue,d.date,d.main,d.extra])]));
+  if(priorRecord?.revisionKey===revisionKey){
+   diagnostics[game].readiness='已采用当前策略和最新历史';continue;
   }
   const plans=Object.fromEntries(modes.map(mode=>[mode,stagedResearch(rows,game,mode)]));
   const picks=MODES.map(mode=>{
@@ -112,10 +118,11 @@ export function run(now=new Date(),root='.'){
     const p=plans[mode].compound;
     return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:p.summ.text,shapePlan:briefShape(p.shapePlan),shapeActual:p.shapeActual,softKills:p.softKills};
   });
-  const rec={columnSource:plans.analyst.source,stagesByMode:Object.fromEntries(modes.map(m=>[m,plans[m].stages])),primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${processPolicy}`),game,targetDate:target,baseIssue:rows[0].issue,
+  const rec={revisionKey,revision:(priorRecord?.revision??(priorRecord?1:0))+1,columnSourceByMode:Object.fromEntries(modes.map(m=>[m,plans[m].source])),goldByMode:Object.fromEntries(modes.map(m=>[m,plans[m].gold])),stagesByMode:Object.fromEntries(modes.map(m=>[m,plans[m].stages])),primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${revisionKey}`),game,targetDate:target,baseIssue:rows[0].issue,
    createdAt:now.toISOString(),policy:processPolicy,window:Math.min(120,rows.length),
-   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'三阶段正式选号：先按研究员评分圈定初选池，再从池内选出单式并扩为预算复式。形态依据包括软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:processPolicy}};
-  records.push(rec);changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
+   origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'三阶段正式选号：先取23码，再按分区和奇偶缩至15码，定胆后取复式再取单式。形态依据包括软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:processPolicy}};
+  if(index<0)records.push(rec);else records[index]=rec;
+  changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';
  }
  // Only append true before-the-draw records, no retrospective insertion.
  existing.records=records.slice(-600);existing.summary=Object.fromEntries(Object.keys(GAMES).map(g=>[g,summary(existing.records,g)]));

@@ -152,27 +152,29 @@ function makeFilters(){
 function work(r){
  if(!r)return note('该彩种还没有公开选号记录。');
  const {game,mode}=state,actual=settled(r);
+ const columnSource=r.columnSourceByMode?.[mode]??r.columnSource;
  const official=r.stagesByMode;
  const lock=official ? {createdAt:r.createdAt,byMode:Object.fromEntries(Object.entries(official).map(([m,stages])=>[m,{stages}]))} : db.selection.locks.find(l=>l.game===game&&l.targetDate===r.targetDate);
  const legacy=r.picks?.find(p=>p.mode===mode),budget=r.compoundPicks?.find(p=>p.mode===mode);
  let s=hero(names[game]+' · '+r.targetDate,actual?'已开奖 · 第 '+actual.issue+' 期':'开奖前记录 · '+pendingLabel(r),'依据第 '+r.baseIssue+' 期及更早数据。'+(actual?'实心号码表示命中。':'开奖结算后显示每一步删去和保留的中奖号码。'));
+ if(r.revision&&!actual)s+=note('当前公开方案 · 第 '+r.revision+' 版 · '+esc(new Date(r.createdAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}))+' 更新。');
  if(actual)s+=card('本期开奖',balls(game,actual,null));
  if(lock){
-  const t=lock.byMode[mode],sizes=game==='ssq'?['15+5','8+1','6+1']:['13+5','7+2','5+2'];
-  if(r.columnSource){
+  const t=lock.byMode[mode],sizes=t.stages.map(p=>p.main.length+'+'+p.extra.length);
+  if(columnSource){
    if(actual){
-    const chain=[r.columnSource,...t.stages], labels=['专栏大底外','缩至初选池时删去','缩至预算复式时删去','缩至最终单式时删去'];
+    const chain=[columnSource,...t.stages], labels=['专栏大底外','缩至初选池时删去','缩至预算复式时删去','缩至最终单式时删去'];
     const diagnosis=['main','extra'].map((part,j)=>actual[part].map(n=>{
       const at=chain.findIndex(pool=>!pool[part].includes(n));
       return partNames[game][j]+' '+pad(n)+' · '+(at<0?'最终保留':labels[at]);
     }).join('；')).join('<br>');
     s+=card('开奖号码在哪一步留下或被删去','<p>'+diagnosis+'</p>');
    }
-   s+=stage(game,'专栏原始大底',r.columnSource,actual,'来源池',null);
+   s+=stage(game,r.goldByMode?'23码大底':'专栏原始大底',columnSource,actual,'来源池',null);
    s+=card('专栏如何影响本研究员选号','<p>'+esc(legacy.summary)+'</p>');
   }
-  s+=card(official?'研究员正式选号 · 三阶段':'历史号码池缩号试验 · 单独对照',(r.columnSource?'<p>按本期分区和研究员顺位逐层缩号。':'<p>按'+esc(researchers[mode])+'的逐球分排出初选池，同分按号码升序。在池内比较 360 组单式的形态与逐球分，保留得分最高的一组，再补两个主区号形成预算复式。下列三档按覆盖范围展示。')+'</p><small>北京时间 '+esc(new Date(lock.createdAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}))+' 锁定</small>')+
-    t.stages.map((p,i)=>stage(game,['初选池','预算内复式','最终单式'][i]+' · '+sizes[i],p,actual,['仅观察',game==='ssq'?'28 注 · 56 元':'21 注 · 42 元','1 注 · 2 元'][i],(i?t.stages[i-1]:r.columnSource))).join('');
+  s+=card(official?'研究员正式选号 · 三阶段':'当期缩水流程存档 · 与旧首页分别计分',(columnSource?'<p>按本期分区和研究员顺位逐层缩号。':'<p>按'+esc(researchers[mode])+'的逐球分排出初选池，同分按号码升序。在池内比较 360 组单式的形态与逐球分，保留得分最高的一组，再补两个主区号形成预算复式。下列三档按覆盖范围展示。')+'</p><small>北京时间 '+esc(new Date(lock.createdAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false}))+(r.revision?' 更新':' 留档')+'</small>')+
+    t.stages.map((p,i)=>stage(game,['初选池','预算内复式','最终单式'][i]+' · '+sizes[i],p,actual,['仅观察',budget?budget.bets+' 注 · '+budget.cost+' 元':(game==='ssq'?'28 注 · 56 元':'21 注 · 42 元'),'1 注 · 2 元'][i],(i?t.stages[i-1]:columnSource))).join('');
   const modes=Object.values(lock.byMode).filter(m=>m.stages?.length);
   if(modes.length>1){
    const shared=['main','extra'].map((key,i)=>{
@@ -181,11 +183,11 @@ function work(r){
    });
    s+=card('各研究员单式共同选择',shared.join('')+note('各方案共享历史输入，重合号码单独记一次。'));
   }
-  s+=r.columnSource?auditCards(game,[r.columnSource,...t.stages],actual,['专栏大底','初选池','预算内复式','最终单式']):auditCards(game,t.stages,actual,['初选池','预算内复式','最终单式']);
+  s+=columnSource?auditCards(game,[columnSource,...t.stages],actual,['专栏大底','初选池','预算内复式','最终单式']):auditCards(game,t.stages,actual,['初选池','预算内复式','最终单式']);
   if(game==='dlt')s+=heatCard(r,t.stages[1],actual);
  }else s+=note('这一期只保留了原策略的记录。以下展示当时实际保存的选号阶段。');
  if(legacy&&!official){
-   s+=card('原策略 · 单式扩到复式','<p>'+esc(legacy.shapePlan?.reason??legacy.summary??researchers[mode])+'</p>');
+   s+=card('当期旧首页实际公布的号码','<p>'+esc(legacy.shapePlan?.reason??legacy.summary??researchers[mode])+'</p>');
    s+=stage(game,'单式',legacy,actual,'1 注 · 2 元');
    if(budget)s+=stage(game,'扩号后的复式',budget,actual,budget.bets+' 注 · '+budget.cost+' 元',legacy);
    if(legacy.softKills)s+=card('当期软杀号',balls(game,legacy.softKills,actual)+(actual?note('染色号码是被降权后实际开出的号码。'):''));

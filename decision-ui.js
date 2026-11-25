@@ -1,4 +1,4 @@
-import {researcherPlan} from './selection-engine.js?v=18.18';
+import {researcherPlan} from './selection-engine.js?v=18.23';
 /** V18 next-draw decision screen: one explicit target, 30/120/300 fact evidence,
  * analyst-generated tickets, single-budget compound choice and no post hoc editing.
  */
@@ -16,8 +16,8 @@ function showStatus(message,isError=false){const node=$('v18Status');node.textCo
 function screen(){
  if(!$('v18Run'))return;
  const c=context(),g=c.game,t=stage(c);
- if(lastGame!==g){lastGame=g;$('v18Template').innerHTML=COMPOUND_TYPES[g].map((x,i)=>`<option value="${x}">${x}${i?'（后区覆盖型）':'（主区覆盖型）'}</option>`).join('');$('v18Budget').value=g==='ssq'?56:42;currentPlan=null;cached=null;cacheKey='';}
- $('v18Status').textContent=c.rows.length?`${fmtBase(t)} → 研究目标：${fmtTarget(t)}。${statusText(t)} 当前候选是本机即时计算，不等于 GitHub 提前锁定。`:'没有已收录的真实开奖，请先到“数据与备份”同步。';
+ if(lastGame!==g){lastGame=g;$('v18Template').innerHTML=COMPOUND_TYPES[g].slice(0,1).map((x,i)=>`<option value="${x}">${x}${i?'（后区覆盖型）':'（主区覆盖型）'}</option>`).join('');$('v18Budget').value=g==='ssq'?112:126;currentPlan=null;cached=null;cacheKey='';}
+ $('v18Status').textContent=c.rows.length?`${fmtBase(t)} → 研究目标：${fmtTarget(t)}。${statusText(t)} 研究员正式单式优先采用本期公开记录。`:'没有已收录的真实开奖，请先到“数据与备份”同步。';
  $('v18Run').disabled=!t.canRecommend||c.rows.length<30;
  if(currentPlan&&(currentPlan.game!==g||currentPlan.baseIssue!==c.rows[0]?.issue||currentPlan.lockId!==(t.record?.id||null)||!t.canRecommend)){
   currentPlan=null;$('v18Picks').innerHTML='<p class="sub">当前研究期次或彩种已经改变。旧号码已停止作为下一期候选显示；请先同步并重新生成。</p>';
