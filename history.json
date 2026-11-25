@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-25T03:04:11.599468+00:00",
+  "generatedAt": "2026-11-25T15:30:09.449864+00:00",
   "ssq": [
     {
       "issue": "2026135",
@@ -67147,6 +67147,25 @@
   ],
   "dlt": [
     {
+      "issue": "2026135",
+      "date": "2026-11-25",
+      "main": [
+        1,
+        8,
+        20,
+        24,
+        33
+      ],
+      "extra": [
+        3,
+        4
+      ],
+      "verification": "official-only",
+      "sources": [
+        "https://www.gstc.org.cn/wanfa/dlt"
+      ]
+    },
+    {
       "issue": "2026134",
       "date": "2026-11-23",
       "main": [
@@ -123251,7 +123270,8 @@
       "officialSupplementChecked": 30,
       "officialSupplementInserted": 0,
       "officialSupplementConflicts": 0,
-      "primaryOfficialError": "HTTP Error 403: Forbidden"
+      "primaryOfficialError": "HTTP Error 403: Forbidden",
+      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
     },
     "dlt": {
       "status": "尚无交叉核验；官方单源补入0期；其余单源",
@@ -123261,8 +123281,9 @@
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
       "officialError": "HTTP Error 567: Unknown Status",
-      "latestIssue": "2026134",
-      "rows": 2952
+      "latestIssue": "2026135",
+      "rows": 2953,
+      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
     }
   },
   "quarantine": []

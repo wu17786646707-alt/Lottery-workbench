@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-25T05:55:30.396Z",
+  "generatedAt": "2026-11-25T15:30:09.796Z",
   "games": {
     "ssq": {
       "latestIssue": "2026135",
@@ -9,7 +9,7 @@
       "sourceRows": 3532,
       "independentlyVerified": 34,
       "sourceVerification": "cross-checked",
-      "lastCheckAt": "2026-11-25T05:55:30.396Z",
+      "lastCheckAt": "2026-11-25T15:30:09.796Z",
       "firstObservedAt": "2026-11-24T15:30:11.387Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
@@ -19,18 +19,18 @@
       "mirrorError": ""
     },
     "dlt": {
-      "latestIssue": "2026134",
-      "latestDate": "2026-11-23",
-      "expectedBySchedule": "2026-11-23",
-      "sourceRows": 2952,
+      "latestIssue": "2026135",
+      "latestDate": "2026-11-25",
+      "expectedBySchedule": "2026-11-25",
+      "sourceRows": 2953,
       "independentlyVerified": 1,
-      "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-25T05:55:30.396Z",
-      "firstObservedAt": "2026-11-23T15:34:03.703Z",
+      "sourceVerification": "official-only",
+      "lastCheckAt": "2026-11-25T15:30:09.796Z",
+      "firstObservedAt": "2026-11-25T15:30:09.796Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
       "freshness": "最新开奖覆盖常规日程",
-      "settlement": "已核对11条，暂无逾期待核对记录",
+      "settlement": "已核对12条，暂无逾期待核对记录",
       "officialError": "HTTP Error 567: Unknown Status",
       "mirrorError": ""
     }
