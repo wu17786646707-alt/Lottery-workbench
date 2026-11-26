@@ -1,7 +1,27 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-26T10:51:10.651718+00:00",
+  "generatedAt": "2026-11-26T23:10:37.297225+00:00",
   "ssq": [
+    {
+      "issue": "2026136",
+      "date": "2026-11-26",
+      "main": [
+        9,
+        11,
+        22,
+        27,
+        30,
+        33
+      ],
+      "extra": [
+        5
+      ],
+      "verification": "cross-checked",
+      "sources": [
+        "yangxb919/lottery-data (来源声明500.com)",
+        "上海市福利彩票发行中心(www.swlc.net.cn)"
+      ]
+    },
     {
       "issue": "2026135",
       "date": "2026-11-24",
@@ -123264,8 +123284,8 @@
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
       "officialError": "",
-      "latestIssue": "2026135",
-      "rows": 3532,
+      "latestIssue": "2026136",
+      "rows": 3533,
       "officialSupplementSource": "上海市福利彩票发行中心(www.swlc.net.cn)",
       "officialSupplementChecked": 30,
       "officialSupplementInserted": 0,
