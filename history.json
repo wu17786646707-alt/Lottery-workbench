@@ -1,6 +1,6 @@
 {
   "schema": "lottery-static-v12",
-  "generatedAt": "2026-11-25T15:30:09.449864+00:00",
+  "generatedAt": "2026-11-26T00:34:54.529132+00:00",
   "ssq": [
     {
       "issue": "2026135",
@@ -67160,9 +67160,9 @@
         3,
         4
       ],
-      "verification": "official-only",
+      "verification": "single-source",
       "sources": [
-        "https://www.gstc.org.cn/wanfa/dlt"
+        "yangxb919/lottery-data (来源声明500.com)"
       ]
     },
     {
@@ -123257,21 +123257,15 @@
   ],
   "provenance": {
     "ssq": {
-      "status": "备用官方核验与镜像一致30期；官方单源补入0期；冲突0期",
+      "status": "尚无交叉核验；官方单源补入0期；其余单源",
       "officialRows": 0,
       "checked": 0,
       "conflicts": 0,
       "mirrorSource": "yangxb919/lottery-data",
       "mirrorError": "",
-      "officialError": "",
+      "officialError": "HTTP Error 403: Forbidden",
       "latestIssue": "2026135",
-      "rows": 3532,
-      "officialSupplementSource": "上海市福利彩票发行中心(www.swlc.net.cn)",
-      "officialSupplementChecked": 30,
-      "officialSupplementInserted": 0,
-      "officialSupplementConflicts": 0,
-      "primaryOfficialError": "HTTP Error 403: Forbidden",
-      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
+      "rows": 3532
     },
     "dlt": {
       "status": "尚无交叉核验；官方单源补入0期；其余单源",
@@ -123282,8 +123276,7 @@
       "mirrorError": "",
       "officialError": "HTTP Error 567: Unknown Status",
       "latestIssue": "2026135",
-      "rows": 2953,
-      "snapshotRecovery": "官方公告一次性核对快照；不等同于持续独立双源验证"
+      "rows": 2953
     }
   },
   "quarantine": []
