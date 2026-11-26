@@ -1,6 +1,6 @@
 {
   "schema": "lottery-health-v1",
-  "generatedAt": "2026-11-26T00:37:25.655Z",
+  "generatedAt": "2026-11-26T10:51:12.250Z",
   "games": {
     "ssq": {
       "latestIssue": "2026135",
@@ -9,13 +9,13 @@
       "sourceRows": 3532,
       "independentlyVerified": 34,
       "sourceVerification": "cross-checked",
-      "lastCheckAt": "2026-11-26T00:37:25.655Z",
+      "lastCheckAt": "2026-11-26T10:51:12.250Z",
       "firstObservedAt": "2026-11-24T15:30:11.387Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
       "freshness": "最新开奖覆盖常规日程",
       "settlement": "已核对10条，暂无逾期待核对记录",
-      "officialError": "HTTP Error 403: Forbidden",
+      "officialError": "",
       "mirrorError": ""
     },
     "dlt": {
@@ -25,7 +25,7 @@
       "sourceRows": 2953,
       "independentlyVerified": 1,
       "sourceVerification": "single-source",
-      "lastCheckAt": "2026-11-26T00:37:25.655Z",
+      "lastCheckAt": "2026-11-26T10:51:12.250Z",
       "firstObservedAt": "2026-11-25T15:30:09.796Z",
       "statusCode": "on-schedule",
       "delayDays": 0,
@@ -36,7 +36,6 @@
     }
   },
   "alerts": [
-    "双色球 官方独立核验失败：HTTP Error 403: Forbidden",
     "超级大乐透 官方独立核验失败：HTTP Error 567: Unknown Status"
   ],
   "note": "绿色任务仅说明代码执行成功。数据时效、独立核验和研究核对需要分别检查；常规开奖日可能遇到假期调整。"
