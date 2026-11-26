@@ -1,3 +1,5 @@
+import {jointPlan,JOINT} from './joint-rule.js';
+import {acceptedFactor} from './joint-config.js';
 import {integrated} from './unified-rule.js';
 import {legacyPlan,hits,modes,processPolicy} from './selection-engine.js';
 export function replayStages(rows,game){
@@ -17,7 +19,7 @@ export function replayStages(rows,game){
         direct:score(direct.stages[3]),old:[score({main:old.compound.main,extra}),score({main:old.single.main,extra:old.single.extra})],
         facts:p.ranked.map(f=>[f.n,f.frequencyRank,f.trendRank,+f.score.toFixed(3)]),shares:p.shares};
     }
-    return {issue:actual.issue,date:actual.date,main:actual.main,extra:actual.extra,base:training[0].issue,byMode,audit};
+    return {joint:jointPlan(training,game,{factor:acceptedFactor[game]}),issue:actual.issue,date:actual.date,main:actual.main,extra:actual.extra,base:training[0].issue,byMode,audit};
   });
-  return {game,policy:processPolicy,draws};
+  return {game,jointRule:JOINT,policy:processPolicy,draws};
 }

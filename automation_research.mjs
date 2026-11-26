@@ -5,6 +5,8 @@
  * No prediction is invented for past draws. Historical backtests remain separate.
  */
 import fs from 'node:fs';
+import {jointPlan,stageHits,JOINT} from './joint-rule.js';
+import {acceptedFactor} from './joint-config.js';
 import {drawDeadline} from './issue-context.js';
 import {modes, stagedResearch, processPolicy} from './selection-engine.js';
 import {hit, scoreLabel, compoundHit, historicPatterns} from './engine.js';
@@ -86,6 +88,7 @@ export function run(now=new Date(),root='.'){
    const draw=rows.find(d=>d.issue>rec.baseIssue&&d.date===rec.targetDate);
    if(draw){
     const outcome={};for(const p of rec.picks){outcome[p.mode]={main:hit(p.main,draw.main),extra:hit(p.extra,draw.extra)};}
+    if(rec.joint)rec.jointHits=stageHits(rec.joint,draw);
     rec.status='settled';rec.firstSettledAt=now.toISOString();rec.outcome=outcome;rec.actual={issue:draw.issue,date:draw.date,main:draw.main,extra:draw.extra,verification:draw.verification};
     // Append derived audit upon actual settlement; never mutate the pre-draw pick arrays.
     try{const idx=rows.findIndex(r=>r.issue===rec.baseIssue);if(idx>=0)rec.audit=settledAudit(rec,rows[idx],rows[idx+1]||null,draw);}catch(e){rec.auditError='audit unavailable: '+e.message;}
@@ -105,7 +108,7 @@ export function run(now=new Date(),root='.'){
   const index=records.findIndex(r=>r.game===game&&r.targetDate===target);
   const priorRecord=records[index];
   if(priorRecord&&(priorRecord.status!=='pending'||Date.parse(priorRecord.createdAt)>now.getTime()))continue;
-  const revisionKey=hash(JSON.stringify([processPolicy,rows.slice(0,300).map(d=>[d.issue,d.date,d.main,d.extra])]));
+  const revisionKey=hash(JSON.stringify([JOINT,acceptedFactor[game],processPolicy,rows.slice(0,300).map(d=>[d.issue,d.date,d.main,d.extra])]));
   if(priorRecord?.revisionKey===revisionKey){
    diagnostics[game].readiness='已采用当前策略和最新历史';continue;
   }
@@ -118,8 +121,8 @@ export function run(now=new Date(),root='.'){
     const p=plans[mode].compound;
     return {mode,main:p.main,extra:p.extra,bets:p.bets,cost:p.cost,snapshot:p.snapshot,pattern:p.pattern,explanations:p.explain,summary:p.summ.text,shapePlan:briefShape(p.shapePlan),shapeActual:p.shapeActual,softKills:p.softKills};
   });
-  const rec={revisionKey,revision:(priorRecord?.revision??(priorRecord?1:0))+1,columnSourceByMode:Object.fromEntries(modes.map(m=>[m,plans[m].source])),goldByMode:Object.fromEntries(modes.map(m=>[m,plans[m].gold])),stagesByMode:Object.fromEntries(modes.map(m=>[m,plans[m].stages])),primaryCompoundMode:'veteran',compoundDecision:'三位研究员均保存研究候选；默认仅展示B经验形态复式一组，不代表比其他号码有更高一等奖概率；不自动购买。',id:hash(`${game}|${target}|${rows[0].issue}|${revisionKey}`),game,targetDate:target,baseIssue:rows[0].issue,
-   createdAt:now.toISOString(),policy:processPolicy,window:Math.min(120,rows.length),
+  const rec={joint:jointPlan(rows,game,{factor:acceptedFactor[game]}),revisionKey,revision:(priorRecord?.revision??(priorRecord?1:0))+1,columnSourceByMode:Object.fromEntries(modes.map(m=>[m,plans[m].source])),goldByMode:Object.fromEntries(modes.map(m=>[m,plans[m].gold])),stagesByMode:Object.fromEntries(modes.map(m=>[m,plans[m].stages])),primaryCompoundMode:'veteran',compoundDecision:'联合观察票以 joint.stages 为准，A/B/C 独立票为历史比较基线。',id:hash(`${game}|${target}|${rows[0].issue}|${revisionKey}`),game,targetDate:target,baseIssue:rows[0].issue,
+   createdAt:now.toISOString(),policy:processPolicy,window:Math.min(30,rows.length),
    origin:"GitHub Actions public automation; not the user's private device records",status:'pending',picks,compoundPicks,featureSnapshot:{previousIssue:rows[0].issue,patternHistory:historicPatterns(rows,game,60),method:'三阶段正式选号：先取23码，再按分区和奇偶缩至15码，定胆后取复式再取单式。形态依据包括软杀号、龙头凤尾、三区比例、奇偶大小、和值跨度、重号连号斜连号，双区独立研究；不代表预测概率',policy:processPolicy}};
   if(index<0)records.push(rec);else records[index]=rec;
   changed=true;diagnostics[game].readiness='新建公开候选，待工作流提交到 GitHub';

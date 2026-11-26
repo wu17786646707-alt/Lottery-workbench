@@ -1,3 +1,4 @@
+import {jointCard} from './joint-view.js';
 import {stageAudit,heatTrial,author134} from './stage-audit.js';
 import {positionScore,aggregate} from './position-study.js';
 import {roadCounts,roadStats,summary} from './selection-engine.js';
@@ -144,13 +145,14 @@ function makeFilters(){
  const opts=Object.fromEntries(records.map(r=>[r.targetDate,r.targetDate+' · '+(settled(r)?.issue??pendingLabel(r))]));
  let s=select('game','彩种',names,state.game);
  if(state.view!=='compare')s+=select('date','目标开奖日',opts,state.date);
- if(state.view!=='roads')s+=select('mode','研究员',researchers,state.mode);
+ if(state.view!=='roads'&&!(state.view==='work'&&records.find(r=>r.targetDate===state.date)?.joint))s+=select('mode','研究员',researchers,state.mode);
  if(state.view==='compare')s+=select('sample','证据类型',{replay:'最近 30 期历史回放',public:'开奖前公开锁定'},state.sample);
  $('filters').innerHTML='<div class="filters">'+s+'</div>';
  return records.find(r=>r.targetDate===state.date);
 }
 function work(r){
  if(!r)return note('该彩种还没有公开选号记录。');
+ if(r.joint)return jointCard(r);
  const {game,mode}=state,actual=settled(r);
  const columnSource=r.columnSourceByMode?.[mode]??r.columnSource;
  const official=r.stagesByMode;

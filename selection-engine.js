@@ -59,7 +59,7 @@ function rankedPoolPlan(rows,game,mode){
 export const processPolicy=RULE;
 export const legacyPlan=rankedPoolPlan;
 export function stagedResearch(history,game,mode){
-  const rows=history.slice(0,300),cfg=GAMES[game];
+  const rows=history,cfg=GAMES[game];
   const plan=integrated(rows,game,mode);
   const [source,mid,budget,final]=plan.stages;
   const excluded=(max,allowed)=>Array.from({length:max},(_,i)=>i+1).filter(n=>!allowed.includes(n));
@@ -73,8 +73,8 @@ export function stagedResearch(history,game,mode){
     p.snapshot.policy=RULE;p.summ.text=summary;
     p.explain=['main','extra'].flatMap(k=>p[k].map(n=>{
       const f=(k==='main'?plan.ranked:plan.rear).find(x=>x.n===n);
-      return {kind:k,number:n,observed:f.long,expected:Math.min(rows.length,120)*cfg[k+'Count']/cfg[k+'Max'],miss:f.miss,score:f.score,
-        reason:'近10期 '+f.ten+' 次，近30期 '+f.thirty+' 次，近120期 '+f.long+' 次。频次顺位 '+f.frequencyRank+'，趋势顺位 '+f.trendRank+'，综合分 '+f.score.toFixed(3)+'。'};
+      return {kind:k,number:n,observed:f.thirty,expected:Math.min(rows.length,30)*cfg[k+'Count']/cfg[k+'Max'],miss:f.miss,score:f.score,
+        reason:'近10期 '+f.ten+' 次，近30期 '+f.thirty+' 次；连续遗漏 '+(f.miss===rows.length?'至少':'')+f.miss+' 期。频次顺位 '+f.frequencyRank+'，趋势顺位 '+f.trendRank+'，综合分 '+f.score.toFixed(3)+'。'};
     }));
   }
   return {source,stages:[mid,budget,final],gold:plan.gold,single,compound};

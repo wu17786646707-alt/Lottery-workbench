@@ -6,6 +6,8 @@ import path from 'node:path';
 import {run} from './automation_research.mjs';
 import {stagedResearch, researcherPlan, makeTrial, processPolicy, modes} from './selection-engine.js';
 
+import {jointText,jointCard} from './joint-view.js';
+import {stageHits} from './joint-rule.js';
 const history=JSON.parse(fs.readFileSync(new URL('./history.json',import.meta.url)));
 for(const game of ['ssq','dlt']){
  test(game+' official tickets follow the same ranked pool in all three stages',()=>{
@@ -38,6 +40,13 @@ test('revise pending tickets once, then settle the last public version',()=>{
   const first=JSON.parse(fs.readFileSync(log));
   assert.equal(first.records.length,2);
   for(const r of first.records){
+   assert.ok(jointCard(r).includes(jointText(r)));
+   for(const [i,t] of r.joint.stages.entries()){
+    assert.equal(t.main.length,[23,15,r.game==='ssq'?8:7,r.game==='ssq'?6:5][i]);
+    assert.equal(t.extra.length,[6,4,r.game==='ssq'?2:3,r.game==='ssq'?1:2][i]);
+    if(i)for(const k of ['main','extra'])assert.ok(t[k].every(n=>r.joint.stages[i-1][k].includes(n)));
+   }
+   assert.ok(r.joint.gold.every(n=>r.joint.stages[3].main.includes(n)));
    assert.equal(r.policy,processPolicy);
    for(const mode of modes){
     const plan=researcherPlan(input[r.game],r.game,mode,r);
@@ -61,6 +70,8 @@ test('revise pending tickets once, then settle the last public version',()=>{
   assert.deepEqual(latest.find(r=>r.id===updated.id),updated);
   const settled=latest.find(r=>r.game==='ssq'&&r.targetDate==='2026-11-19');
   assert.equal(settled.status,'settled');
+  assert.deepEqual(settled.joint,first.records.find(r=>r.id===settled.id).joint);
+  assert.deepEqual(settled.jointHits,stageHits(settled.joint,settled.actual));
   for(const mode of modes)for(const part of ['main','extra'])
    assert.equal(settled.outcome[mode][part],settled.stagesByMode[mode][2][part].filter(n=>settled.actual[part].includes(n)).length);
  }finally{fs.rmSync(root,{recursive:true,force:true});}

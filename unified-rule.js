@@ -1,15 +1,15 @@
 // Parameters are fixed for this release before comparison with prior draws.
-export const RULE='research-v18.23-integrated';
+export const RULE='research-v18.28-short';
 const params={analyst:[.55,.45,.65],veteran:[.5,.5,.95],trend:[.35,.65,.65]};
 const asc=(a,b)=>a-b;
 const nums=items=>items.map(f=>f.n).sort(asc);
-function rankFacts(rows,max,part,weights){
+export function rankFacts(rows,max,part,weights){
   const count=(sample,n)=>sample.reduce((s,d)=>s+Number(d[part].includes(n)),0);
   const facts=Array.from({length:max},(_,i)=>{
     const n=i+1, ten=count(rows.slice(0,10),n),lastTen=count(rows.slice(10,20),n);
-    const thirty=count(rows.slice(0,30),n),long=count(rows.slice(0,120),n);
+    const thirty=count(rows.slice(0,30),n);
     const miss=rows.findIndex(d=>d[part].includes(n));
-    return {n,ten,thirty,long,miss:miss<0?rows.length:miss,change:ten-lastTen,freq:thirty+30*long/Math.min(120,rows.length)};
+    return {n,ten,thirty,miss:miss<0?rows.length:miss,change:ten-lastTen,freq:thirty};
   });
   for(const f of facts){
     // Ties receive the same rank; numeric order only breaks the final tie.
@@ -19,7 +19,7 @@ function rankFacts(rows,max,part,weights){
   }
   return facts.sort((a,b)=>b.score-a.score||a.n-b.n);
 }
-function shaped(pool,size,gold,shape,weight){
+export function shaped(pool,size,gold,shape,weight){
   const chosen=pool.filter(f=>gold.includes(f.n)),left=pool.filter(f=>!gold.includes(f.n));
   while(chosen.length<size){
     const step=chosen.length+1,zoneCounts=[0,0,0],odd=chosen.filter(f=>f.n%2).length;

@@ -1,3 +1,4 @@
+import {JOINT} from './joint-rule.js';
 import {replayStages} from './replay-stages.js';
 import {processPolicy} from './selection-engine.js';
 import {drawDeadline} from './issue-context.js';
@@ -32,7 +33,7 @@ export function update(history,records,prior,now=new Date()){
     data.stageReplay??={};
     const fingerprint=JSON.stringify(rows.slice(0,330).map(r=>[r.issue,r.date,r.main,r.extra]));
     const previousReplay=data.stageReplay[game];
-    if(previousReplay?.policy!==processPolicy||previousReplay?.fingerprint!==fingerprint)
+    if(previousReplay?.jointRule!==JOINT||previousReplay?.policy!==processPolicy||previousReplay?.fingerprint!==fingerprint)
       data.stageReplay[game]={...replayStages(rows,game),fingerprint};
     for(const record of records.filter(r=>r.game===game)){
       const previous=data.locks.find(l=>l.game===game&&l.targetDate===record.targetDate);

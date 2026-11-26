@@ -1,4 +1,4 @@
-import {researcherPlan} from './selection-engine.js?v=18.23';
+import {researcherPlan} from './selection-engine.js?v=18.28';
 /** V17 shape-first, one-compound-at-a-time research view. */
 import {pickV15,makeCompoundV15,MODE_LABELS} from './multiwindow.js?v=18.0';
 import {shapePlan,softKill,exclusionRisk,featuresOf,extraShape,SHAPE_POLICY} from './shape-engine.js?v=18.0';

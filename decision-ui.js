@@ -1,4 +1,4 @@
-import {researcherPlan} from './selection-engine.js?v=18.23';
+import {researcherPlan} from './selection-engine.js?v=18.28';
 /** V18 next-draw decision screen: one explicit target, 30/120/300 fact evidence,
  * analyst-generated tickets, single-budget compound choice and no post hoc editing.
  */
